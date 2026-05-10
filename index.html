@@ -189,7 +189,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDomain:"rise-81dab.firebaseapp.com",projectId:"rise-81dab",storageBucket:"rise-81dab.firebasestorage.app",messagingSenderId:"1059201705038",appId:"1:1059201705038:web:810d08d1e34b37dd51cf1f"};
 const CURRENT_YEAR=1;
 const PERIODS={1:"2025.12~2026.02",2:"2026.03~2027.02",3:"2027.03~2028.02",4:"2028.03~2029.02",5:"2029.03~2030.02"};
-const PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
+const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
+let PLAN_CATS_BY_YEAR={}; // {1:[...], 2:[...], ...}
 const TAG_COLORS={"인건비":"tag-blue","수용비":"tag-green","용역비":"tag-teal","시설장비비":"tag-yellow","연구활동비":"tag-pink","학생지원비":"tag-blue","행사운영비":"tag-yellow","여비":"tag-green","기타":"tag-teal"};
 const won=v=>!v?'—':v>=100000000?(v/100000000).toFixed(1).replace(/\.0$/,'')+'억':v>=10000?Math.floor(v/10000).toLocaleString('ko-KR')+'만':v.toLocaleString('ko-KR');
 const wonFull=v=>v?v.toLocaleString('ko-KR')+'원':'—';
@@ -198,13 +199,25 @@ const d=new Date();
 document.getElementById('today-pill').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
-let budgetPlans={},allExpenses=[],plansLoaded=false,expLoaded=false;
-db.collection('budgetPlans').onSnapshot(snap=>{budgetPlans={};snap.forEach(doc=>{budgetPlans[parseInt(doc.id)]=doc.data()});plansLoaded=true;if(expLoaded)renderAll();},err=>{budgetPlans=SP;plansLoaded=true;if(expLoaded)renderAll()});
+let budgetPlans={},allExpenses=[],plansLoaded=false,expLoaded=false,catsLoaded=false;
+// categories 로드 (5개 차년도)
+Promise.all([1,2,3,4,5].map(y=>
+  db.collection('categories').doc(String(y)).get()
+    .then(doc=>({y,data:doc.exists?doc.data():{}}))
+    .catch(()=>({y,data:{}}))
+)).then(results=>{
+  results.forEach(({y,data})=>{
+    PLAN_CATS_BY_YEAR[y]=data.planCats&&data.planCats.length>0?data.planCats:[...DEFAULT_PLAN_CATS];
+  });
+  catsLoaded=true;
+  if(plansLoaded&&expLoaded)renderAll();
+});
+db.collection('budgetPlans').onSnapshot(snap=>{budgetPlans={};snap.forEach(doc=>{budgetPlans[parseInt(doc.id)]=doc.data()});plansLoaded=true;if(expLoaded&&catsLoaded)renderAll();},err=>{plansLoaded=true;if(expLoaded&&catsLoaded)renderAll()});
 db.collection('expenses').onSnapshot(snap=>{
   const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
   docs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  allExpenses=docs;expLoaded=true;if(plansLoaded)renderAll();
-},err=>{allExpenses=SE;expLoaded=true;if(plansLoaded)renderAll()});
+  allExpenses=docs;expLoaded=true;if(plansLoaded&&catsLoaded)renderAll();
+},err=>{allExpenses=[];expLoaded=true;if(plansLoaded&&catsLoaded)renderAll()});
 function renderAll(){
   const yt={};for(let y=1;y<=5;y++){const p=budgetPlans[y]||{};yt[y]=Object.values(p).reduce((a,b)=>a+(Number(b)||0),0)}
   const gt=Object.values(yt).reduce((a,b)=>a+b,0);
@@ -216,15 +229,18 @@ function renderAll(){
   document.getElementById('s-total-rate').textContent='전체 대비 '+pct(ts,gt)+'%';
   const tbody=document.getElementById('bp-tbody');let html='';
 
-  // 구분별 × 차년도별 집행액 집계
+  // 구분별 × 차년도별 집행액 집계 (차년도별 항목 기준)
+  const allPlanCats=[...new Set(Object.values(PLAN_CATS_BY_YEAR).flat())]; // 전체 구분 합집합
   const spentByPlanYear={};
-  PLAN_CATS.forEach(c=>{spentByPlanYear[c]={};for(let y=1;y<=5;y++)spentByPlanYear[c][y]=0});
+  allPlanCats.forEach(c=>{spentByPlanYear[c]={};for(let y=1;y<=5;y++)spentByPlanYear[c][y]=0});
   allExpenses.forEach(e=>{
     const pc=e.planCategory,y=parseInt(e.year);
     if(pc&&spentByPlanYear[pc]&&y>=1&&y<=5) spentByPlanYear[pc][y]+=(e.amount||0);
   });
-  // 구분별 전체 집행액(차년도 합산)
-  const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=Object.values(spentByPlanYear[c]).reduce((a,b)=>a+b,0));
+  const spentByPlan={};allPlanCats.forEach(c=>spentByPlan[c]=Object.values(spentByPlanYear[c]).reduce((a,b)=>a+b,0));
+
+  // 차년도별로 해당 차년도 항목만 행으로 표시 (전체 구분 합집합 기준)
+  const PLAN_CATS=allPlanCats.length>0?allPlanCats:DEFAULT_PLAN_CATS;
 
   const rateCell=(budget,spent)=>{
     if(!budget) return `<td style="color:var(--text4);font-size:11px">—</td>`;
@@ -237,15 +253,24 @@ function renderAll(){
     html+=`<tr><td style="font-weight:500;color:var(--text)">${cat}</td>`;
     let totalBudget=0,totalSpent=0;
     for(let y=1;y<=5;y++){
-      const b=(budgetPlans[y]||{})[cat]||0;
-      const s=spentByPlanYear[cat][y]||0;
-      totalBudget+=b; totalSpent+=s;
+      const yCats=PLAN_CATS_BY_YEAR[y]||DEFAULT_PLAN_CATS;
+      const hasThisYear=yCats.includes(cat); // 이 차년도에 해당 항목이 있는지
+      const b=hasThisYear?(budgetPlans[y]||{})[cat]||0:null;
+      const s=spentByPlanYear[cat]?spentByPlanYear[cat][y]||0:0;
+      if(b!==null){totalBudget+=b;totalSpent+=s;}
       const isCur=y===CURRENT_YEAR;
-      const borderL=`border-left:1px solid var(--border);`;
-      html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}font-family:var(--mono);font-size:12px">${b?won(b):'<span style="color:var(--text4);font-size:11px">미입력</span>'}</td>`;
-      html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--green);font-family:var(--mono);font-size:12px;font-weight:600">${s?won(s):'—'}</td>`;
-      if(!b) html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
-      else { const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)'; html+=`<td style="${isCur?'background:var(--blue-50);':''}color:${col};font-weight:700;font-family:var(--mono);font-size:12px">${r}%</td>`; }
+      const borderL='border-left:1px solid var(--border);';
+      if(!hasThisYear){
+        // 이 차년도에 없는 항목은 회색으로 표시
+        html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">해당없음</td>`;
+        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
+        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
+      } else {
+        html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}font-family:var(--mono);font-size:12px">${b?won(b):'<span style="color:var(--text4);font-size:11px">미입력</span>'}</td>`;
+        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--green);font-family:var(--mono);font-size:12px;font-weight:600">${s?won(s):'—'}</td>`;
+        if(!b) html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
+        else { const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)'; html+=`<td style="${isCur?'background:var(--blue-50);':''}color:${col};font-weight:700;font-family:var(--mono);font-size:12px">${r}%</td>`; }
+      }
     }
     // 전체 합계
     const tr=pct(totalSpent,totalBudget),tcol=tr>=100?'var(--red)':tr>=80?'var(--yellow)':'var(--green)';

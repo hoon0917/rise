@@ -98,7 +98,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .bp-total-row td{background:var(--blue-50)!important;border-top:2px solid var(--blue-100)!important;font-weight:700;font-family:var(--mono);font-size:13px;padding:12px 16px}
 .bp-total-row td:first-child{color:var(--blue-600)}
 
-/* SECTION HEAD */
+/* 항목 관리 */
+.cat-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px}
+.cat-item-name{flex:1;font-size:13px;color:var(--text)}
+.cat-item-drag{color:var(--text4);cursor:grab;font-size:16px;user-select:none}
+.cat-item-del{background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:4px;font-size:11px;padding:3px 8px;cursor:pointer;transition:background .15s;font-family:var(--mono)}
+.cat-item-del:hover{background:#fee2e2}
 .sh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .sh-label{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;font-weight:600}
 .sh-line{flex:1;height:1px;background:var(--border)}
@@ -175,6 +180,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="page-wrap">
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchTab('budget',this)">예산 배정</button>
+      <button class="tab-btn" onclick="switchTab('cats',this)">항목 관리</button>
       <button class="tab-btn" onclick="switchTab('input',this)">집행 내역 입력</button>
       <button class="tab-btn" onclick="switchTab('manage',this)">내역 조회 · 수정</button>
     </div>
@@ -245,13 +251,65 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
 
+    <!-- 탭2: 항목 관리 -->
+    <div id="tab-cats" style="display:none">
+      <div class="form-card" style="margin-bottom:16px">
+        <div class="form-card-title"><span class="dot-indicator"></span>차년도별 항목 관리</div>
+        <p class="info-text">
+          차년도를 선택하고 사업계획서 구분 항목과 집행 과목 항목을 각각 관리하세요.<br>
+          저장하면 예산 배정 탭과 집행 내역 입력 시 해당 차년도의 항목으로 자동 반영됩니다.
+        </p>
+        <div class="year-selector">
+          <button class="yr-btn active" onclick="selectCatYear(1,this)">1차년도</button>
+          <button class="yr-btn" onclick="selectCatYear(2,this)">2차년도</button>
+          <button class="yr-btn" onclick="selectCatYear(3,this)">3차년도</button>
+          <button class="yr-btn" onclick="selectCatYear(4,this)">4차년도</button>
+          <button class="yr-btn" onclick="selectCatYear(5,this)">5차년도</button>
+        </div>
+        <div class="year-info-bar">
+          <strong id="cat-year-title">1차년도 항목 관리</strong>
+          <span class="saved-badge" id="cat-saved">저장됨</span>
+          <span class="unsaved-badge" id="cat-unsaved">미저장</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- 사업계획서 구분 -->
+        <div class="form-card">
+          <div class="form-card-title" style="font-size:14px"><span class="dot-indicator"></span>사업계획서 구분 항목</div>
+          <div id="plan-cat-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="f-input" id="new-plan-cat" placeholder="새 구분 항목 입력" style="flex:1">
+            <button class="btn-primary" style="white-space:nowrap;padding:10px 16px" onclick="addPlanCat()">+ 추가</button>
+          </div>
+        </div>
+
+        <!-- 집행 과목 -->
+        <div class="form-card">
+          <div class="form-card-title" style="font-size:14px"><span class="dot-indicator"></span>집행 과목 항목</div>
+          <div id="exp-cat-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="f-input" id="new-exp-cat" placeholder="새 과목 항목 입력" style="flex:1">
+            <button class="btn-primary" style="white-space:nowrap;padding:10px 16px" onclick="addExpCat()">+ 추가</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-actions" style="margin-top:16px">
+        <button class="btn-secondary" onclick="loadCats(activeCatYear)">되돌리기</button>
+        <button class="btn-primary" onclick="saveCats()">이 차년도 항목 저장</button>
+      </div>
+    </div>
+
     <!-- 탭3: 집행 내역 입력 -->
     <div id="tab-input" style="display:none">
       <div class="form-card">
         <div class="form-card-title"><span class="dot-indicator"></span>집행 내역 신규 등록</div>
         <div class="grid-2">
           <div><label class="f-label">차년도</label>
-            <select class="f-select" id="f-year"><option value="1">1차년도</option><option value="2">2차년도</option><option value="3">3차년도</option><option value="4">4차년도</option><option value="5">5차년도</option></select></div>
+            <select class="f-select" id="f-year" onchange="loadCatsForInput(parseInt(this.value))"><option value="1">1차년도</option><option value="2">2차년도</option><option value="3">3차년도</option><option value="4">4차년도</option><option value="5">5차년도</option></select></div>
           <div><label class="f-label">집행일</label><input type="date" class="f-input" id="f-date"></div>
         </div>
         <div class="grid-2" style="margin-top:14px">
@@ -367,6 +425,8 @@ function showAdmin(){
   if(y)document.getElementById('f-year').value=y;
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   loadBudget();
+  loadCats(activeCatYear);
+  loadCatsForInput(1);
   loadManageData();
 }
 function logout(){sessionStorage.removeItem('rise_admin');location.reload()}
@@ -374,7 +434,7 @@ function logout(){sessionStorage.removeItem('rise_admin');location.reload()}
 /* 탭 전환 */
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  ['tab-budget','tab-input','tab-manage'].forEach(id=>{document.getElementById(id).style.display=id==='tab-'+tab?'block':'none'});
+  ['tab-budget','tab-cats','tab-input','tab-manage'].forEach(id=>{document.getElementById(id).style.display=id==='tab-'+tab?'block':'none'});
 }
 
 /* 토스트 */
@@ -473,6 +533,137 @@ async function saveBudgetPlan(){
   btn.disabled=false; btn.textContent='저장';
 }
 
+/* ══════════════════════════════════════
+   탭2: 항목 관리
+══════════════════════════════════════ */
+// 기본 항목 (Firebase에 저장된 항목이 없을 때 초기값)
+const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
+const DEFAULT_EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
+
+let activeCatYear=1;
+let currentPlanCats=[...DEFAULT_PLAN_CATS];
+let currentExpCats=[...DEFAULT_EXP_CATS];
+
+function selectCatYear(y,btn){
+  activeCatYear=y;
+  document.querySelectorAll('#tab-cats .year-selector .yr-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cat-year-title').textContent=y+'차년도 항목 관리';
+  loadCats(y);
+}
+
+function loadCats(y){
+  db.collection('categories').doc(String(y)).get().then(doc=>{
+    const data=doc.exists?doc.data():{};
+    currentPlanCats=data.planCats&&data.planCats.length>0?[...data.planCats]:[...DEFAULT_PLAN_CATS];
+    currentExpCats=data.expCats&&data.expCats.length>0?[...data.expCats]:[...DEFAULT_EXP_CATS];
+    renderCatLists();
+    const ok=doc.exists&&(data.planCats||data.expCats);
+    document.getElementById('cat-saved').style.display=ok?'inline':'none';
+    document.getElementById('cat-unsaved').style.display=ok?'none':'inline';
+  }).catch(()=>{
+    currentPlanCats=[...DEFAULT_PLAN_CATS];
+    currentExpCats=[...DEFAULT_EXP_CATS];
+    renderCatLists();
+    document.getElementById('cat-saved').style.display='none';
+    document.getElementById('cat-unsaved').style.display='inline';
+  });
+}
+
+function renderCatLists(){
+  // 사업계획서 구분 목록
+  document.getElementById('plan-cat-list').innerHTML=currentPlanCats.map((cat,i)=>`
+    <div class="cat-item">
+      <span class="cat-item-drag">☰</span>
+      <span class="cat-item-name">${cat}</span>
+      <button class="cat-item-del" onclick="deletePlanCat(${i})">삭제</button>
+    </div>`).join('');
+  // 집행 과목 목록
+  document.getElementById('exp-cat-list').innerHTML=currentExpCats.map((cat,i)=>`
+    <div class="cat-item">
+      <span class="cat-item-drag">☰</span>
+      <span class="cat-item-name">${cat}</span>
+      <button class="cat-item-del" onclick="deleteExpCat(${i})">삭제</button>
+    </div>`).join('');
+}
+
+function addPlanCat(){
+  const inp=document.getElementById('new-plan-cat');
+  const val=inp.value.trim();
+  if(!val){toast('항목명을 입력하세요.',true);return}
+  if(currentPlanCats.includes(val)){toast('이미 존재하는 항목입니다.',true);return}
+  currentPlanCats.push(val);
+  inp.value='';
+  renderCatLists();
+}
+
+function addExpCat(){
+  const inp=document.getElementById('new-exp-cat');
+  const val=inp.value.trim();
+  if(!val){toast('항목명을 입력하세요.',true);return}
+  if(currentExpCats.includes(val)){toast('이미 존재하는 항목입니다.',true);return}
+  currentExpCats.push(val);
+  inp.value='';
+  renderCatLists();
+}
+
+function deletePlanCat(i){
+  if(!confirm(`"${currentPlanCats[i]}" 항목을 삭제하시겠습니까?`))return;
+  currentPlanCats.splice(i,1);
+  renderCatLists();
+}
+
+function deleteExpCat(i){
+  if(!confirm(`"${currentExpCats[i]}" 항목을 삭제하시겠습니까?`))return;
+  currentExpCats.splice(i,1);
+  renderCatLists();
+}
+
+async function saveCats(){
+  const y=activeCatYear;
+  try{
+    await db.collection('categories').doc(String(y)).set({
+      planCats:[...currentPlanCats],
+      expCats:[...currentExpCats],
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('cat-saved').style.display='inline';
+    document.getElementById('cat-unsaved').style.display='none';
+    toast(`✓ ${y}차년도 항목이 저장되었습니다`);
+    // 집행 내역 입력 탭 선택 옵션도 갱신
+    updateInputSelects(y);
+  }catch(e){toast('저장 실패: '+e.message,true)}
+}
+
+// 집행 내역 입력 탭의 드롭다운을 현재 차년도 항목으로 갱신
+function updateInputSelects(y){
+  if(parseInt(document.getElementById('f-year').value)===y){
+    loadCatsForInput(y);
+  }
+}
+
+// 집행 내역 입력 탭 — 차년도 변경 시 해당 차년도 항목 로드
+function loadCatsForInput(y){
+  db.collection('categories').doc(String(y)).get().then(doc=>{
+    const data=doc.exists?doc.data():{};
+    const planCats=data.planCats&&data.planCats.length>0?data.planCats:DEFAULT_PLAN_CATS;
+    const expCats=data.expCats&&data.expCats.length>0?data.expCats:DEFAULT_EXP_CATS;
+    // 사업계획서 구분 드롭다운 갱신
+    const planSel=document.getElementById('f-plancat');
+    const planVal=planSel.value;
+    planSel.innerHTML='<option value="">구분 선택</option>'+planCats.map(c=>`<option${c===planVal?' selected':''}>${c}</option>`).join('');
+    // 집행 과목 드롭다운 갱신
+    const expSel=document.getElementById('f-category');
+    const expVal=expSel.value;
+    expSel.innerHTML='<option value="">과목 선택</option>'+expCats.map(c=>`<option${c===expVal?' selected':''}>${c}</option>`).join('');
+    // 수정 모달도 갱신
+    const mPlanSel=document.getElementById('m-plancat');
+    if(mPlanSel) mPlanSel.innerHTML='<option value="">구분 선택</option>'+planCats.map(c=>`<option>${c}</option>`).join('');
+    const mCatSel=document.getElementById('m-category');
+    if(mCatSel) mCatSel.innerHTML=expCats.map(c=>`<option>${c}</option>`).join('');
+  }).catch(()=>{});
+}
+
 /* ── 탭2: 집행 내역 입력 ── */
 async function submitExpense(){
   const year=parseInt(document.getElementById('f-year').value),date=document.getElementById('f-date').value,plancat=document.getElementById('f-plancat').value,cat=document.getElementById('f-category').value,title=document.getElementById('f-title').value.trim(),amount=parseInt(document.getElementById('f-amount').value)||0,note=document.getElementById('f-note').value.trim();
@@ -487,11 +678,7 @@ function resetExpForm(){['f-plancat','f-category','f-title','f-amount','f-note']
 /* ── 탭4: 조회·수정 ── */
 let allData=[],manageFilter=0;
 function loadManageData(){
-  db.collection('expenses').onSnapshot(snap=>{
-    const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
-    docs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-    allData=docs;renderManage();
-  },err=>{allData=[];renderManage()});
+  db.collection('expenses').orderBy('date','desc').onSnapshot(snap=>{allData=snap.docs.map(d=>({id:d.id,...d.data()}));renderManage();},err=>{allData=[];renderManage()});
   document.querySelectorAll('.mf-btn').forEach(btn=>{btn.addEventListener('click',()=>{manageFilter=parseInt(btn.dataset.y);document.querySelectorAll('.mf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderManage()})});
 }
 function renderManage(){

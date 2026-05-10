@@ -229,7 +229,9 @@ const FIREBASE_CONFIG={apiKey: "AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",
     messagingSenderId: "1059201705038",
     appId: "1:1059201705038:web:810d08d1e34b37dd51cf1f"
   };
-const EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
+const DEFAULT_EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
+const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
+let EXP_CATS=[...DEFAULT_EXP_CATS];
 const TAG_COLORS={"인건비":"tag-blue","수용비":"tag-green","용역비":"tag-teal","시설장비비":"tag-yellow","연구활동비":"tag-pink","학생지원비":"tag-blue","행사운영비":"tag-yellow","여비":"tag-green","기타":"tag-teal"};
 const PERIODS={1:"2024.03 ~ 2025.02",2:"2025.03 ~ 2026.02",3:"2026.03 ~ 2027.02",4:"2027.03 ~ 2028.02",5:"2028.03 ~ 2029.02"};
 const PAGE_SIZE=15;
@@ -255,14 +257,20 @@ let allData=[],catBudgets={},planBudgetTotal=0,filtered=[],curPage=1,activeCat='
 Promise.all([
   db.collection('expBudgets').doc(String(Y)).get()
     .then(doc=>doc.exists?doc.data():{})
-    .catch(()=>SB[Y]||{}),
+    .catch(()=>{}),
   db.collection('budgetPlans').doc(String(Y)).get()
     .then(doc=>doc.exists?doc.data():{})
-    .catch(()=>SP[Y]||{}),
-]).then(([expData, planData])=>{
+    .catch(()=>{}),
+  db.collection('categories').doc(String(Y)).get()
+    .then(doc=>doc.exists?doc.data():{})
+    .catch(()=>{}),
+]).then(([expData, planData, catData])=>{
   catBudgets=expData;
   planBudgetTotal=Object.values(planData).reduce((a,b)=>a+(Number(b)||0),0);
   window._planBudgetData=planData;
+  // 차년도별 항목 적용 (없으면 기본값 사용)
+  if(catData.expCats&&catData.expCats.length>0) EXP_CATS=catData.expCats;
+  window._planCats=catData.planCats&&catData.planCats.length>0?catData.planCats:DEFAULT_PLAN_CATS;
   // year 필드가 숫자로 저장된 경우와 문자열로 저장된 경우 둘 다 처리
   Promise.all([
     db.collection('expenses').where('year','==',Y).get(),
@@ -297,10 +305,11 @@ Promise.all([
     allData=[];renderAll();
   });
 }).catch(()=>{
-  catBudgets=SB[Y]||{};
-  planBudgetTotal=Object.values(SP[Y]||{}).reduce((a,b)=>a+(Number(b)||0),0);
-  window._planBudgetData=SP[Y]||{};
-  allData=SE.filter(e=>e.year===Y);
+  catBudgets={};
+  planBudgetTotal=0;
+  window._planBudgetData={};
+  window._planCats=[...DEFAULT_PLAN_CATS];
+  allData=[];
   renderAll();
 });
 function renderAll(){
@@ -331,7 +340,7 @@ function renderAll(){
   applyFilter();
 }
 function renderPlanTable(){
-  const PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
+  const PLAN_CATS=window._planCats||DEFAULT_PLAN_CATS;
   // budgetPlans에서 이 차년도 구분별 배정액 가져오기 (planBudgetData 별도 저장)
   const planBudget=window._planBudgetData||{};
   // planCategory 기준 집행액 집계
