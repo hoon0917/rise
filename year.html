@@ -308,9 +308,7 @@ function renderAll(){
 }
 function renderPlanTable(){
   const PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
-  // budgetPlans에서 이 차년도 구분별 배정액 가져오기 (planBudgetData 별도 저장)
   const planBudget=window._planBudgetData||{};
-  // planCategory 기준 집행액 집계
   const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=0);
   allData.forEach(e=>{const pc=e.planCategory;if(pc&&spentByPlan[pc]!==undefined)spentByPlan[pc]+=(e.amount||0)});
   const tbody=document.getElementById('plan-tbody');let html='';let sB=0,sS=0;
@@ -330,7 +328,7 @@ function renderPlanTable(){
   html+=`<tr class="total-row"><td>합 계</td><td>${sB?fmt(sB):'<span class="no-budget">미입력</span>'}</td><td style="color:var(--green)">${fmt(sS)}</td><td style="${sB-sS<0?'color:var(--red)':'color:var(--yellow)'}">${sB?(fmt(Math.abs(sB-sS))+(sB-sS<0?' 초과':'')):'—'}</td><td class="rate-cell"><div class="rate-inner"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:${sB?Math.min(tR,100):0}%"></div></div><span class="rate-num ok">${sB?tR+'%':'—'}</span></div></td></tr>`;
   tbody.innerHTML=html;
 }
-
+function renderCatTable(spent){
   const tbody=document.getElementById('cat-tbody');let html='';let sB=0,sS=0;
   EXP_CATS.forEach(cat=>{
     const b=Number(catBudgets[cat])||0,s=spent[cat]||0,r=pct(s,b),rem=b-s;
