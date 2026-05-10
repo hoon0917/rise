@@ -137,8 +137,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <div class="summary">
   <div class="s-card"><div class="s-label">5개년 총 배정 예산</div><div class="s-value blue" id="s-total-budget">—</div><div class="s-sub">사업계획서 기준 합계</div></div>
   <div class="s-card"><div class="s-label">누계 집행액</div><div class="s-value green" id="s-total-spent">—</div><div class="s-sub" id="s-total-rate">전체 대비 —%</div></div>
-  <div class="s-card"><div class="s-label">현재 차년도</div><div class="s-value" id="s-current-year">—</div><div class="s-sub" id="s-cur-period">—</div></div>
-  <div class="s-card"><div class="s-label">현재 차년도 집행률</div><div class="s-value yellow" id="s-cur-rate">—%</div><div class="s-sub" id="s-cur-remain">잔액 —</div></div>
 </div>
 <section class="section">
   <div class="sh"><span class="sh-label">구분별 예산 배정 및 집행 현황</span><div class="sh-line"></div><span class="sh-badge">사업계획서 기준</span></div>
@@ -198,8 +196,6 @@ const wonFull=v=>v?v.toLocaleString('ko-KR')+'원':'—';
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 const d=new Date();
 document.getElementById('today-pill').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-document.getElementById('s-current-year').textContent=CURRENT_YEAR+'차년도';
-document.getElementById('s-cur-period').textContent=PERIODS[CURRENT_YEAR]||'';
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
 let budgetPlans={},allExpenses=[],plansLoaded=false,expLoaded=false;
@@ -218,9 +214,6 @@ function renderAll(){
   document.getElementById('s-total-budget').textContent=won(gt);
   document.getElementById('s-total-spent').textContent=won(ts);
   document.getElementById('s-total-rate').textContent='전체 대비 '+pct(ts,gt)+'%';
-  const cb=yt[CURRENT_YEAR]||0,cs=sy[CURRENT_YEAR]||0;
-  document.getElementById('s-cur-rate').textContent=pct(cs,cb)+'%';
-  document.getElementById('s-cur-remain').textContent='잔액 '+won(Math.max(cb-cs,0));
   const tbody=document.getElementById('bp-tbody');let html='';
 
   // 구분별 × 차년도별 집행액 집계
