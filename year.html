@@ -229,9 +229,6 @@ const FIREBASE_CONFIG={apiKey: "AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",
     messagingSenderId: "1059201705038",
     appId: "1:1059201705038:web:810d08d1e34b37dd51cf1f"
   };
-const SB={};
-const SP={};
-const SE=[];
 const EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
 const TAG_COLORS={"인건비":"tag-blue","수용비":"tag-green","용역비":"tag-teal","시설장비비":"tag-yellow","연구활동비":"tag-pink","학생지원비":"tag-blue","행사운영비":"tag-yellow","여비":"tag-green","기타":"tag-teal"};
 const PERIODS={1:"2024.03 ~ 2025.02",2:"2025.03 ~ 2026.02",3:"2026.03 ~ 2027.02",4:"2027.03 ~ 2028.02",5:"2028.03 ~ 2029.02"};
@@ -268,31 +265,31 @@ Promise.all([
   window._planBudgetData=planData;
   // year 필드가 숫자로 저장된 경우와 문자열로 저장된 경우 둘 다 처리
   Promise.all([
-    db.collection('expenses').where('year','==',Y).orderBy('date','desc').get(),
-    db.collection('expenses').where('year','==',String(Y)).orderBy('date','desc').get()
+    db.collection('expenses').where('year','==',Y).get(),
+    db.collection('expenses').where('year','==',String(Y)).get()
   ]).then(([snap1, snap2])=>{
     const seen=new Set();
     const docs=[];
     [...snap1.docs,...snap2.docs].forEach(d=>{
       if(!seen.has(d.id)){seen.add(d.id);docs.push({id:d.id,...d.data()})}
     });
-    // 날짜 내림차순 정렬
+    // 날짜 내림차순 정렬 (JS에서 처리 — Firestore 복합 인덱스 불필요)
     docs.sort((a,b)=>{
-      const da=a.date?.toDate?a.date.toDate():new Date(a.date||0);
-      const db2=b.date?.toDate?b.date.toDate():new Date(b.date||0);
-      return db2-da;
+      const da=a.date||'';
+      const db2=b.date||'';
+      return db2.localeCompare(da);
     });
     allData=docs;
     renderAll();
-    // 이후 실시간 반영 (숫자 타입 기준)
-    db.collection('expenses').where('year','==',Y).orderBy('date','desc')
+    // 이후 실시간 반영
+    db.collection('expenses').where('year','==',Y)
       .onSnapshot(snap=>{
         const seen2=new Set();const docs2=[];
         snap.docs.forEach(d=>{if(!seen2.has(d.id)){seen2.add(d.id);docs2.push({id:d.id,...d.data()})}});
         docs2.sort((a,b2)=>{
-          const da=a.date?.toDate?a.date.toDate():new Date(a.date||0);
-          const db3=b2.date?.toDate?b2.date.toDate():new Date(b2.date||0);
-          return db3-da;
+          const da=a.date||'';
+          const db3=b2.date||'';
+          return db3.localeCompare(da);
         });
         allData=docs2; renderAll();
       },()=>{});
@@ -358,7 +355,6 @@ function renderPlanTable(){
   tbody.innerHTML=html;
 }
 
-function renderCatTable(spent){
   const tbody=document.getElementById('cat-tbody');let html='';let sB=0,sS=0;
   EXP_CATS.forEach(cat=>{
     const b=Number(catBudgets[cat])||0,s=spent[cat]||0,r=pct(s,b),rem=b-s;
@@ -405,6 +401,10 @@ function renderTable(){
   pg.innerHTML=h;
 }
 function goPage(n){curPage=n;renderTable();window.scrollTo({top:600,behavior:'smooth'})}
+const SB={};  // 샘플 expBudgets (Firebase 미연결 시)
+const SP={};  // 샘플 budgetPlans (Firebase 미연결 시)
+// 샘플 집행 데이터 제거 — Firebase 실데이터만 사용
+const SE=[];
 </script>
 </body>
 </html>

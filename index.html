@@ -204,7 +204,11 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
 let budgetPlans={},allExpenses=[],plansLoaded=false,expLoaded=false;
 db.collection('budgetPlans').onSnapshot(snap=>{budgetPlans={};snap.forEach(doc=>{budgetPlans[parseInt(doc.id)]=doc.data()});plansLoaded=true;if(expLoaded)renderAll();},err=>{budgetPlans=SP;plansLoaded=true;if(expLoaded)renderAll()});
-db.collection('expenses').orderBy('date','desc').onSnapshot(snap=>{allExpenses=snap.docs.map(d=>({id:d.id,...d.data()}));expLoaded=true;if(plansLoaded)renderAll();},err=>{allExpenses=SE;expLoaded=true;if(plansLoaded)renderAll()});
+db.collection('expenses').onSnapshot(snap=>{
+  const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  docs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  allExpenses=docs;expLoaded=true;if(plansLoaded)renderAll();
+},err=>{allExpenses=SE;expLoaded=true;if(plansLoaded)renderAll()});
 function renderAll(){
   const yt={};for(let y=1;y<=5;y++){const p=budgetPlans[y]||{};yt[y]=Object.values(p).reduce((a,b)=>a+(Number(b)||0),0)}
   const gt=Object.values(yt).reduce((a,b)=>a+b,0);

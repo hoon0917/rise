@@ -487,7 +487,11 @@ function resetExpForm(){['f-plancat','f-category','f-title','f-amount','f-note']
 /* ── 탭4: 조회·수정 ── */
 let allData=[],manageFilter=0;
 function loadManageData(){
-  db.collection('expenses').orderBy('date','desc').onSnapshot(snap=>{allData=snap.docs.map(d=>({id:d.id,...d.data()}));renderManage();},err=>{allData=[];renderManage()});
+  db.collection('expenses').onSnapshot(snap=>{
+    const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
+    docs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    allData=docs;renderManage();
+  },err=>{allData=[];renderManage()});
   document.querySelectorAll('.mf-btn').forEach(btn=>{btn.addEventListener('click',()=>{manageFilter=parseInt(btn.dataset.y);document.querySelectorAll('.mf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderManage()})});
 }
 function renderManage(){
