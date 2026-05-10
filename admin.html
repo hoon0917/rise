@@ -467,21 +467,42 @@ function selectBudgetMode(mode,btn){
 function loadBudget(){
   const y=activeBudgetYear;
   const col = budgetMode==='plan' ? 'budgetPlans' : 'expBudgets';
-  const cats = budgetMode==='plan' ? PLAN_CATS : EXP_CATS;
   const modeLabel = budgetMode==='plan' ? '사업계획서 구분별' : '집행 과목별';
   document.getElementById('bm-title').textContent  = `${y}차년도 · ${modeLabel}`;
   document.getElementById('bm-period').textContent = PERIODS[y]||'';
 
-  db.collection(col).doc(String(y)).get().then(doc=>{
-    const data=doc.exists?doc.data():{};
-    renderBudgetTable(cats, data);
-    const ok=doc.exists&&Object.keys(data).length>0;
-    document.getElementById('bm-saved').style.display   = ok?'inline':'none';
-    document.getElementById('bm-unsaved').style.display = ok?'none':'inline';
+  // categories에서 이 차년도 항목 먼저 로드
+  db.collection('categories').doc(String(y)).get().then(catDoc=>{
+    const catData=catDoc.exists?catDoc.data():{};
+    const cats = budgetMode==='plan'
+      ? (catData.planCats&&catData.planCats.length>0 ? catData.planCats : DEFAULT_PLAN_CATS)
+      : (catData.expCats&&catData.expCats.length>0   ? catData.expCats  : DEFAULT_EXP_CATS);
+
+    db.collection(col).doc(String(y)).get().then(doc=>{
+      const data=doc.exists?doc.data():{};
+      renderBudgetTable(cats, data);
+      const ok=doc.exists&&Object.keys(data).length>0;
+      document.getElementById('bm-saved').style.display   = ok?'inline':'none';
+      document.getElementById('bm-unsaved').style.display = ok?'none':'inline';
+    }).catch(()=>{
+      renderBudgetTable(cats,{});
+      document.getElementById('bm-saved').style.display='none';
+      document.getElementById('bm-unsaved').style.display='inline';
+    });
   }).catch(()=>{
-    renderBudgetTable(cats,{});
-    document.getElementById('bm-saved').style.display='none';
-    document.getElementById('bm-unsaved').style.display='inline';
+    // categories 로드 실패 시 기본값 사용
+    const cats = budgetMode==='plan' ? DEFAULT_PLAN_CATS : DEFAULT_EXP_CATS;
+    db.collection(col).doc(String(y)).get().then(doc=>{
+      const data=doc.exists?doc.data():{};
+      renderBudgetTable(cats, data);
+      const ok=doc.exists&&Object.keys(data).length>0;
+      document.getElementById('bm-saved').style.display   = ok?'inline':'none';
+      document.getElementById('bm-unsaved').style.display = ok?'none':'inline';
+    }).catch(()=>{
+      renderBudgetTable(cats,{});
+      document.getElementById('bm-saved').style.display='none';
+      document.getElementById('bm-unsaved').style.display='inline';
+    });
   });
 }
 
@@ -515,11 +536,13 @@ function resetBudgetInputs(){
 
 async function saveBudgetPlan(){
   const y=activeBudgetYear;
-  const cats = budgetMode==='plan' ? PLAN_CATS : EXP_CATS;
-  const col  = budgetMode==='plan' ? 'budgetPlans' : 'expBudgets';
+  const col = budgetMode==='plan' ? 'budgetPlans' : 'expBudgets';
   const data={};
-  document.querySelectorAll('.bm-amt').forEach((inp,i)=>{
-    const v=parseInt(inp.value)||0; if(v>0) data[cats[i]]=v;
+  // 현재 테이블에 렌더링된 항목명과 금액을 직접 읽어서 저장
+  document.querySelectorAll('#bm-tbody tr').forEach(row=>{
+    const name=row.cells[0]?.textContent?.trim();
+    const val=parseInt(row.querySelector('.bm-amt')?.value)||0;
+    if(name&&val>0) data[name]=val;
   });
   const btn=document.getElementById('btn-save-budget');
   btn.disabled=true; btn.textContent='저장 중…';
