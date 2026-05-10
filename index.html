@@ -58,29 +58,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .sh-line{flex:1;height:1px;background:var(--border)}
 .sh-badge{font-size:11px;font-family:var(--mono);color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-100);padding:2px 10px;border-radius:50px}
 .bp-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;box-shadow:var(--shadow)}
-.bp-table{width:100%;border-collapse:collapse;min-width:760px}
-.bp-table thead tr{background:#f8fafc;border-bottom:2px solid var(--border)}
-.bp-table th{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);padding:11px 16px;text-align:right;font-weight:600;white-space:nowrap}
+.bp-table{width:100%;border-collapse:collapse;min-width:1500px}
+.bp-table thead tr:first-child{background:#f0f4ff}
+.bp-table thead tr:first-child th{border-bottom:1px solid var(--border);padding:8px 10px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--text2);letter-spacing:0;text-transform:none;white-space:nowrap}
+.bp-table thead tr:last-child{background:#f8fafc}
+.bp-table thead tr:last-child th{border-bottom:2px solid var(--border);padding:5px 8px;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--text3);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.bp-table th{text-align:right}
 .bp-table th:first-child{text-align:left}
-.bp-table th.cur-head{color:var(--blue-600);background:var(--blue-50)}
-.bp-table th.spent-head{color:var(--green);background:var(--green-bg)}
-.bp-table th.remain-head{color:var(--yellow)}
-.bp-table th.rate-head{color:var(--text3)}
-/* 집행률 인라인 바 (대시보드용) */
-.d-rate{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-.d-rate-bg{width:60px;background:var(--bg);border:1px solid var(--border);border-radius:50px;height:5px;overflow:hidden;flex-shrink:0}
-.d-rate-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--blue-600),var(--teal));transition:width .8s ease}
-.d-rate-fill.warn{background:linear-gradient(90deg,var(--yellow),#f97316)}
-.d-rate-fill.over{background:linear-gradient(90deg,var(--red),#f97316)}
-.d-rate-num{font-family:var(--mono);font-size:11px;font-weight:600;min-width:34px;text-align:right}
-.d-rate-num.ok{color:var(--green)} .d-rate-num.warn{color:var(--yellow)} .d-rate-num.over{color:var(--red)}
-.bp-table td{padding:12px 16px;font-size:13px;color:var(--text2);text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.bp-table td:first-child{text-align:left;font-family:var(--sans);color:var(--text);font-weight:500;font-size:13px}
+.bp-table td{padding:10px 8px;font-size:12px;color:var(--text2);text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.bp-table td:first-child{text-align:left;font-family:var(--sans);color:var(--text);font-weight:500;font-size:13px;padding-left:14px;min-width:190px}
 .bp-table tr:hover td{background:#fafbfc}
 .bp-table tr:last-child td{border-bottom:none}
 .bp-table .total-row td{background:var(--blue-50)!important;border-top:2px solid var(--blue-100)!important;font-weight:700;color:var(--text)!important}
 .bp-table .total-row td:first-child{color:var(--blue-600)!important}
-.bp-cur{color:var(--blue-600)!important;font-weight:600!important;background:var(--blue-50)}
 .bp-empty{color:var(--text4)!important;font-size:11px!important}
 .year-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .y-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px 18px;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
@@ -156,15 +146,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <table class="bp-table">
       <thead>
         <tr>
-          <th style="text-align:left">구분</th>
-          <th>1차년도</th><th>2차년도</th><th>3차년도</th><th>4차년도</th><th>5차년도</th>
-          <th class="cur-head">배정 합계</th>
-          <th class="spent-head">집행액 합계</th>
-          <th class="remain-head">잔 액</th>
-          <th class="rate-head">집행률</th>
+          <th style="text-align:left;min-width:200px">구분</th>
+          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">1차년도</th>
+          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">2차년도</th>
+          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">3차년도</th>
+          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">4차년도</th>
+          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">5차년도</th>
+          <th colspan="3" style="text-align:center;border-left:2px solid var(--blue-100);background:var(--blue-50)">전체 합계</th>
+        </tr>
+        <tr>
+          <th style="text-align:left;border-bottom:2px solid var(--border)"></th>
+          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
+          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
+          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
+          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
+          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
+          <th style="border-left:2px solid var(--blue-100);background:var(--blue-50)">배정</th>
+          <th style="background:var(--blue-50)">집행</th>
+          <th style="background:var(--blue-50)">집행률</th>
         </tr>
       </thead>
-      <tbody id="bp-tbody"><tr><td colspan="10" style="text-align:center;padding:40px"><div class="spin"></div></td></tr></tbody>
+      <tbody id="bp-tbody"><tr><td colspan="19" style="text-align:center;padding:40px"><div class="spin"></div></td></tr></tbody>
     </table>
   </div>
 </section>
@@ -186,13 +188,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
-const FIREBASE_CONFIG={apiKey: "AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",
-    authDomain: "rise-81dab.firebaseapp.com",
-    projectId: "rise-81dab",
-    storageBucket: "rise-81dab.firebasestorage.app",
-    messagingSenderId: "1059201705038",
-    appId: "1:1059201705038:web:810d08d1e34b37dd51cf1f"
-  };
+const FIREBASE_CONFIG={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT_ID.firebaseapp.com",projectId:"YOUR_PROJECT_ID",storageBucket:"YOUR_PROJECT_ID.appspot.com",messagingSenderId:"YOUR_SENDER_ID",appId:"YOUR_APP_ID"};
 const CURRENT_YEAR=1;
 const PERIODS={1:"2024.03~2025.02",2:"2025.03~2026.02",3:"2026.03~2027.02",4:"2027.03~2028.02",5:"2028.03~2029.02"};
 const PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
@@ -222,29 +218,62 @@ function renderAll(){
   document.getElementById('s-cur-rate').textContent=pct(cs,cb)+'%';
   document.getElementById('s-cur-remain').textContent='잔액 '+won(Math.max(cb-cs,0));
   const tbody=document.getElementById('bp-tbody');let html='';
-  // 구분별 집행액 집계 (planCategory 기준)
-  const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=0);
-  allExpenses.forEach(e=>{const pc=e.planCategory;if(pc&&spentByPlan[pc]!==undefined)spentByPlan[pc]+=(e.amount||0)});
+
+  // 구분별 × 차년도별 집행액 집계
+  const spentByPlanYear={};
+  PLAN_CATS.forEach(c=>{spentByPlanYear[c]={};for(let y=1;y<=5;y++)spentByPlanYear[c][y]=0});
+  allExpenses.forEach(e=>{
+    const pc=e.planCategory,y=parseInt(e.year);
+    if(pc&&spentByPlanYear[pc]&&y>=1&&y<=5) spentByPlanYear[pc][y]+=(e.amount||0);
+  });
+  // 구분별 전체 집행액(차년도 합산)
+  const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=Object.values(spentByPlanYear[c]).reduce((a,b)=>a+b,0));
+
+  const rateCell=(budget,spent)=>{
+    if(!budget) return `<td style="color:var(--text4);font-size:11px">—</td>`;
+    const r=pct(spent,budget);
+    const col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)';
+    return `<td style="color:${col};font-weight:600;font-family:var(--mono);font-size:12px">${r}%</td>`;
+  };
 
   PLAN_CATS.forEach(cat=>{
-    html+=`<tr><td>${cat}</td>`;let rt=0;
-    for(let y=1;y<=5;y++){const v=(budgetPlans[y]||{})[cat]||0;rt+=v;html+=`<td class="${y===CURRENT_YEAR?'bp-cur':''}">${v?wonFull(v):'<span class="bp-empty">미입력</span>'}</td>`}
-    const sp=spentByPlan[cat]||0,rem=rt-sp,r=pct(sp,rt);
-    const rc=r>=100?'over':r>=80?'warn':'ok',bc=r>=100?'over':r>=80?'warn':'';
-    html+=`<td style="font-weight:700">${rt?wonFull(rt):'—'}</td>`;
-    html+=`<td style="color:var(--green);font-weight:600">${wonFull(sp)}</td>`;
-    html+=`<td style="${rem<0?'color:var(--red)':'color:var(--yellow)'}${!rt?';color:var(--text4)':''};font-weight:600">${rt?(rem>=0?wonFull(rem):'초과 '+wonFull(Math.abs(rem))):'—'}</td>`;
-    html+=`<td><div class="d-rate"><div class="d-rate-bg"><div class="d-rate-fill ${bc}" style="width:${rt?Math.min(r,100):0}%;transition:width .8s ease"></div></div><span class="d-rate-num ${rt?rc:''}">${rt?r+'%':'—'}</span></div></td>`;
+    html+=`<tr><td style="font-weight:500;color:var(--text)">${cat}</td>`;
+    let totalBudget=0,totalSpent=0;
+    for(let y=1;y<=5;y++){
+      const b=(budgetPlans[y]||{})[cat]||0;
+      const s=spentByPlanYear[cat][y]||0;
+      totalBudget+=b; totalSpent+=s;
+      const isCur=y===CURRENT_YEAR;
+      const borderL=`border-left:1px solid var(--border);`;
+      html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}font-family:var(--mono);font-size:12px">${b?won(b):'<span style="color:var(--text4);font-size:11px">미입력</span>'}</td>`;
+      html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--green);font-family:var(--mono);font-size:12px;font-weight:600">${s?won(s):'—'}</td>`;
+      if(!b) html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
+      else { const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)'; html+=`<td style="${isCur?'background:var(--blue-50);':''}color:${col};font-weight:700;font-family:var(--mono);font-size:12px">${r}%</td>`; }
+    }
+    // 전체 합계
+    const tr=pct(totalSpent,totalBudget),tcol=tr>=100?'var(--red)':tr>=80?'var(--yellow)':'var(--green)';
+    html+=`<td style="border-left:2px solid var(--blue-100);background:var(--blue-50);font-weight:700;font-family:var(--mono);font-size:12px">${totalBudget?won(totalBudget):'—'}</td>`;
+    html+=`<td style="background:var(--blue-50);color:var(--green);font-weight:700;font-family:var(--mono);font-size:12px">${totalSpent?won(totalSpent):'—'}</td>`;
+    html+=`<td style="background:var(--blue-50);color:${tcol};font-weight:700;font-family:var(--mono);font-size:12px">${totalBudget?tr+'%':'—'}</td>`;
     html+=`</tr>`;
   });
+
   // 합계 행
-  html+=`<tr class="total-row"><td>합 계</td>`;let gtt=0;
-  for(let y=1;y<=5;y++){const v=yt[y]||0;gtt+=v;html+=`<td class="${y===CURRENT_YEAR?'bp-cur':''}">${wonFull(v)}</td>`}
-  const totalSp=Object.values(spentByPlan).reduce((a,b)=>a+b,0),totalRem=gtt-totalSp,totalR=pct(totalSp,gtt);
-  html+=`<td style="color:var(--blue-600)">${wonFull(gtt)}</td>`;
-  html+=`<td style="color:var(--green)">${wonFull(totalSp)}</td>`;
-  html+=`<td style="${totalRem<0?'color:var(--red)':'color:var(--yellow)'}">${wonFull(Math.abs(totalRem))}${totalRem<0?' 초과':''}</td>`;
-  html+=`<td><div class="d-rate"><div class="d-rate-bg"><div class="d-rate-fill" style="width:${Math.min(totalR,100)}%"></div></div><span class="d-rate-num ok">${totalR}%</span></div></td>`;
+  html+=`<tr class="total-row"><td>합 계</td>`;
+  let grandB=0,grandS=0;
+  for(let y=1;y<=5;y++){
+    const b=yt[y]||0,s=sy[y]||0;
+    grandB+=b;grandS+=s;
+    const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)';
+    const isCur=y===CURRENT_YEAR;
+    html+=`<td style="border-left:1px solid var(--border2);${isCur?'background:rgba(37,99,235,.1);':''}font-family:var(--mono)">${b?won(b):'—'}</td>`;
+    html+=`<td style="${isCur?'background:rgba(37,99,235,.1);':''}color:var(--green);font-family:var(--mono)">${s?won(s):'—'}</td>`;
+    html+=`<td style="${isCur?'background:rgba(37,99,235,.1);':''}color:${col};font-weight:700;font-family:var(--mono)">${b?r+'%':'—'}</td>`;
+  }
+  const gr=pct(grandS,grandB);
+  html+=`<td style="border-left:2px solid var(--blue-100);background:rgba(37,99,235,.1);color:var(--blue-600);font-family:var(--mono)">${won(grandB)}</td>`;
+  html+=`<td style="background:rgba(37,99,235,.1);color:var(--green);font-family:var(--mono)">${won(grandS)}</td>`;
+  html+=`<td style="background:rgba(37,99,235,.1);color:${gr>=100?'var(--red)':gr>=80?'var(--yellow)':'var(--green)'};font-weight:700;font-family:var(--mono)">${gr}%</td>`;
   html+=`</tr>`;
   tbody.innerHTML=html;
   const grid=document.getElementById('year-grid');grid.innerHTML='';
@@ -258,8 +287,8 @@ function renderAll(){
   if(!rc.length){rb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">집행 내역이 없습니다</td></tr>`;return}
   rb.innerHTML=rc.map(e=>{const dt=e.date?.toDate?e.date.toDate().toLocaleDateString('ko-KR'):(e.date||'—');return`<tr><td style="font-weight:600;color:var(--blue-600)">${e.year||'—'}차</td><td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${dt}</td><td><span class="tag ${TAG_COLORS[e.category||'기타']||'tag-teal'}">${e.category||'기타'}</span></td><td>${e.title||'—'}</td><td style="text-align:right;font-family:var(--mono);font-size:13px;font-weight:600">${(e.amount||0).toLocaleString('ko-KR')}원</td></tr>`}).join('');
 }
-const SP={1:{"인건비":80000000,"장학금":50000000,"교육·연구프로그램개발·운영비":120000000,"교육·연구 환경개선비":40000000,"실험·실습장비 및 기자재 구입·운영비":90000000,"지역 연계·협업 지원비":30000000,"기업 지원·협력 활동비":30000000,"성과 활용·확산 지원비":20000000,"그 밖의 사업운영 경비":40000000},2:{"인건비":85000000,"장학금":55000000,"교육·연구프로그램개발·운영비":125000000},3:{},4:{},5:{}};
-const SE=[{year:1,date:'2024-05-15',planCategory:'교육·연구프로그램개발·운영비',category:'용역비',title:'AI상담플랫폼 개발 1차',amount:25000000},{year:1,date:'2024-05-01',planCategory:'실험·실습장비 및 기자재 구입·운영비',category:'수용비',title:'GPU 서버 구입',amount:19200000},{year:1,date:'2024-04-20',planCategory:'인건비',category:'인건비',title:'연구보조원 4월',amount:2800000}];
+const SP={};
+const SE=[];
 </script>
 </body>
 </html>
