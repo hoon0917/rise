@@ -355,6 +355,7 @@ function renderPlanTable(){
   tbody.innerHTML=html;
 }
 
+function renderCatTable(spent){
   const tbody=document.getElementById('cat-tbody');let html='';let sB=0,sS=0;
   EXP_CATS.forEach(cat=>{
     const b=Number(catBudgets[cat])||0,s=spent[cat]||0,r=pct(s,b),rem=b-s;
