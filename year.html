@@ -229,6 +229,9 @@ const FIREBASE_CONFIG={apiKey: "AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",
     messagingSenderId: "1059201705038",
     appId: "1:1059201705038:web:810d08d1e34b37dd51cf1f"
   };
+const SB={};
+const SP={};
+const SE=[];
 const EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
 const TAG_COLORS={"인건비":"tag-blue","수용비":"tag-green","용역비":"tag-teal","시설장비비":"tag-yellow","연구활동비":"tag-pink","학생지원비":"tag-blue","행사운영비":"tag-yellow","여비":"tag-green","기타":"tag-teal"};
 const PERIODS={1:"2024.03 ~ 2025.02",2:"2025.03 ~ 2026.02",3:"2026.03 ~ 2027.02",4:"2027.03 ~ 2028.02",5:"2028.03 ~ 2029.02"};
@@ -355,6 +358,7 @@ function renderPlanTable(){
   tbody.innerHTML=html;
 }
 
+function renderCatTable(spent){
   const tbody=document.getElementById('cat-tbody');let html='';let sB=0,sS=0;
   EXP_CATS.forEach(cat=>{
     const b=Number(catBudgets[cat])||0,s=spent[cat]||0,r=pct(s,b),rem=b-s;
@@ -401,10 +405,6 @@ function renderTable(){
   pg.innerHTML=h;
 }
 function goPage(n){curPage=n;renderTable();window.scrollTo({top:600,behavior:'smooth'})}
-const SB={};  // 샘플 expBudgets (Firebase 미연결 시)
-const SP={};  // 샘플 budgetPlans (Firebase 미연결 시)
-// 샘플 집행 데이터 제거 — Firebase 실데이터만 사용
-const SE=[];
 </script>
 </body>
 </html>
