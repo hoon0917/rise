@@ -3,314 +3,325 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RISE사업단 예산 현황 — 대신대학교</title>
+<title>RISE사업단 — 대신대학교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#f5f7fa; --surface:#ffffff;
-  --border:#e2e8f0; --border2:#cbd5e1;
-  --text:#0f172a; --text2:#334155; --text3:#64748b; --text4:#94a3b8;
-  --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-500:#3b82f6;
-  --blue-100:#dbeafe; --blue-50:#eff6ff;
-  --green:#059669; --green-bg:#ecfdf5;
-  --yellow:#d97706; --yellow-bg:#fffbeb;
-  --red:#dc2626; --teal:#0891b2;
-  --mono:'DM Mono',monospace; --sans:'Noto Sans KR',sans-serif;
-  --radius:12px; --radius-sm:8px;
+  --bg:#f5f7fa;--surface:#fff;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#0f172a;--text2:#334155;--text3:#64748b;--text4:#94a3b8;
+  --blue:#2563eb;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --green:#059669;--green-l:#ecfdf5;--green-b:#a7f3d0;
+  --yellow:#d97706;--yellow-l:#fffbeb;--yellow-b:#fde68a;
+  --purple:#7c3aed;--purple-l:#f5f3ff;--purple-b:#ddd6fe;
+  --red:#dc2626;--teal:#0891b2;
+  --mono:'DM Mono',monospace;--sans:'Noto Sans KR',sans-serif;
+  --radius:12px;--radius-sm:8px;
   --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
   --shadow-md:0 4px 16px rgba(0,0,0,.09),0 2px 4px rgba(0,0,0,.04);
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* NAV */
 .nav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--border);padding:0 40px;box-shadow:var(--shadow)}
-.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
+.nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-chip{background:var(--blue-600);color:#fff;font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
+.nav-chip{background:var(--blue);color:#fff;font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
 .nav-title{font-size:15px;font-weight:700;color:var(--text)}
-.nav-menu{display:flex;gap:2px;list-style:none}
-.nav-menu a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all .15s}
-.nav-menu a:hover{background:var(--blue-50);color:var(--blue-600)}
-.nav-menu a.active{background:var(--blue-50);color:var(--blue-600);font-weight:600}
-.btn-admin{background:var(--blue-600);color:#fff;font-size:12px;font-family:var(--mono);padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .15s}
-.btn-admin:hover{background:var(--blue-700)}
-.hero{max-width:1280px;margin:0 auto;padding:48px 40px 36px}
-.hero-eyebrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--blue-600);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
-.hero-eyebrow::before{content:'';width:22px;height:1.5px;background:var(--blue-600)}
+.nav-links{display:flex;gap:2px;list-style:none}
+.nav-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all .15s}
+.nav-links a:hover{background:var(--blue-l);color:var(--blue)}
+.nav-links a.active{background:var(--blue-l);color:var(--blue);font-weight:600}
+.btn-admin{background:var(--blue);color:#fff;font-size:12px;font-family:var(--mono);padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .15s}
+.btn-admin:hover{background:#1d4ed8}
+
+/* HERO */
+.hero{max-width:1400px;margin:0 auto;padding:48px 40px 36px}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.hero-eyebrow::before{content:'';width:22px;height:1.5px;background:var(--blue)}
 .hero h1{font-size:clamp(24px,3.5vw,40px);font-weight:900;letter-spacing:-.04em;color:var(--text);margin-bottom:8px}
-.hero h1 em{font-style:normal;color:var(--blue-600)}
+.hero h1 em{font-style:normal;color:var(--blue)}
 .hero-desc{color:var(--text3);font-size:15px}
 .hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .pill{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 12px;border-radius:50px;font-size:12px;color:var(--text3);font-family:var(--mono);box-shadow:var(--shadow)}
 .pill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.pill-dot.green{background:var(--green)} .pill-dot.blue{background:var(--blue-500)} .pill-dot.yellow{background:var(--yellow)}
-.summary{max-width:1280px;margin:0 auto 32px;padding:0 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-.s-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);transition:box-shadow .2s,border-color .2s}
-.s-card:hover{box-shadow:var(--shadow-md);border-color:var(--border2)}
+
+/* SUMMARY STRIP */
+.summary{max-width:1400px;margin:0 auto 36px;padding:0 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.s-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
 .s-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
 .s-value{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);letter-spacing:-.02em;line-height:1}
-.s-value.blue{color:var(--blue-600)} .s-value.green{color:var(--green)} .s-value.yellow{color:var(--yellow)}
+.s-value.blue{color:var(--blue)} .s-value.green{color:var(--green)}
 .s-sub{font-size:12px;color:var(--text3);margin-top:5px}
-.section{max-width:1280px;margin:0 auto;padding:0 40px 52px}
-.sh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+
+/* SECTION */
+.section{max-width:1400px;margin:0 auto;padding:0 40px 52px}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .sh-label{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;font-weight:600}
 .sh-line{flex:1;height:1px;background:var(--border)}
-.sh-badge{font-size:11px;font-family:var(--mono);color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-100);padding:2px 10px;border-radius:50px}
-.bp-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;box-shadow:var(--shadow)}
-.bp-table{width:100%;border-collapse:collapse;min-width:1500px}
-.bp-table thead tr:first-child{background:#f0f4ff}
-.bp-table thead tr:first-child th{border-bottom:1px solid var(--border);padding:8px 10px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--text2);letter-spacing:0;text-transform:none;white-space:nowrap}
-.bp-table thead tr:last-child{background:#f8fafc}
-.bp-table thead tr:last-child th{border-bottom:2px solid var(--border);padding:5px 8px;font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--text3);font-weight:600;text-transform:uppercase;white-space:nowrap}
-.bp-table th{text-align:right}
-.bp-table th:first-child{text-align:left}
-.bp-table td{padding:10px 8px;font-size:12px;color:var(--text2);text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.bp-table td:first-child{text-align:left;font-family:var(--sans);color:var(--text);font-weight:500;font-size:13px;padding-left:14px;min-width:190px}
-.bp-table tr:hover td{background:#fafbfc}
-.bp-table tr:last-child td{border-bottom:none}
-.bp-table .total-row td{background:var(--blue-50)!important;border-top:2px solid var(--blue-100)!important;font-weight:700;color:var(--text)!important}
-.bp-table .total-row td:first-child{color:var(--blue-600)!important}
-.bp-empty{color:var(--text4)!important;font-size:11px!important}
-.year-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.y-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px 18px;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
-.y-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue-600),var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .25s}
-.y-card:hover{border-color:var(--blue-500);box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.y-card:hover::after,.y-card.cur-year::after{transform:scaleX(1)}
-.y-card.cur-year{border-color:var(--blue-500);border-top:3px solid var(--blue-600)}
-.y-num{font-family:var(--mono);font-size:10px;color:var(--blue-600);letter-spacing:.08em;font-weight:600}
-.y-title{font-size:19px;font-weight:700;color:var(--text)}
-.y-period{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.y-budget-row{display:flex;justify-content:space-between;align-items:flex-end}
-.y-blabel{font-size:11px;color:var(--text3);margin-bottom:2px}
-.y-bvalue{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
-.y-bar-wrap{background:var(--bg);border-radius:50px;height:4px;overflow:hidden}
-.y-bar{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--blue-600),var(--teal));transition:width 1s cubic-bezier(.16,1,.3,1)}
-.y-rate{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right}
-.y-rate span{color:var(--green);font-weight:600}
-.y-arrow{position:absolute;top:18px;right:16px;color:var(--text4);font-size:14px;transition:transform .2s,color .2s}
-.y-card:hover .y-arrow{transform:translateX(3px);color:var(--blue-600)}
-.rtable{width:100%;border-collapse:collapse}
-.rtable th{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);background:#f8fafc;font-weight:600}
-.rtable td{padding:12px 16px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);transition:background .12s}
-.rtable tr:hover td{background:#fafbfc}
-.rtable tr:last-child td{border-bottom:none}
-.tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:50px;font-family:var(--mono);font-size:10px;font-weight:500}
-.tag-blue{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-100)}
-.tag-green{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0}
-.tag-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid #fde68a}
-.tag-teal{background:#f0fdfa;color:var(--teal);border:1px solid #99f6e4}
-.tag-pink{background:#fdf2f8;color:#9d174d;border:1px solid #fbcfe8}
-.spin{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue-500);animation:spin .9s linear infinite;margin:0 auto}
+
+/* PROJECT CARDS */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.proj-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:16px;transition:all .2s;position:relative;overflow:hidden}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--proj-color,var(--blue));opacity:1}
+.proj-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--proj-border,var(--blue-b))}
+.proj-header{display:flex;align-items:center;gap:12px}
+.proj-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--proj-light,var(--blue-l))}
+.proj-name{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.proj-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.proj-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.proj-stat{background:var(--bg);border-radius:8px;padding:10px 12px}
+.proj-stat-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.proj-stat-value{font-size:15px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.proj-stat-value.colored{color:var(--proj-color,var(--blue))}
+.proj-bar-wrap{background:var(--bg);border:1px solid var(--border);border-radius:50px;height:5px;overflow:hidden}
+.proj-bar{height:100%;border-radius:50px;background:var(--proj-color,var(--blue));transition:width 1s cubic-bezier(.16,1,.3,1)}
+.proj-rate{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right;margin-top:4px}
+.proj-rate span{font-weight:600;color:var(--proj-color,var(--blue))}
+.proj-arrow{position:absolute;top:24px;right:20px;color:var(--text4);font-size:14px;transition:all .2s}
+.proj-card:hover .proj-arrow{transform:translateX(3px);color:var(--proj-color,var(--blue))}
+.proj-years{display:flex;gap:6px;flex-wrap:wrap}
+.proj-yr-btn{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;background:var(--proj-light,var(--blue-l));color:var(--proj-color,var(--blue));border:1px solid var(--proj-border,var(--blue-b));text-decoration:none;transition:all .15s}
+.proj-yr-btn:hover{opacity:.8}
+
+/* QUICK LINKS */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.quick-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:all .2s}
+.quick-card:hover{box-shadow:var(--shadow-md);border-color:var(--border2);transform:translateY(-1px)}
+.quick-icon{font-size:24px;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quick-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.quick-sub{font-size:11px;color:var(--text3)}
+
+/* SPIN */
+.spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue);animation:spin .9s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-.footer{border-top:1px solid var(--border);padding:24px 40px;max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:24px 40px;max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .footer-copy{font-size:12px;color:var(--text3);font-family:var(--mono)}
 .footer-live{font-size:11px;color:var(--green);font-family:var(--mono);display:flex;align-items:center;gap:6px}
 .footer-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
-@media(max-width:768px){.nav{padding:0 16px}.nav-menu{display:none}.hero,.summary,.section{padding-left:16px;padding-right:16px}.footer{padding:20px 16px;flex-direction:column;align-items:flex-start}.year-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.year-grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}}
+
+/* NAV REMOTE (우측 고정 네비) */
+.nav-remote{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:300;display:flex;flex-direction:column;gap:6px}
+.nr-btn{width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--text3)}
+.nr-btn:hover{border-color:var(--blue);color:var(--blue);transform:scale(1.1)}
+.nr-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nr-tooltip{position:absolute;right:52px;background:var(--text);color:#fff;font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.nr-btn:hover .nr-tooltip{opacity:1}
+
+@media(max-width:768px){
+  .nav{padding:0 16px}.nav-links{display:none}
+  .hero,.summary,.section{padding-left:16px;padding-right:16px}
+  .footer{padding:20px 16px;flex-direction:column;align-items:flex-start}
+  .nav-remote{display:none}
+  .project-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
+
+<!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="index.html" class="nav-brand"><span class="nav-chip">RISE</span><span class="nav-title">예산 현황 관리</span></a>
-    <ul class="nav-menu">
-      <li><a href="index.html" class="active">대시보드</a></li>
-      <li><a href="year.html?y=1">1차년도</a></li><li><a href="year.html?y=2">2차년도</a></li>
-      <li><a href="year.html?y=3">3차년도</a></li><li><a href="year.html?y=4">4차년도</a></li>
-      <li><a href="year.html?y=5">5차년도</a></li>
+    <a href="index.html" class="nav-brand">
+      <span class="nav-chip">RISE</span>
+      <span class="nav-title">대신대학교 RISE사업단</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">전체 현황</a></li>
+      <li><a href="budget.html?p=localrd">로컬R&D</a></li>
+      <li><a href="budget.html?p=overseas">해외인재유치</a></li>
+      <li><a href="budget.html?p=common">공통운영경비</a></li>
+      <li><a href="budget.html?p=city">시비</a></li>
+      <li><a href="calendar.html">캘린더</a></li>
     </ul>
     <a href="admin.html" class="btn-admin">⚙ 관리자</a>
   </div>
 </nav>
+
+<!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">대신대학교 RISE사업단</div>
-  <h1>예산 현황 <em>대시보드</em></h1>
-  <p class="hero-desc">차년도별 예산 배정 현황과 집행 내역을 한 눈에 확인합니다.</p>
+  <h1>사업 현황 <em>통합 대시보드</em></h1>
+  <p class="hero-desc">4개 사업의 예산 배정 및 집행 현황을 한눈에 확인합니다.</p>
   <div class="hero-pills">
-    <div class="pill"><span class="pill-dot green"></span>실시간 동기화</div>
-    <div class="pill"><span class="pill-dot blue"></span>5차년도 사업</div>
-    <div class="pill"><span class="pill-dot yellow"></span><span id="today-pill">—</span></div>
+    <div class="pill"><span class="pill-dot" style="background:var(--green)"></span>실시간 동기화</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--blue)"></span>5차년도 사업</div>
+    <div class="pill"><span class="pill-dot" style="background:var(--yellow)"></span><span id="today-pill">—</span></div>
   </div>
 </section>
+
+<!-- SUMMARY -->
 <div class="summary">
-  <div class="s-card"><div class="s-label">5개년 총 배정 예산</div><div class="s-value blue" id="s-total-budget">—</div><div class="s-sub">사업계획서 기준 합계</div></div>
-  <div class="s-card"><div class="s-label">누계 집행액</div><div class="s-value green" id="s-total-spent">—</div><div class="s-sub" id="s-total-rate">전체 대비 —%</div></div>
+  <div class="s-card">
+    <div class="s-label">전체 배정 예산</div>
+    <div class="s-value blue" id="s-total-budget">—</div>
+    <div class="s-sub">4개 사업 합계</div>
+  </div>
+  <div class="s-card">
+    <div class="s-label">전체 집행액</div>
+    <div class="s-value green" id="s-total-spent">—</div>
+    <div class="s-sub" id="s-total-rate">전체 대비 —%</div>
+  </div>
 </div>
+
+<!-- 사업별 카드 -->
 <section class="section">
-  <div class="sh"><span class="sh-label">구분별 예산 배정 및 집행 현황</span><div class="sh-line"></div><span class="sh-badge">사업계획서 기준</span></div>
-  <div class="bp-wrap">
-    <table class="bp-table">
-      <thead>
-        <tr>
-          <th style="text-align:left;min-width:200px">구분</th>
-          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">1차년도</th>
-          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">2차년도</th>
-          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">3차년도</th>
-          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">4차년도</th>
-          <th colspan="3" style="text-align:center;border-left:1px solid var(--border)">5차년도</th>
-          <th colspan="3" style="text-align:center;border-left:2px solid var(--blue-100);background:var(--blue-50)">전체 합계</th>
-        </tr>
-        <tr>
-          <th style="text-align:left;border-bottom:2px solid var(--border)"></th>
-          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
-          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
-          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
-          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
-          <th style="border-left:1px solid var(--border)">배정</th><th>집행</th><th>집행률</th>
-          <th style="border-left:2px solid var(--blue-100);background:var(--blue-50)">배정</th>
-          <th style="background:var(--blue-50)">집행</th>
-          <th style="background:var(--blue-50)">집행률</th>
-        </tr>
-      </thead>
-      <tbody id="bp-tbody"><tr><td colspan="19" style="text-align:center;padding:40px"><div class="spin"></div></td></tr></tbody>
-    </table>
+  <div class="sh"><span class="sh-label">사업별 예산 현황</span><div class="sh-line"></div></div>
+  <div class="project-grid" id="project-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:48px"><div class="spin"></div></div>
   </div>
 </section>
+
+<!-- 바로가기 -->
 <section class="section">
-  <div class="sh"><span class="sh-label">차년도별 집행 현황</span><div class="sh-line"></div></div>
-  <div class="year-grid" id="year-grid"><div style="grid-column:1/-1;text-align:center;padding:48px"><div class="spin"></div></div></div>
-</section>
-<section class="section">
-  <div class="sh"><span class="sh-label">최근 집행 내역</span><div class="sh-line"></div></div>
-  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)">
-    <table class="rtable">
-      <thead><tr><th>차년도</th><th>집행일</th><th>집행 과목</th><th>내용</th><th style="text-align:right">금액</th></tr></thead>
-      <tbody id="recent-tbody"><tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">불러오는 중…</td></tr></tbody>
-    </table>
+  <div class="sh"><span class="sh-label">바로가기</span><div class="sh-line"></div></div>
+  <div class="quick-grid">
+    <a href="calendar.html" class="quick-card">
+      <div class="quick-icon" style="background:#eff6ff">📅</div>
+      <div><div class="quick-label">공용 캘린더</div><div class="quick-sub">일정 · 휴가 등록</div></div>
+    </a>
+    <a href="document.html?p=localrd" class="quick-card">
+      <div class="quick-icon" style="background:#eff6ff">📋</div>
+      <div><div class="quick-label">공문 색인표 — 로컬R&D</div><div class="quick-sub">공문 번호 · 제목 · 날짜</div></div>
+    </a>
+    <a href="document.html?p=overseas" class="quick-card">
+      <div class="quick-icon" style="background:#ecfdf5">📋</div>
+      <div><div class="quick-label">공문 색인표 — 해외인재유치</div><div class="quick-sub">공문 번호 · 제목 · 날짜</div></div>
+    </a>
+    <a href="admin.html" class="quick-card">
+      <div class="quick-icon" style="background:#f5f3ff">⚙️</div>
+      <div><div class="quick-label">관리자 페이지</div><div class="quick-sub">예산 배정 · 집행 입력</div></div>
+    </a>
   </div>
 </section>
-<footer><div class="footer"><span class="footer-copy">© 대신대학교 RISE사업단 — 내부 공유용</span><span class="footer-live">실시간 업데이트</span></div></footer>
+
+<footer>
+  <div class="footer">
+    <span class="footer-copy">© 대신대학교 RISE사업단 — 내부 공유용</span>
+    <span class="footer-live">실시간 업데이트</span>
+  </div>
+</footer>
+
+<!-- 우측 네비 리모콘 -->
+<div class="nav-remote">
+  <a href="index.html" class="nr-btn active" title="전체 현황">
+    🏠<span class="nr-tooltip">전체 현황</span>
+  </a>
+  <a href="budget.html?p=localrd" class="nr-btn" title="로컬R&D">
+    🔬<span class="nr-tooltip">로컬R&D</span>
+  </a>
+  <a href="budget.html?p=overseas" class="nr-btn" title="해외인재유치">
+    ✈️<span class="nr-tooltip">해외인재유치</span>
+  </a>
+  <a href="budget.html?p=common" class="nr-btn" title="공통운영경비">
+    📦<span class="nr-tooltip">공통운영경비</span>
+  </a>
+  <a href="budget.html?p=city" class="nr-btn" title="시비">
+    🏛️<span class="nr-tooltip">시비</span>
+  </a>
+  <a href="calendar.html" class="nr-btn" title="캘린더">
+    📅<span class="nr-tooltip">캘린더</span>
+  </a>
+  <a href="document.html?p=localrd" class="nr-btn" title="공문 색인표">
+    📋<span class="nr-tooltip">공문 색인표</span>
+  </a>
+  <a href="admin.html" class="nr-btn" title="관리자">
+    ⚙️<span class="nr-tooltip">관리자</span>
+  </a>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
 const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDomain:"rise-81dab.firebaseapp.com",projectId:"rise-81dab",storageBucket:"rise-81dab.firebasestorage.app",messagingSenderId:"1059201705038",appId:"1:1059201705038:web:810d08d1e34b37dd51cf1f"};
-const CURRENT_YEAR=1;
+const PROJECTS={
+  localrd: {id:'localrd', label:'로컬R&D',    icon:'🔬', color:'#2563eb', light:'#eff6ff', border:'#bfdbfe'},
+  overseas:{id:'overseas',label:'해외인재유치',icon:'✈️', color:'#059669', light:'#ecfdf5', border:'#a7f3d0'},
+  common:  {id:'common',  label:'공통운영경비',icon:'📦', color:'#d97706', light:'#fffbeb', border:'#fde68a'},
+  city:    {id:'city',    label:'시비',         icon:'🏛️', color:'#7c3aed', light:'#f5f3ff', border:'#ddd6fe'},
+};
 const PERIODS={1:"2025.12~2026.02",2:"2026.03~2027.02",3:"2027.03~2028.02",4:"2028.03~2029.02",5:"2029.03~2030.02"};
-const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
-let PLAN_CATS_BY_YEAR={}; // {1:[...], 2:[...], ...}
-const TAG_COLORS={"인건비":"tag-blue","수용비":"tag-green","용역비":"tag-teal","시설장비비":"tag-yellow","연구활동비":"tag-pink","학생지원비":"tag-blue","행사운영비":"tag-yellow","여비":"tag-green","기타":"tag-teal"};
 const won=v=>!v?'—':v>=100000000?(v/100000000).toFixed(1).replace(/\.0$/,'')+'억':v>=10000?Math.floor(v/10000).toLocaleString('ko-KR')+'만':v.toLocaleString('ko-KR');
-const wonFull=v=>v?v.toLocaleString('ko-KR')+'원':'—';
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 const d=new Date();
 document.getElementById('today-pill').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
-let budgetPlans={},allExpenses=[],plansLoaded=false,expLoaded=false,catsLoaded=false;
-// categories 로드 (5개 차년도)
-Promise.all([1,2,3,4,5].map(y=>
-  db.collection('categories').doc(String(y)).get()
-    .then(doc=>({y,data:doc.exists?doc.data():{}}))
-    .catch(()=>({y,data:{}}))
-)).then(results=>{
-  results.forEach(({y,data})=>{
-    PLAN_CATS_BY_YEAR[y]=data.planCats&&data.planCats.length>0?data.planCats:[...DEFAULT_PLAN_CATS];
-  });
-  catsLoaded=true;
-  if(plansLoaded&&expLoaded)renderAll();
+
+let budgetByProj={},spentByProj={},dataReady=0;
+
+// 사업별 예산·집행 로드
+Object.keys(PROJECTS).forEach(pid=>{
+  budgetByProj[pid]=0; spentByProj[pid]=0;
+  // budgetPlans에서 해당 사업 전체 합산
+  db.collection(`${pid}_budgetPlans`).get().then(snap=>{
+    let total=0;
+    snap.forEach(doc=>{ Object.values(doc.data()).forEach(v=>total+=(Number(v)||0)); });
+    budgetByProj[pid]=total;
+    dataReady++; if(dataReady===Object.keys(PROJECTS).length*2) renderAll();
+  }).catch(()=>{dataReady++;if(dataReady===Object.keys(PROJECTS).length*2)renderAll()});
+  // expenses에서 해당 사업 집행액 합산
+  db.collection('expenses').where('project','==',pid).get().then(snap=>{
+    let total=0;
+    snap.forEach(doc=>total+=(doc.data().amount||0));
+    spentByProj[pid]=total;
+    dataReady++; if(dataReady===Object.keys(PROJECTS).length*2) renderAll();
+  }).catch(()=>{dataReady++;if(dataReady===Object.keys(PROJECTS).length*2)renderAll()});
 });
-db.collection('budgetPlans').onSnapshot(snap=>{budgetPlans={};snap.forEach(doc=>{budgetPlans[parseInt(doc.id)]=doc.data()});plansLoaded=true;if(expLoaded&&catsLoaded)renderAll();},err=>{plansLoaded=true;if(expLoaded&&catsLoaded)renderAll()});
-db.collection('expenses').onSnapshot(snap=>{
-  const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
-  docs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  allExpenses=docs;expLoaded=true;if(plansLoaded&&catsLoaded)renderAll();
-},err=>{allExpenses=[];expLoaded=true;if(plansLoaded&&catsLoaded)renderAll()});
+
 function renderAll(){
-  const yt={};for(let y=1;y<=5;y++){const p=budgetPlans[y]||{};yt[y]=Object.values(p).reduce((a,b)=>a+(Number(b)||0),0)}
-  const gt=Object.values(yt).reduce((a,b)=>a+b,0);
-  const sy={};for(let y=1;y<=5;y++)sy[y]=0;
-  allExpenses.forEach(e=>{const y=parseInt(e.year);if(y>=1&&y<=5)sy[y]+=(e.amount||0)});
-  const ts=Object.values(sy).reduce((a,b)=>a+b,0);
-  document.getElementById('s-total-budget').textContent=won(gt);
-  document.getElementById('s-total-spent').textContent=won(ts);
-  document.getElementById('s-total-rate').textContent='전체 대비 '+pct(ts,gt)+'%';
-  const tbody=document.getElementById('bp-tbody');let html='';
+  const totalBudget=Object.values(budgetByProj).reduce((a,b)=>a+b,0);
+  const totalSpent=Object.values(spentByProj).reduce((a,b)=>a+b,0);
+  document.getElementById('s-total-budget').textContent=won(totalBudget);
+  document.getElementById('s-total-spent').textContent=won(totalSpent);
+  document.getElementById('s-total-rate').textContent='전체 대비 '+pct(totalSpent,totalBudget)+'%';
 
-  // 구분별 × 차년도별 집행액 집계 (차년도별 항목 기준)
-  const allPlanCats=[...new Set(Object.values(PLAN_CATS_BY_YEAR).flat())]; // 전체 구분 합집합
-  const spentByPlanYear={};
-  allPlanCats.forEach(c=>{spentByPlanYear[c]={};for(let y=1;y<=5;y++)spentByPlanYear[c][y]=0});
-  allExpenses.forEach(e=>{
-    const pc=e.planCategory,y=parseInt(e.year);
-    if(pc&&spentByPlanYear[pc]&&y>=1&&y<=5) spentByPlanYear[pc][y]+=(e.amount||0);
+  const grid=document.getElementById('project-grid');
+  grid.innerHTML='';
+  Object.values(PROJECTS).forEach(proj=>{
+    const b=budgetByProj[proj.id]||0;
+    const s=spentByProj[proj.id]||0;
+    const r=pct(s,b);
+    const card=document.createElement('a');
+    card.href=`budget.html?p=${proj.id}`;
+    card.className='proj-card';
+    card.style.cssText=`--proj-color:${proj.color};--proj-light:${proj.light};--proj-border:${proj.border}`;
+    card.innerHTML=`
+      <div class="proj-header">
+        <div class="proj-icon">${proj.icon}</div>
+        <div>
+          <div class="proj-name">${proj.label}</div>
+          <div class="proj-sub">5차년도 사업</div>
+        </div>
+        <div class="proj-arrow">→</div>
+      </div>
+      <div class="proj-stats">
+        <div class="proj-stat">
+          <div class="proj-stat-label">배정 예산</div>
+          <div class="proj-stat-value colored">${b?won(b):'미입력'}</div>
+        </div>
+        <div class="proj-stat">
+          <div class="proj-stat-label">집행액</div>
+          <div class="proj-stat-value" style="color:var(--green)">${won(s)}</div>
+        </div>
+      </div>
+      <div>
+        <div class="proj-bar-wrap"><div class="proj-bar" id="pb-${proj.id}" style="width:0%"></div></div>
+        <div class="proj-rate">집행률 <span>${r}%</span></div>
+      </div>
+      <div class="proj-years">
+        ${[1,2,3,4,5].map(y=>`<a href="year.html?p=${proj.id}&y=${y}" class="proj-yr-btn" onclick="event.stopPropagation()">${y}차년도</a>`).join('')}
+      </div>`;
+    grid.appendChild(card);
+    setTimeout(()=>{const pb=document.getElementById('pb-'+proj.id);if(pb)pb.style.width=r+'%'},100);
   });
-  const spentByPlan={};allPlanCats.forEach(c=>spentByPlan[c]=Object.values(spentByPlanYear[c]).reduce((a,b)=>a+b,0));
-
-  // 차년도별로 해당 차년도 항목만 행으로 표시 (전체 구분 합집합 기준)
-  const PLAN_CATS=allPlanCats.length>0?allPlanCats:DEFAULT_PLAN_CATS;
-
-  const rateCell=(budget,spent)=>{
-    if(!budget) return `<td style="color:var(--text4);font-size:11px">—</td>`;
-    const r=pct(spent,budget);
-    const col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)';
-    return `<td style="color:${col};font-weight:600;font-family:var(--mono);font-size:12px">${r}%</td>`;
-  };
-
-  PLAN_CATS.forEach(cat=>{
-    html+=`<tr><td style="font-weight:500;color:var(--text)">${cat}</td>`;
-    let totalBudget=0,totalSpent=0;
-    for(let y=1;y<=5;y++){
-      const yCats=PLAN_CATS_BY_YEAR[y]||DEFAULT_PLAN_CATS;
-      const hasThisYear=yCats.includes(cat); // 이 차년도에 해당 항목이 있는지
-      const b=hasThisYear?(budgetPlans[y]||{})[cat]||0:null;
-      const s=spentByPlanYear[cat]?spentByPlanYear[cat][y]||0:0;
-      if(b!==null){totalBudget+=b;totalSpent+=s;}
-      const isCur=y===CURRENT_YEAR;
-      const borderL='border-left:1px solid var(--border);';
-      if(!hasThisYear){
-        // 이 차년도에 없는 항목은 회색으로 표시
-        html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">해당없음</td>`;
-        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
-        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
-      } else {
-        html+=`<td style="${borderL}${isCur?'background:var(--blue-50);':''}font-family:var(--mono);font-size:12px">${b?won(b):'<span style="color:var(--text4);font-size:11px">미입력</span>'}</td>`;
-        html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--green);font-family:var(--mono);font-size:12px;font-weight:600">${s?won(s):'—'}</td>`;
-        if(!b) html+=`<td style="${isCur?'background:var(--blue-50);':''}color:var(--text4);font-size:11px">—</td>`;
-        else { const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)'; html+=`<td style="${isCur?'background:var(--blue-50);':''}color:${col};font-weight:700;font-family:var(--mono);font-size:12px">${r}%</td>`; }
-      }
-    }
-    // 전체 합계
-    const tr=pct(totalSpent,totalBudget),tcol=tr>=100?'var(--red)':tr>=80?'var(--yellow)':'var(--green)';
-    html+=`<td style="border-left:2px solid var(--blue-100);background:var(--blue-50);font-weight:700;font-family:var(--mono);font-size:12px">${totalBudget?won(totalBudget):'—'}</td>`;
-    html+=`<td style="background:var(--blue-50);color:var(--green);font-weight:700;font-family:var(--mono);font-size:12px">${totalSpent?won(totalSpent):'—'}</td>`;
-    html+=`<td style="background:var(--blue-50);color:${tcol};font-weight:700;font-family:var(--mono);font-size:12px">${totalBudget?tr+'%':'—'}</td>`;
-    html+=`</tr>`;
-  });
-
-  // 합계 행
-  html+=`<tr class="total-row"><td>합 계</td>`;
-  let grandB=0,grandS=0;
-  for(let y=1;y<=5;y++){
-    const b=yt[y]||0,s=sy[y]||0;
-    grandB+=b;grandS+=s;
-    const r=pct(s,b),col=r>=100?'var(--red)':r>=80?'var(--yellow)':'var(--green)';
-    const isCur=y===CURRENT_YEAR;
-    html+=`<td style="border-left:1px solid var(--border2);${isCur?'background:rgba(37,99,235,.1);':''}font-family:var(--mono)">${b?won(b):'—'}</td>`;
-    html+=`<td style="${isCur?'background:rgba(37,99,235,.1);':''}color:var(--green);font-family:var(--mono)">${s?won(s):'—'}</td>`;
-    html+=`<td style="${isCur?'background:rgba(37,99,235,.1);':''}color:${col};font-weight:700;font-family:var(--mono)">${b?r+'%':'—'}</td>`;
-  }
-  const gr=pct(grandS,grandB);
-  html+=`<td style="border-left:2px solid var(--blue-100);background:rgba(37,99,235,.1);color:var(--blue-600);font-family:var(--mono)">${won(grandB)}</td>`;
-  html+=`<td style="background:rgba(37,99,235,.1);color:var(--green);font-family:var(--mono)">${won(grandS)}</td>`;
-  html+=`<td style="background:rgba(37,99,235,.1);color:${gr>=100?'var(--red)':gr>=80?'var(--yellow)':'var(--green)'};font-weight:700;font-family:var(--mono)">${gr}%</td>`;
-  html+=`</tr>`;
-  tbody.innerHTML=html;
-  const grid=document.getElementById('year-grid');grid.innerHTML='';
-  for(let y=1;y<=5;y++){
-    const b=yt[y]||0,s=sy[y]||0,r=pct(s,b);
-    const c=document.createElement('a');c.href=`year.html?y=${y}`;c.className='y-card'+(y===CURRENT_YEAR?' cur-year':'');
-    c.innerHTML=`<div class="y-num">YEAR ${y}${y===CURRENT_YEAR?' · 진행 중':''}</div><div class="y-title">${y}차년도</div><div class="y-period">${PERIODS[y]}</div><div class="y-budget-row"><div><div class="y-blabel">배정 예산</div><div class="y-bvalue">${b?won(b):'미입력'}</div></div><div style="text-align:right"><div class="y-blabel">집행액</div><div class="y-bvalue" style="color:var(--green)">${won(s)}</div></div></div><div class="y-bar-wrap"><div class="y-bar" id="yb${y}" style="width:0%"></div></div><div class="y-rate">집행률 <span>${r}%</span></div><div class="y-arrow">→</div>`;
-    grid.appendChild(c);setTimeout(()=>{const b2=document.getElementById('yb'+y);if(b2)b2.style.width=r+'%'},100);
-  }
-  const rb=document.getElementById('recent-tbody');const rc=allExpenses.slice(0,10);
-  if(!rc.length){rb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">집행 내역이 없습니다</td></tr>`;return}
-  rb.innerHTML=rc.map(e=>{const dt=e.date?.toDate?e.date.toDate().toLocaleDateString('ko-KR'):(e.date||'—');return`<tr><td style="font-weight:600;color:var(--blue-600)">${e.year||'—'}차</td><td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${dt}</td><td><span class="tag ${TAG_COLORS[e.category||'기타']||'tag-teal'}">${e.category||'기타'}</span></td><td>${e.title||'—'}</td><td style="text-align:right;font-family:var(--mono);font-size:13px;font-weight:600">${(e.amount||0).toLocaleString('ko-KR')}원</td></tr>`}).join('');
 }
-const SP={};
-const SE=[];
 </script>
 </body>
 </html>
