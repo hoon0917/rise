@@ -272,6 +272,9 @@ Promise.all([1,2,3,4,5].map(y=>
     catsByYear[y]=data.planCats&&data.planCats.length>0?data.planCats:[...DEFAULT_PLAN_CATS];
   });
   catsLoaded=true; if(plansLoaded&&expLoaded) renderAll();
+}).catch(()=>{
+  for(let y=1;y<=5;y++) catsByYear[y]=[...DEFAULT_PLAN_CATS];
+  catsLoaded=true; if(plansLoaded&&expLoaded) renderAll();
 });
 
 // budgetPlans 로드
@@ -329,9 +332,10 @@ function renderAll(){
       }
     }
     const tr=pct(tS,tB);
+    const trCol=tB?(tr>=100?'var(--red)':tr>=80?'var(--yellow)':'var(--green)'):'var(--text4)';
     html+=`<td style="border-left:2px solid var(--pc-b);background:var(--pc-l);font-weight:700">${tB?wonFull(tB):'—'}</td>`;
     html+=`<td style="background:var(--pc-l);color:var(--green);font-weight:700">${tS?wonFull(tS):'—'}</td>`;
-    html+=`<td style="background:var(--pc-l);font-weight:700;color:${tB?(tr>=100?'var(--red)':tr>=80?'var(--yellow)':'var(--green)'):'var(--text4)'}">${tB?tr+'%':'—'}</td>`;
+    html+=`<td style="background:var(--pc-l);font-weight:700;color:${trCol}">${tB?tr+'%':'—'}</td>`;
     html+=`</tr>`;
   });
   // 합계 행
@@ -343,7 +347,10 @@ function renderAll(){
     html+=`<td style="border-left:1px solid var(--border)">${wonFull(b)}</td><td style="color:var(--green)">${s?wonFull(s):'—'}</td><td style="color:${col};font-weight:700">${b?r+'%':'—'}</td>`;
   }
   const gr=pct(gS,gB);
-  html+=`<td style="border-left:2px solid var(--pc-b)">${wonFull(gB)}</td><td style="color:var(--green)">${wonFull(gS)}</td><td style="color:${gr>=100?'var(--red)':gr>=80?'var(--yellow)':'var(--green)';font-weight:700}">${gr}%</td></tr>`;
+  const grCol=gr>=100?'var(--red)':gr>=80?'var(--yellow)':'var(--green)';
+  html+=`<td style="border-left:2px solid var(--pc-b);background:var(--blue-l);font-weight:700">${wonFull(gB)}</td>`;
+  html+=`<td style="background:var(--blue-l);color:var(--green);font-weight:700">${wonFull(gS)}</td>`;
+  html+=`<td style="background:var(--blue-l);font-weight:700;color:${grCol}">${gr}%</td></tr>`;
   tbody.innerHTML=html;
 
   // 차년도 카드
