@@ -214,6 +214,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <div class="nav-remote" id="nav-remote"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
@@ -408,77 +409,505 @@ function renderTable(){
 }
 function goPage(n){curPage=n;renderTable();window.scrollTo({top:600,behavior:'smooth'})}
 
-/* ── 엑셀 다운로드 ── */
-function downloadYearExcel(){
-  const btn=document.getElementById('btn-year-dl');
-  btn.textContent='생성 중…';btn.disabled=true;
-  const today=new Date();
-  const todayStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-  const YEAR_LABELS=['1차년도','2차년도','3차년도','4차년도','5차년도'];
-  const wb=XLSX.utils.book_new();
-  const planBudget=window._planBudgetData||{};
-  const PLAN_CATS=window._planCats||DEFAULT_PLAN_CATS;
+/* ════════════════════════════════════════════════════════════════
+   RISE사업단 엑셀 생성 핵심 모듈 (xlsx-style 서식 완전 적용)
+   원본 양식 재현:
+   - 구분별 고유 색상 헤더
+   - 비목행 회색 (F2F2F2) bold
+   - 세부내역 흰/연파랑(DEEAF1) 교대
+   - 소계행 구분색 bold
+   - 총계행 진남색(1F3864) 흰글씨
+   - 집행률 % 서식, 금액 숫자 서식
+════════════════════════════════════════════════════════════════ */
 
-  // ── 시트1: 예산현황 요약 ──
-  {
-    const rows=[];
-    rows.push([`${proj.label} ${YEAR_LABELS[Y-1]} 예산 현황 (${PERIODS[Y]})`,'','','','생성일: '+todayStr]);
-    rows.push([]);
-    // 사업계획서 구분별
-    rows.push(['항목 (사업계획서 구분별)','예산금액(원)','집행금액(원)','잔액(원)','집행률(%)']);
-    const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=0);
-    allData.forEach(e=>{const pc=e.planCategory;if(pc&&spentByPlan[pc]!==undefined)spentByPlan[pc]+=(e.amount||0)});
-    let sTb=0,sTs=0;
-    PLAN_CATS.forEach(cat=>{
-      const b=Number(planBudget[cat])||0,s=spentByPlan[cat]||0;
-      sTb+=b;sTs+=s;
-      rows.push([`  ${cat}`,b,s,b-s,b>0?s/b:0]);
-    });
-    rows.push(['  ▶ 총  계',sTb,sTs,sTb-sTs,sTb>0?sTs/sTb:0]);
-    rows.push([]);
-    // 집행 과목별
-    rows.push(['항목 (집행 과목별)','배정 예산(원)','집행금액(원)','잔액(원)','집행률(%)']);
-    const spent={};EXP_CATS.forEach(c=>spent[c]=0);
-    allData.forEach(e=>{const c=e.category;if(spent[c]!==undefined)spent[c]+=(e.amount||0)});
-    let eTb=0,eTs=0;
-    EXP_CATS.forEach(cat=>{
-      const b=Number(catBudgets[cat])||0,s=spent[cat]||0;
-      eTb+=b;eTs+=s;
-      rows.push([`  ${cat}`,b,s,b-s,b>0?s/b:0]);
-    });
-    rows.push(['  ▶ 총  계',eTb,eTs,eTb-eTs,eTb>0?eTs/eTb:0]);
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    const range=XLSX.utils.decode_range(ws['!ref']||'A1');
-    for(let R=range.s.r;R<=range.e.r;R++){
-      const cell=ws[XLSX.utils.encode_cell({r:R,c:4})];
-      if(cell&&typeof cell.v==='number'){cell.t='n';cell.z='0.00%';}
-    }
-    ws['!cols']=[{wch:40},{wch:16},{wch:16},{wch:16},{wch:10}];
-    XLSX.utils.book_append_sheet(wb,ws,'📊 예산현황');
-  }
+// ── 색상 팔레트 ──
+const RISE_COLORS = {
+  title:    { bg: '1F3864', fg: 'FFFFFF' }, // 진남색 타이틀/총계
+  header:   { bg: '2E75B6', fg: 'FFFFFF' }, // 파랑 헤더
+  subtotal: { bg: '2E75B6', fg: 'FFFFFF' }, // 소계 (구분색으로 override)
+  bimok:    { bg: 'F2F2F2', fg: '000000' }, // 비목행 회색
+  detail_w: { bg: 'FFFFFF', fg: '000000' }, // 세부내역 흰
+  detail_b: { bg: 'DEEAF1', fg: '000000' }, // 세부내역 연파랑
+  total:    { bg: '1F3864', fg: 'FFFFFF' }, // 합계행 진남색
+};
+// 구분별 고유 색상 (원본 파일 그대로)
+const CAT_THEME_COLORS = [
+  '2E75B6', // 1. 인건비·장학금 — 파랑
+  'ED7D31', // 2. 교육·연구운영 — 주황
+  '70AD47', // 3. 환경개선 — 녹색
+  'FFD966', // 4. 실험·실습장비 — 노랑
+  '9DC3E6', // 5. 지역연계 — 연파랑
+  'F4B183', // 6. 성과확산 — 살구
+  'C5E0B4', // 7. 기타운영 — 연녹색
+  'A9D18E', // 8. 추가
+  'B4C7E7', // 9. 추가
+];
+// 노랑/연파랑 계열은 글씨를 검정으로 (명도 높아서)
+const LIGHT_COLORS = new Set(['FFD966','9DC3E6','C5E0B4','F4B183','A9D18E','B4C7E7']);
 
-  // ── 시트2: 세부 집행 내역 ──
-  {
-    const rows=[];
-    rows.push([`${proj.label} ${YEAR_LABELS[Y-1]} 세부 집행 내역`,'','','','','생성일: '+todayStr]);
-    rows.push([]);
-    rows.push(['집행일','사업계획서 구분','집행 과목','집행 내용','집행액(원)','비고']);
-    const sorted=[...allData].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-    sorted.forEach(e=>{
-      rows.push([e.date||'',e.planCategory||'',e.category||'',e.title||'',e.amount||0,e.note||'']);
-    });
-    if(sorted.length){
-      const total=sorted.reduce((a,b)=>a+(b.amount||0),0);
-      rows.push(['','','','합  계',total,'']);
-    }
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:14},{wch:36},{wch:14},{wch:48},{wch:14},{wch:28}];
-    XLSX.utils.book_append_sheet(wb,ws,'세부 집행내역');
-  }
+function catFg(hex) { return LIGHT_COLORS.has(hex) ? '000000' : 'FFFFFF'; }
 
-  XLSX.writeFile(wb,`RISE사업_${proj.label}_${YEAR_LABELS[Y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
-  btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
+// ── 셀 스타일 헬퍼 ──
+function cs(bgHex, fgHex, opts = {}) {
+  return {
+    font: {
+      name: '맑은 고딕',
+      sz: opts.sz || 10,
+      bold: opts.bold || false,
+      color: { rgb: fgHex }
+    },
+    fill: bgHex ? { patternType: 'solid', fgColor: { rgb: bgHex } } : {},
+    alignment: {
+      vertical: 'center',
+      horizontal: opts.align || 'left',
+      wrapText: opts.wrap !== false
+    },
+    border: {
+      top:    { style: 'thin', color: { rgb: 'D0D0D0' } },
+      bottom: { style: 'thin', color: { rgb: 'D0D0D0' } },
+      left:   { style: 'thin', color: { rgb: 'D0D0D0' } },
+      right:  { style: 'thin', color: { rgb: 'D0D0D0' } },
+    },
+    numFmt: opts.numFmt || ''
+  };
 }
+
+// 숫자셀
+function numCs(bgHex, fgHex, opts = {}) {
+  return cs(bgHex, fgHex, { ...opts, align: 'right', numFmt: opts.pct ? '0.00%' : '#,##0' });
+}
+
+// ── 셀 생성 헬퍼 ──
+function cell(v, style) {
+  const t = typeof v === 'number' ? 'n' : 's';
+  return { v, t, s: style };
+}
+
+// ── 워크시트에 셀 쓰기 ──
+function writeCell(ws, r, c, v, style) {
+  const addr = XLSX.utils.encode_cell({ r, c });
+  ws[addr] = cell(v, style);
+}
+
+function setRange(ws, r, c, v, style) { writeCell(ws, r, c, v, style); }
+
+// ── 머지 헬퍼 ──
+function addMerge(ws, r1, c1, r2, c2) {
+  if (!ws['!merges']) ws['!merges'] = [];
+  ws['!merges'].push({ s: { r: r1, c: c1 }, e: { r: r2, c: c2 } });
+}
+
+// ── 행 높이 헬퍼 ──
+function setRowHeight(ws, r, hpx) {
+  if (!ws['!rows']) ws['!rows'] = [];
+  ws['!rows'][r] = { hpx };
+}
+
+// ═══════════════════════════════════════════════════════
+// 📊 예산현황 시트 생성
+// ═══════════════════════════════════════════════════════
+function makeOverviewSheet(projLabel, yearLabel, period, planCats, planBudgetData, allExpenses) {
+  const ws = { '!ref': 'A1:A1' };
+  let row = 0;
+
+  // 타이틀 (row 0 = 엑셀 1행, B~F = col1~5 = 0-based col 1~5)
+  // B열=1, C=2, D=3, E=4, F=5 로 B:F 사용
+  const title = `${projLabel} ${yearLabel} 예산 현황`;
+  writeCell(ws, row, 1, title, cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, sz: 13 }));
+  for (let c = 2; c <= 5; c++) writeCell(ws, row, c, '', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, {}));
+  if (period) writeCell(ws, row, 6, period, cs('FFFFFF', '64748B', { sz: 9, align: 'right' }));
+  addMerge(ws, row, 1, row, 5);
+  setRowHeight(ws, row, 28);
+  row++;
+
+  // 빈 행
+  row++;
+
+  // 헤더행 (row 2)
+  const hdr = ['항  목', '예산금액(원)', '집행금액(원)', '잔  액(원)', '집행률(%)'];
+  const hdrStyle = cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'center' });
+  hdr.forEach((h, i) => writeCell(ws, row, i + 1, h, {
+    ...hdrStyle,
+    alignment: { vertical: 'center', horizontal: i === 0 ? 'left' : 'right', wrapText: false }
+  }));
+  setRowHeight(ws, row, 20);
+  row++;
+
+  // 집행액 집계 (planCategory 기준)
+  const spentMap = {};
+  planCats.forEach(c => spentMap[c] = 0);
+  (allExpenses || []).forEach(e => {
+    if (e.planCategory && spentMap[e.planCategory] !== undefined)
+      spentMap[e.planCategory] += (e.amount || 0);
+  });
+
+  // 구분별 행
+  planCats.forEach((cat, idx) => {
+    const colorHex = CAT_THEME_COLORS[idx % CAT_THEME_COLORS.length];
+    const fg = catFg(colorHex);
+    const bgt = Number(planBudgetData[cat]) || 0;
+    const spt = spentMap[cat] || 0;
+    const rem = bgt - spt;
+    const rate = bgt > 0 ? spt / bgt : 0;
+
+    writeCell(ws, row, 1, `  ${cat}`, cs(colorHex, fg, { bold: true }));
+    writeCell(ws, row, 2, bgt, numCs(colorHex.replace(/FF/, ''), fg, { bold: true }));
+    writeCell(ws, row, 3, spt, numCs(colorHex.replace(/FF/, ''), fg, { bold: true }));
+    writeCell(ws, row, 4, rem, numCs(colorHex.replace(/FF/, ''), fg, { bold: true }));
+    writeCell(ws, row, 5, rate, numCs(colorHex.replace(/FF/, ''), fg, { bold: true, pct: true }));
+    setRowHeight(ws, row, 18);
+    row++;
+  });
+
+  // 총계행
+  const tB = planCats.reduce((a, c) => a + (Number(planBudgetData[c]) || 0), 0);
+  const tS = Object.values(spentMap).reduce((a, b) => a + b, 0);
+  const tR = tB > 0 ? tS / tB : 0;
+  writeCell(ws, row, 1, '  ▶ 총  계', cs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 2, tB, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 3, tS, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 4, tB - tS, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 5, tR, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true, pct: true }));
+  setRowHeight(ws, row, 20);
+  row++;
+
+  ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: row, c: 7 } });
+  ws['!cols'] = [
+    { wch: 2 },   // A (여백)
+    { wch: 40 },  // B 항목
+    { wch: 16 },  // C 예산
+    { wch: 16 },  // D 집행
+    { wch: 16 },  // E 잔액
+    { wch: 10 },  // F 집행률
+    { wch: 14 },  // G 기간
+  ];
+  ws['!rows'] = ws['!rows'] || [];
+
+  return ws;
+}
+
+// ═══════════════════════════════════════════════════════
+// 구분별 상세 시트 생성
+// ═══════════════════════════════════════════════════════
+function makeCatSheet(catName, catIdx, planBudgetData, allExpenses) {
+  const ws = { '!ref': 'A1:A1' };
+  const colorHex = CAT_THEME_COLORS[catIdx % CAT_THEME_COLORS.length];
+  const fg = catFg(colorHex);
+  let row = 0;
+
+  // 타이틀 (B2:J2 머지) — 0-based: row0, col1~9
+  writeCell(ws, row, 1, catName, cs(colorHex, fg, { bold: true, sz: 12 }));
+  for (let c = 2; c <= 9; c++) writeCell(ws, row, c, '', cs(colorHex, fg, {}));
+  addMerge(ws, row, 1, row, 9);
+  setRowHeight(ws, row, 26);
+  row++;
+
+  // 빈 행
+  row++;
+
+  // 헤더행 (B4~J4)
+  const hdrs = ['비  목', '세  목', '세세목', '산출내역 / 집행내역', '예산금액(원)', '집행금액(원)', '잔  액(원)', '집행률(%)', '내부문서번호'];
+  hdrs.forEach((h, i) => {
+    const isNum = i >= 4 && i <= 7;
+    writeCell(ws, row, i + 1, h, cs(colorHex, fg, {
+      bold: true, sz: 9,
+      align: isNum ? 'right' : (i === 3 ? 'center' : 'center'),
+      wrap: false
+    }));
+  });
+  setRowHeight(ws, row, 18);
+  row++;
+
+  // 해당 구분의 집행 내역 필터
+  const catExps = (allExpenses || []).filter(e => e.planCategory === catName);
+  const budget = Number(planBudgetData[catName]) || 0;
+  const spent = catExps.reduce((a, b) => a + (b.amount || 0), 0);
+
+  // 집행 내역이 없는 경우 — 빈 비목행 + 소계만
+  if (catExps.length === 0) {
+    writeCell(ws, row, 1, '', cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 2, '', cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 3, '', cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 4, '', cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 5, budget, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 6, 0, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 7, budget, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+    writeCell(ws, row, 8, 0, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true, pct: true }));
+    writeCell(ws, row, 9, '', cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, {}));
+    row++;
+  } else {
+    // 집행 과목(category) 기준으로 그룹화
+    const groups = {};
+    catExps.forEach(e => {
+      const k = e.category || '기타';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(e);
+    });
+
+    let detailIdx = 0;
+    Object.entries(groups).forEach(([cat, exps]) => {
+      const catSpent = exps.reduce((a, b) => a + (b.amount || 0), 0);
+      const catRate = budget > 0 ? catSpent / budget : 0;
+
+      // 비목행 (집행 과목 = 비목, 빈칸 = 세목, 세세목)
+      const bStyle = cs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true });
+      writeCell(ws, row, 1, cat, bStyle);
+      writeCell(ws, row, 2, '', bStyle);
+      writeCell(ws, row, 3, '', bStyle);
+      writeCell(ws, row, 4, '', bStyle);
+      writeCell(ws, row, 5, budget, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+      writeCell(ws, row, 6, catSpent, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+      writeCell(ws, row, 7, budget - catSpent, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true }));
+      writeCell(ws, row, 8, catRate, numCs(RISE_COLORS.bimok.bg, RISE_COLORS.bimok.fg, { bold: true, pct: true }));
+      writeCell(ws, row, 9, '', bStyle);
+      setRowHeight(ws, row, 18);
+      row++;
+
+      // 세부 집행내역 — 흰/연파랑 교대
+      exps.forEach(e => {
+        const bgH = detailIdx % 2 === 0 ? 'FFFFFF' : 'DEEAF1';
+        const dStyle = cs(bgH, '000000', { sz: 9 });
+        writeCell(ws, row, 1, '', dStyle);
+        writeCell(ws, row, 2, '', dStyle);
+        writeCell(ws, row, 3, '', dStyle);
+        writeCell(ws, row, 4, e.title || '', cs(bgH, '000000', { sz: 9, wrap: true }));
+        writeCell(ws, row, 5, '', cs(bgH, '000000', { sz: 9 }));
+        writeCell(ws, row, 6, e.amount || 0, numCs(bgH, '000000', { sz: 9 }));
+        writeCell(ws, row, 7, '', cs(bgH, '000000', { sz: 9 }));
+        writeCell(ws, row, 8, '', cs(bgH, '000000', { sz: 9 }));
+        writeCell(ws, row, 9, e.note || '', cs(bgH, '5C6BC0', { sz: 9 }));
+        setRowHeight(ws, row, 16);
+        row++;
+        detailIdx++;
+      });
+    });
+  }
+
+  // 소계행 (B:E 머지)
+  const rate = budget > 0 ? spent / budget : 0;
+  const sStyle = cs(colorHex, fg, { bold: true });
+  writeCell(ws, row, 1, '소  계', sStyle);
+  writeCell(ws, row, 2, '', sStyle);
+  writeCell(ws, row, 3, '', sStyle);
+  writeCell(ws, row, 4, '', sStyle);
+  addMerge(ws, row, 1, row, 4);
+  writeCell(ws, row, 5, budget, numCs(colorHex, fg, { bold: true }));
+  writeCell(ws, row, 6, spent, numCs(colorHex, fg, { bold: true }));
+  writeCell(ws, row, 7, budget - spent, numCs(colorHex, fg, { bold: true }));
+  writeCell(ws, row, 8, rate, numCs(colorHex, fg, { bold: true, pct: true }));
+  writeCell(ws, row, 9, '', sStyle);
+  setRowHeight(ws, row, 18);
+  row++;
+
+  ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: row, c: 10 } });
+  ws['!cols'] = [
+    { wch: 2 },   // A 여백
+    { wch: 12 },  // B 비목
+    { wch: 12 },  // C 세목
+    { wch: 18 },  // D 세세목
+    { wch: 44 },  // E 산출/집행내역
+    { wch: 16 },  // F 예산
+    { wch: 16 },  // G 집행
+    { wch: 16 },  // H 잔액
+    { wch: 9 },   // I 집행률
+    { wch: 14 },  // J 내부문서번호
+  ];
+  ws['!rows'] = ws['!rows'] || [];
+  return ws;
+}
+
+// ═══════════════════════════════════════════════════════
+// 5개년 요약 시트 (budget.html용)
+// ═══════════════════════════════════════════════════════
+function make5YearSheet(projLabel, catsByYear, budgetPlans, allExpenses) {
+  const ws = { '!ref': 'A1:A1' };
+  let row = 0;
+  const allCats = [...new Set(Object.values(catsByYear).flat())];
+
+  // 타이틀
+  writeCell(ws, row, 1, `${projLabel} 5개년 예산 현황`, cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, sz: 12 }));
+  for (let c = 2; c <= 18; c++) writeCell(ws, row, c, '', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, {}));
+  addMerge(ws, row, 1, row, 18);
+  setRowHeight(ws, row, 26);
+  row++;
+  row++; // 빈행
+
+  // 헤더 1행 (차년도 그룹)
+  writeCell(ws, row, 1, '구분', cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'center' }));
+  for (let y = 1; y <= 5; y++) {
+    const c = (y - 1) * 3 + 2;
+    writeCell(ws, row, c, `${y}차년도`, cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'center' }));
+    writeCell(ws, row, c + 1, '', cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, {}));
+    writeCell(ws, row, c + 2, '', cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, {}));
+    addMerge(ws, row, c, row, c + 2);
+  }
+  writeCell(ws, row, 17, '전체 합계', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, align: 'center' }));
+  writeCell(ws, row, 18, '', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, {}));
+  writeCell(ws, row, 19, '', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, {}));
+  addMerge(ws, row, 17, row, 19);
+  setRowHeight(ws, row, 18);
+  row++;
+
+  // 헤더 2행 (배정/집행/집행률)
+  writeCell(ws, row, 1, '', cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, {}));
+  for (let y = 1; y <= 5; y++) {
+    const c = (y - 1) * 3 + 2;
+    writeCell(ws, row, c,     '배정',   cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'right', sz: 9 }));
+    writeCell(ws, row, c + 1, '집행',   cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'right', sz: 9 }));
+    writeCell(ws, row, c + 2, '집행률', cs(RISE_COLORS.header.bg, RISE_COLORS.header.fg, { bold: true, align: 'right', sz: 9 }));
+  }
+  writeCell(ws, row, 17, '배정',   cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, align: 'right', sz: 9 }));
+  writeCell(ws, row, 18, '집행',   cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, align: 'right', sz: 9 }));
+  writeCell(ws, row, 19, '집행률', cs(RISE_COLORS.title.bg, RISE_COLORS.title.fg, { bold: true, align: 'right', sz: 9 }));
+  setRowHeight(ws, row, 16);
+  row++;
+
+  // 집계
+  const spentByCatYear = {};
+  allCats.forEach(c => { spentByCatYear[c] = {}; for (let y = 1; y <= 5; y++) spentByCatYear[c][y] = 0; });
+  (allExpenses || []).forEach(e => {
+    const pc = e.planCategory, y = parseInt(e.year);
+    if (pc && spentByCatYear[pc] && y >= 1 && y <= 5) spentByCatYear[pc][y] += (e.amount || 0);
+  });
+
+  // 구분별 행
+  allCats.forEach((cat, idx) => {
+    const colorHex = CAT_THEME_COLORS[idx % CAT_THEME_COLORS.length];
+    const fg = catFg(colorHex);
+    writeCell(ws, row, 1, `  ${cat}`, cs(colorHex, fg, { bold: true }));
+    let tB = 0, tS = 0;
+    for (let y = 1; y <= 5; y++) {
+      const inYear = (catsByYear[y] || []).includes(cat);
+      const b = inYear ? (Number((budgetPlans[y] || {})[cat]) || 0) : 0;
+      const s = spentByCatYear[cat][y] || 0;
+      if (inYear) { tB += b; tS += s; }
+      const c = (y - 1) * 3 + 2;
+      if (!inYear) {
+        writeCell(ws, row, c,     '—', cs('F5F5F5', 'AAAAAA', { align: 'center' }));
+        writeCell(ws, row, c + 1, '—', cs('F5F5F5', 'AAAAAA', { align: 'center' }));
+        writeCell(ws, row, c + 2, '—', cs('F5F5F5', 'AAAAAA', { align: 'center' }));
+      } else {
+        writeCell(ws, row, c,     b, numCs('FFFFFF', '0F172A'));
+        writeCell(ws, row, c + 1, s, numCs('ECFDF5', '059669'));
+        writeCell(ws, row, c + 2, b > 0 ? s / b : 0, numCs('FFFFFF', '0F172A', { pct: true }));
+      }
+    }
+    writeCell(ws, row, 17, tB, numCs('EFF6FF', '2563EB', { bold: true }));
+    writeCell(ws, row, 18, tS, numCs('ECFDF5', '059669', { bold: true }));
+    writeCell(ws, row, 19, tB > 0 ? tS / tB : 0, numCs('EFF6FF', '2563EB', { bold: true, pct: true }));
+    setRowHeight(ws, row, 16);
+    row++;
+  });
+
+  // 합계행
+  writeCell(ws, row, 1, '합  계', cs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  let gB = 0, gS = 0;
+  for (let y = 1; y <= 5; y++) {
+    const yB = Object.values(budgetPlans[y] || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+    const yS = (allExpenses || []).filter(e => parseInt(e.year) === y).reduce((a, b) => a + (b.amount || 0), 0);
+    gB += yB; gS += yS;
+    const c = (y - 1) * 3 + 2;
+    writeCell(ws, row, c,     yB, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+    writeCell(ws, row, c + 1, yS, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+    writeCell(ws, row, c + 2, yB > 0 ? yS / yB : 0, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true, pct: true }));
+  }
+  writeCell(ws, row, 17, gB, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 18, gS, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true }));
+  writeCell(ws, row, 19, gB > 0 ? gS / gB : 0, numCs(RISE_COLORS.total.bg, RISE_COLORS.total.fg, { bold: true, pct: true }));
+  setRowHeight(ws, row, 20);
+  row++;
+
+  ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: row, c: 20 } });
+  ws['!cols'] = [
+    { wch: 2 }, { wch: 36 },
+    ...Array(5).fill(null).flatMap(() => [{ wch: 14 }, { wch: 14 }, { wch: 8 }]),
+    { wch: 14 }, { wch: 14 }, { wch: 8 }
+  ];
+  return ws;
+}
+
+// ═══════════════════════════════════════════════════════
+// 메인: budget.html용 엑셀 다운로드
+// ═══════════════════════════════════════════════════════
+function downloadBudgetExcel() {
+  const btn = document.getElementById('btn-budget-dl');
+  btn.textContent = '생성 중…'; btn.disabled = true;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const YEAR_LABELS = ['1차년도','2차년도','3차년도','4차년도','5차년도'];
+
+  try {
+    const wb = { SheetNames: [], Sheets: {} };
+
+    // 시트1: 5개년 요약
+    const s0 = make5YearSheet(proj.label, catsByYear, budgetPlans, allExpenses);
+    wb.SheetNames.push('📊 5개년 요약');
+    wb.Sheets['📊 5개년 요약'] = s0;
+
+    // 시트2~6: 차년도별 예산현황 + 구분별 상세
+    for (let y = 1; y <= 5; y++) {
+      const yCats = catsByYear[y] || [];
+      const planBudget = budgetPlans[y] || {};
+      const yExp = allExpenses.filter(e => parseInt(e.year) === y);
+
+      // 차년도 예산현황 시트
+      const sOverview = makeOverviewSheet(proj.label, YEAR_LABELS[y-1], PERIODS[y], yCats, planBudget, yExp);
+      wb.SheetNames.push(`${y}차 예산현황`);
+      wb.Sheets[`${y}차 예산현황`] = sOverview;
+
+      // 구분별 상세 시트
+      yCats.forEach((cat, idx) => {
+        const sname = `${y}차 ${idx+1}.${cat.replace(/[:\\/?*\[\]]/g,'').substring(0,12)}`;
+        const sCat = makeCatSheet(cat, idx, planBudget, yExp);
+        wb.SheetNames.push(sname);
+        wb.Sheets[sname] = sCat;
+      });
+    }
+
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+  } catch(e) {
+    console.error(e);
+    alert('엑셀 생성 중 오류: ' + e.message);
+  }
+  btn.textContent = '⬇ 엑셀 다운로드'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// 메인: year.html용 엑셀 다운로드 (단일 차년도)
+// ═══════════════════════════════════════════════════════
+function downloadYearExcel() {
+  const btn = document.getElementById('btn-year-dl');
+  btn.textContent = '생성 중…'; btn.disabled = true;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const YEAR_LABELS = ['1차년도','2차년도','3차년도','4차년도','5차년도'];
+  const planBudget = window._planBudgetData || {};
+  const PLAN_CATS = window._planCats || DEFAULT_PLAN_CATS;
+
+  try {
+    const wb = { SheetNames: [], Sheets: {} };
+
+    // 시트1: 예산현황 요약
+    const sOverview = makeOverviewSheet(proj.label, YEAR_LABELS[Y-1], PERIODS[Y], PLAN_CATS, planBudget, allData);
+    wb.SheetNames.push('📊 예산현황');
+    wb.Sheets['📊 예산현황'] = sOverview;
+
+    // 시트2~n: 구분별 상세
+    PLAN_CATS.forEach((cat, idx) => {
+      const sname = `${idx+1}.${cat.replace(/[:\\/?*\[\]]/g,'').substring(0,15)}`;
+      const sCat = makeCatSheet(cat, idx, planBudget, allData);
+      wb.SheetNames.push(sname);
+      wb.Sheets[sname] = sCat;
+    });
+
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[Y-1]}_${todayStr.replace(/\./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+  } catch(e) {
+    console.error(e);
+    alert('엑셀 생성 중 오류: ' + e.message);
+  }
+  btn.textContent = '⬇ 엑셀 다운로드'; btn.disabled = false;
+}
+
 </script>
 </body>
 </html>
