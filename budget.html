@@ -207,8 +207,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <!-- 네비 리모콘 -->
 <div class="nav-remote" id="nav-remote"></div>
 
-<!-- xlsx-style: SheetJS CE + 셀서식 지원 통합 빌드 -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
@@ -264,6 +263,14 @@ remoteEl.innerHTML=remoteItems.map(it=>`<a href="${it.href}" class="nr-btn${it.a
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
 let budgetPlans={},allExpenses=[],catsByYear={},plansLoaded=false,expLoaded=false,catsLoaded=false;
+// 안전장치: 8초 후에도 로딩 안 되면 강제 렌더링
+const _loadTimer=setTimeout(()=>{
+  if(!plansLoaded||!expLoaded||!catsLoaded){
+    if(!catsLoaded){for(let y=1;y<=5;y++)catsByYear[y]=[...DEFAULT_PLAN_CATS];}
+    plansLoaded=expLoaded=catsLoaded=true;
+    renderAll();
+  }
+},8000);
 
 // categories 로드 (사업별 컬렉션)
 Promise.all([1,2,3,4,5].map(y=>
@@ -449,7 +456,7 @@ function cs(bgHex, fgHex, opts = {}) {
   };
 }
 
-// 숫자셀 — numFmt는 cell()에서 z 필드로 설정
+// 숫자셀
 function numCs(bgHex, fgHex, opts = {}) {
   const style = cs(bgHex, fgHex, { ...opts, align: 'right' });
   style._numFmt = opts.pct ? '0.00%' : '#,##0';
@@ -460,11 +467,7 @@ function numCs(bgHex, fgHex, opts = {}) {
 function cell(v, style) {
   const t = typeof v === 'number' ? 'n' : 's';
   const obj = { v, t, s: style };
-  // xlsx-style은 셀 .z 에 numFmt 문자열을 직접 읽음
-  if (style && style._numFmt) {
-    obj.z = style._numFmt;
-    delete obj.s._numFmt;
-  }
+  if (style && style._numFmt) { obj.z = style._numFmt; delete obj.s._numFmt; }
   return obj;
 }
 
@@ -848,7 +851,7 @@ function downloadBudgetExcel() {
       });
     }
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e);
     alert('엑셀 생성 중 오류: ' + e.message);
@@ -856,8 +859,6 @@ function downloadBudgetExcel() {
   btn.textContent = '⬇ 엑셀 다운로드'; btn.disabled = false;
 }
 
-  btn.textContent = '⬇ 엑셀 다운로드'; btn.disabled = false;
-}
 
 /* 차년도 카드 버튼용 — 특정 차년도만 다운로드 */
 function downloadYearExcelById(y) {
@@ -881,7 +882,7 @@ function downloadYearExcelById(y) {
       wb.Sheets[sname] = sCat;
     });
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[y-1]}_${todayStr.replace(/\./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e); alert('엑셀 생성 오류: ' + e.message);
   }

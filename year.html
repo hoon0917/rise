@@ -213,8 +213,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <!-- 네비 리모콘 -->
 <div class="nav-remote" id="nav-remote"></div>
 
-<!-- xlsx-style: SheetJS CE + 셀서식 지원 통합 빌드 -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
@@ -277,6 +276,8 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
 
 let allData=[],catBudgets={},planBudgetTotal=0;
+// 안전장치: 8초 후에도 로딩 안 되면 강제 렌더링
+const _loadTimer=setTimeout(()=>{ if(!allData.length){ allData=[]; renderAll(); } },8000);
 let EXP_CATS=[...DEFAULT_EXP_CATS], PLAN_CATS=[...DEFAULT_PLAN_CATS];
 let filtered=[],curPage=1,activeCat='전체';
 
@@ -471,7 +472,7 @@ function cs(bgHex, fgHex, opts = {}) {
   };
 }
 
-// 숫자셀 — numFmt는 cell()에서 z 필드로 설정
+// 숫자셀
 function numCs(bgHex, fgHex, opts = {}) {
   const style = cs(bgHex, fgHex, { ...opts, align: 'right' });
   style._numFmt = opts.pct ? '0.00%' : '#,##0';
@@ -482,11 +483,7 @@ function numCs(bgHex, fgHex, opts = {}) {
 function cell(v, style) {
   const t = typeof v === 'number' ? 'n' : 's';
   const obj = { v, t, s: style };
-  // xlsx-style은 셀 .z 에 numFmt 문자열을 직접 읽음
-  if (style && style._numFmt) {
-    obj.z = style._numFmt;
-    delete obj.s._numFmt;
-  }
+  if (style && style._numFmt) { obj.z = style._numFmt; delete obj.s._numFmt; }
   return obj;
 }
 
@@ -870,7 +867,7 @@ function downloadBudgetExcel() {
       });
     }
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e);
     alert('엑셀 생성 중 오류: ' + e.message);
@@ -888,7 +885,7 @@ function downloadYearExcel() {
   const todayStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
   const YEAR_LABELS = ['1차년도','2차년도','3차년도','4차년도','5차년도'];
   const planBudget = window._planBudgetData || {};
-  // PLAN_CATS: 전역 변수 직접 사용 (Firebase 로드 후 갱신된 값)
+  // 전역 PLAN_CATS 직접 사용 (Firebase 로드 후 갱신됨)
   const planCatsToUse = (typeof PLAN_CATS !== 'undefined' && PLAN_CATS.length > 0) ? PLAN_CATS : DEFAULT_PLAN_CATS;
 
   try {
@@ -907,7 +904,7 @@ function downloadYearExcel() {
       wb.Sheets[sname] = sCat;
     });
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[Y-1]}_${todayStr.replace(/./g,'')}.xlsx`, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[Y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e);
     alert('엑셀 생성 중 오류: ' + e.message);
