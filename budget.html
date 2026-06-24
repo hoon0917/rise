@@ -360,7 +360,7 @@ function renderAll(){
   const grid=document.getElementById('year-grid');grid.innerHTML='';
   for(let y=1;y<=5;y++){
     const b=yt[y]||0,s=sy[y]||0,r=pct(s,b);
-    const c=document.createElement('a');c.href=`year.html?p=${P}&y=${y}`;c.className='y-card';
+    const c=document.createElement('div');c.className='y-card';c.style.cursor='pointer';
     c.innerHTML=`<div class="y-num">YEAR ${y}</div><div class="y-title">${y}차년도</div><div class="y-period">${PERIODS[y]}</div>
       <div class="y-budget-row">
         <div><div class="y-blabel">배정 예산</div><div class="y-bvalue">${b?won(b):'미입력'}</div></div>
@@ -368,8 +368,9 @@ function renderAll(){
       </div>
       <div class="y-bar-wrap"><div class="y-bar" id="yb${y}" style="width:0%"></div></div>
       <div class="y-rate">집행률 <span>${r}%</span></div>
-      <button onclick="event.preventDefault();downloadYearExcelById(${y})" style="margin-top:8px;width:100%;background:#059669;border:none;color:#fff;font-size:11px;font-family:var(--mono);padding:5px 0;border-radius:6px;cursor:pointer;font-weight:600;letter-spacing:.03em">⬇ ${y}차년도 엑셀</button>
+      <button onclick="event.stopPropagation();downloadYearExcelById(${y})" style="margin-top:8px;width:100%;background:#059669;border:none;color:#fff;font-size:11px;font-family:var(--mono);padding:5px 0;border-radius:6px;cursor:pointer;font-weight:600;letter-spacing:.03em">⬇ ${y}차년도 엑셀</button>
       <div class="y-arrow">→</div>`;
+    c.addEventListener('click', (e)=>{ if(e.target.tagName!=='BUTTON') location.href=`year.html?p=${P}&y=${y}`; });
     grid.appendChild(c);
     setTimeout(()=>{const b2=document.getElementById('yb'+y);if(b2)b2.style.width=r+'%'},100);
   }
