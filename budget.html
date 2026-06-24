@@ -367,18 +367,45 @@ function renderAll(){
   const grid=document.getElementById('year-grid');grid.innerHTML='';
   for(let y=1;y<=5;y++){
     const b=yt[y]||0,s=sy[y]||0,r=pct(s,b);
-    const c=document.createElement('div');c.className='y-card';c.style.cursor='pointer';
-    c.innerHTML=`<div class="y-num">YEAR ${y}</div><div class="y-title">${y}차년도</div><div class="y-period">${PERIODS[y]}</div>
+
+    // 카드 div
+    const card=document.createElement('div');
+    card.className='y-card';
+    card.style.cursor='pointer';
+
+    // 카드 내용 (버튼 제외)
+    card.innerHTML=`
+      <div class="y-num">YEAR ${y}</div>
+      <div class="y-title">${y}차년도</div>
+      <div class="y-period">${PERIODS[y]}</div>
       <div class="y-budget-row">
         <div><div class="y-blabel">배정 예산</div><div class="y-bvalue">${b?won(b):'미입력'}</div></div>
         <div style="text-align:right"><div class="y-blabel">집행액</div><div class="y-bvalue" style="color:var(--green)">${won(s)}</div></div>
       </div>
       <div class="y-bar-wrap"><div class="y-bar" id="yb${y}" style="width:0%"></div></div>
       <div class="y-rate">집행률 <span>${r}%</span></div>
-      <button onclick="event.stopPropagation();downloadYearExcelById(${y})" style="margin-top:8px;width:100%;background:#059669;border:none;color:#fff;font-size:11px;font-family:var(--mono);padding:5px 0;border-radius:6px;cursor:pointer;font-weight:600;letter-spacing:.03em">⬇ ${y}차년도 엑셀</button>
       <div class="y-arrow">→</div>`;
-    c.addEventListener('click', (e)=>{ if(e.target.tagName!=='BUTTON') location.href=`year.html?p=${P}&y=${y}`; });
-    grid.appendChild(c);
+
+    // 엑셀 버튼 — DOM으로 직접 생성해서 이벤트 명확히 분리
+    const xlBtn=document.createElement('button');
+    xlBtn.textContent='⬇ '+y+'차년도 엑셀';
+    xlBtn.style.cssText='margin-top:8px;width:100%;background:#059669;border:none;color:#fff;font-size:11px;font-family:var(--mono);padding:5px 0;border-radius:6px;cursor:pointer;font-weight:600;letter-spacing:.03em';
+    xlBtn.addEventListener('click', function(e){
+      e.stopPropagation();  // 카드 클릭 이벤트 차단
+      e.preventDefault();
+      downloadYearExcelById(y);
+    });
+
+    // y-rate 뒤, y-arrow 앞에 삽입
+    const arrow=card.querySelector('.y-arrow');
+    card.insertBefore(xlBtn, arrow);
+
+    // 카드 자체 클릭 → year.html 이동 (버튼 클릭은 위에서 stopPropagation으로 차단)
+    card.addEventListener('click', function(){
+      location.href='year.html?p='+P+'&y='+y;
+    });
+
+    grid.appendChild(card);
     setTimeout(()=>{const b2=document.getElementById('yb'+y);if(b2)b2.style.width=r+'%'},100);
   }
 
