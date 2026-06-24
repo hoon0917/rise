@@ -113,6 +113,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="proj-tabs">
     <a href="document.html?p=localrd"  class="proj-tab" id="tab-localrd" >🔬 로컬R&amp;D</a>
     <a href="document.html?p=overseas" class="proj-tab" id="tab-overseas">✈️ 해외인재유치</a>
+    <a href="document.html?p=common"   class="proj-tab" id="tab-common"  >📦 공통운영경비</a>
   </div>
 </div>
 
@@ -145,6 +146,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <span class="sh-label">공문 목록</span>
     <div class="sh-line"></div>
     <span class="sh-count" id="doc-count">0건</span>
+    <button onclick="downloadDocExcel()" id="btn-doc-dl" style="background:#059669;border:none;color:#fff;font-size:12px;font-family:var(--mono);padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)">⬇ 엑셀 다운로드</button>
   </div>
 
   <div class="search-bar">
@@ -174,13 +176,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <div class="nav-remote" id="nav-remote"></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
 const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDomain:"rise-81dab.firebaseapp.com",projectId:"rise-81dab",storageBucket:"rise-81dab.firebasestorage.app",messagingSenderId:"1059201705038",appId:"1:1059201705038:web:810d08d1e34b37dd51cf1f"};
 const PROJECTS={
-  localrd:{label:'로컬R&D',color:'#2563eb',light:'#eff6ff',border:'#bfdbfe'},
+  localrd: {label:'로컬R&D',    color:'#2563eb',light:'#eff6ff',border:'#bfdbfe'},
   overseas:{label:'해외인재유치',color:'#059669',light:'#ecfdf5',border:'#a7f3d0'},
+  common:  {label:'공통운영경비',color:'#d97706',light:'#fffbeb',border:'#fde68a'},
 };
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
@@ -269,6 +273,27 @@ async function delDoc(id,title){
 function toast(msg,isErr=false){
   const el=document.getElementById('toast');el.textContent=msg;el.className='toast'+(isErr?' err':'');
   requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+/* ── 엑셀 다운로드 ── */
+function downloadDocExcel(){
+  const btn=document.getElementById('btn-doc-dl');
+  btn.textContent='생성 중…';btn.disabled=true;
+  const today=new Date();
+  const todayStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const wb=XLSX.utils.book_new();
+  const rows=[];
+  rows.push([`${proj.label} 공문 색인표`, '', '', '', `생성일: ${todayStr}`]);
+  rows.push([]);
+  rows.push(['No.','공문 번호','제목','날짜']);
+  allDocs.forEach((d,i)=>{
+    rows.push([i+1, d.num||'', d.title||'', d.date||'']);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:6},{wch:22},{wch:60},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'공문목록');
+  XLSX.writeFile(wb,`RISE사업_공문색인_${proj.label}_${todayStr.replace(/\./g,'')}.xlsx`);
+  btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
 }
 </script>
 </body>

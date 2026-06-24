@@ -213,6 +213,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <!-- 네비 리모콘 -->
 <div class="nav-remote" id="nav-remote"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
@@ -406,6 +407,78 @@ function renderTable(){
   pg.innerHTML=h;
 }
 function goPage(n){curPage=n;renderTable();window.scrollTo({top:600,behavior:'smooth'})}
+
+/* ── 엑셀 다운로드 ── */
+function downloadYearExcel(){
+  const btn=document.getElementById('btn-year-dl');
+  btn.textContent='생성 중…';btn.disabled=true;
+  const today=new Date();
+  const todayStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const YEAR_LABELS=['1차년도','2차년도','3차년도','4차년도','5차년도'];
+  const wb=XLSX.utils.book_new();
+  const planBudget=window._planBudgetData||{};
+  const PLAN_CATS=window._planCats||DEFAULT_PLAN_CATS;
+
+  // ── 시트1: 예산현황 요약 ──
+  {
+    const rows=[];
+    rows.push([`${proj.label} ${YEAR_LABELS[Y-1]} 예산 현황 (${PERIODS[Y]})`,'','','','생성일: '+todayStr]);
+    rows.push([]);
+    // 사업계획서 구분별
+    rows.push(['항목 (사업계획서 구분별)','예산금액(원)','집행금액(원)','잔액(원)','집행률(%)']);
+    const spentByPlan={};PLAN_CATS.forEach(c=>spentByPlan[c]=0);
+    allData.forEach(e=>{const pc=e.planCategory;if(pc&&spentByPlan[pc]!==undefined)spentByPlan[pc]+=(e.amount||0)});
+    let sTb=0,sTs=0;
+    PLAN_CATS.forEach(cat=>{
+      const b=Number(planBudget[cat])||0,s=spentByPlan[cat]||0;
+      sTb+=b;sTs+=s;
+      rows.push([`  ${cat}`,b,s,b-s,b>0?s/b:0]);
+    });
+    rows.push(['  ▶ 총  계',sTb,sTs,sTb-sTs,sTb>0?sTs/sTb:0]);
+    rows.push([]);
+    // 집행 과목별
+    rows.push(['항목 (집행 과목별)','배정 예산(원)','집행금액(원)','잔액(원)','집행률(%)']);
+    const spent={};EXP_CATS.forEach(c=>spent[c]=0);
+    allData.forEach(e=>{const c=e.category;if(spent[c]!==undefined)spent[c]+=(e.amount||0)});
+    let eTb=0,eTs=0;
+    EXP_CATS.forEach(cat=>{
+      const b=Number(catBudgets[cat])||0,s=spent[cat]||0;
+      eTb+=b;eTs+=s;
+      rows.push([`  ${cat}`,b,s,b-s,b>0?s/b:0]);
+    });
+    rows.push(['  ▶ 총  계',eTb,eTs,eTb-eTs,eTb>0?eTs/eTb:0]);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+    for(let R=range.s.r;R<=range.e.r;R++){
+      const cell=ws[XLSX.utils.encode_cell({r:R,c:4})];
+      if(cell&&typeof cell.v==='number'){cell.t='n';cell.z='0.00%';}
+    }
+    ws['!cols']=[{wch:40},{wch:16},{wch:16},{wch:16},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws,'📊 예산현황');
+  }
+
+  // ── 시트2: 세부 집행 내역 ──
+  {
+    const rows=[];
+    rows.push([`${proj.label} ${YEAR_LABELS[Y-1]} 세부 집행 내역`,'','','','','생성일: '+todayStr]);
+    rows.push([]);
+    rows.push(['집행일','사업계획서 구분','집행 과목','집행 내용','집행액(원)','비고']);
+    const sorted=[...allData].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    sorted.forEach(e=>{
+      rows.push([e.date||'',e.planCategory||'',e.category||'',e.title||'',e.amount||0,e.note||'']);
+    });
+    if(sorted.length){
+      const total=sorted.reduce((a,b)=>a+(b.amount||0),0);
+      rows.push(['','','','합  계',total,'']);
+    }
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:14},{wch:36},{wch:14},{wch:48},{wch:14},{wch:28}];
+    XLSX.utils.book_append_sheet(wb,ws,'세부 집행내역');
+  }
+
+  XLSX.writeFile(wb,`RISE사업_${proj.label}_${YEAR_LABELS[Y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
+  btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
+}
 </script>
 </body>
 </html>
