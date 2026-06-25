@@ -349,7 +349,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
             <input type="file" id="import-file" accept=".xlsx,.xls" style="display:none" onchange="handleImportFile(this)">
           </label>
         </div>
-        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;align-items:center">
           <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer">
             <input type="checkbox" id="skip-restored" checked style="width:15px;height:15px;accent-color:var(--blue)">
             복원 항목 제외 (전체복원)
@@ -358,6 +358,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
             <input type="checkbox" id="skip-notcomplete" checked style="width:15px;height:15px;accent-color:var(--blue)">
             이체완료 외 건 제외
           </label>
+          <span id="import-summary" style="font-size:12px;font-family:var(--mono);color:#64748b;margin-left:8px"></span>
         </div>
       </div>
 
@@ -692,6 +693,13 @@ const PLAN_MAP_RULES = [
   ['디자인 용역',                     '교육·연구프로그램개발·운영비'],
   ['그 밖의 사업운영',                '그 밖의 사업운영 경비'],
   ['그밖의 사업운영',                 '그 밖의 사업운영 경비'],
+  // 공통운영경비 파일의 붙여쓰기 패턴
+  ['그밖의사업운영경비',              '그 밖의 사업운영 경비'],
+  ['운영비기타운영비',                '그 밖의 사업운영 경비'],
+  ['기타운영비',                      '그 밖의 사업운영 경비'],
+  // 공통운영경비 형식: '대신대-공통운영경비-XXX'
+  ['공통운영경비-그밖',               '그 밖의 사업운영 경비'],
+  ['공통운영경비-운영비',             '그 밖의 사업운영 경비'],
 ];
 
 // 보조세목명 → 집행과목
@@ -753,112 +761,161 @@ function handleImportFile(input) {
 }
 
 async function processImportFile(file) {
-  document.getElementById('import-file-name').textContent = file.name;
-  document.getElementById('import-preview-wrap').style.display = 'none';
+  // ── 요소 참조 (null 방어) ──
+  const elFileName    = document.getElementById('import-file-name');
+  const elPreview     = document.getElementById('import-preview-wrap');
+  const elDropLabel   = document.getElementById('import-drop-label');
+  const elSummary     = document.getElementById('import-summary');
+  const elSkipRes     = document.getElementById('skip-restored');
+  const elSkipNC      = document.getElementById('skip-notcomplete');
 
-  // ── 로딩 표시 ──
-  const lbl = document.getElementById('import-drop-label');
-  lbl.style.borderColor = '#2563eb';
-  document.getElementById('import-file-name').textContent = '파싱 및 중복 확인 중…';
+  if (!elFileName) { console.error('import-file-name 요소 없음'); return; }
+
+  elFileName.textContent = file.name;
+  if (elPreview) elPreview.style.display = 'none';
+  if (elDropLabel) elDropLabel.style.borderColor = '#2563eb';
+  elFileName.textContent = '파싱 및 중복 확인 중…';
 
   const reader = new FileReader();
   reader.onload = async e => {
     try {
-      const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
+      const wb   = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
+      if (!rows || rows.length < 2) {
+        throw new Error('데이터가 없거나 헤더만 있는 파일입니다.');
+      }
+
       const header = rows[0] || [];
+      const fi = (keyword) => header.findIndex(h => h && String(h).includes(keyword));
       const COL = {
-        status:   header.findIndex(h => h && String(h).includes('집행상태')),
-        restored: header.findIndex(h => h && String(h).includes('복원상태')),
-        purpose:  header.findIndex(h => h && String(h).includes('집행용도')),
-        amount:   header.findIndex(h => h && String(h).includes('집행액')),
-        execDate: header.findIndex(h => h && String(h).includes('집행일자')),
-        seomok:   header.findIndex(h => h && String(h).includes('보조세목명')),
-        execId:   header.findIndex(h => h && String(h).includes('집행ID')),
+        status:   fi('집행상태'),
+        restored: fi('복원상태'),
+        purpose:  fi('집행용도'),
+        amount:   fi('집행액'),
+        execDate: fi('집행일자'),
+        seomok:   fi('보조세목명'),
+        execId:   fi('집행ID'),
       };
 
-      const skipRestored    = document.getElementById('skip-restored').checked;
-      const skipNotComplete = document.getElementById('skip-notcomplete').checked;
+      // 필수 컬럼 누락 체크
+      const missing = Object.entries(COL).filter(([k,v]) => v < 0).map(([k]) => k);
+      if (missing.length > 0) {
+        throw new Error(`필수 컬럼 없음: ${missing.join(', ')} — 이나라도움 집행내역 파일이 맞는지 확인하세요.`);
+      }
+
+      const skipRestored    = elSkipRes  ? elSkipRes.checked  : true;
+      const skipNotComplete = elSkipNC   ? elSkipNC.checked   : true;
 
       // ── 1단계: 파싱 ──
       const parsed = [];
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
-        if (!row || row.every(v => v === null)) continue;
+        if (!row || row.every(v => v === null || v === undefined)) continue;
 
-        const status   = String(row[COL.status]   || '').trim();
-        const restored = String(row[COL.restored]  || '').trim();
-        const purpose  = String(row[COL.purpose]   || '').trim();
-        const seomok   = String(row[COL.seomok]    || '').trim();
-        const execId   = String(row[COL.execId]    || '').trim();
+        const status   = String(row[COL.status]   ?? '').trim();
+        const restored = String(row[COL.restored]  ?? '').trim();
+        const purpose  = String(row[COL.purpose]   ?? '').trim();
+        const seomok   = String(row[COL.seomok]    ?? '').trim();
+        const execId   = String(row[COL.execId]    ?? '').trim();
 
+        // 날짜 파싱 — Date객체, 문자열, 숫자(엑셀 시리얼) 모두 처리
         let execDate = row[COL.execDate];
         if (execDate instanceof Date) {
           execDate = execDate.toISOString().split('T')[0];
+        } else if (typeof execDate === 'number') {
+          // 엑셀 시리얼 날짜 변환
+          const d = new Date(Math.round((execDate - 25569) * 86400 * 1000));
+          execDate = d.toISOString().split('T')[0];
         } else if (execDate) {
           execDate = String(execDate).substring(0, 10);
+        } else {
+          execDate = '';
         }
 
-        const amount   = parseFloat(row[COL.amount]) || 0;
+        // 금액 파싱 — 문자열/숫자 모두 처리
+        const rawAmount = row[COL.amount];
+        const amount = rawAmount !== null && rawAmount !== undefined
+          ? parseFloat(String(rawAmount).replace(/,/g, '')) || 0
+          : 0;
+
         const excluded = (skipRestored && restored === '전체복원') ||
                          (skipNotComplete && status !== '이체완료');
         const planCat  = extractPlanCat(purpose);
         const category = SEOMOK_MAP[seomok] || '수용비';
         const year     = dateToYear(execDate);
 
-        parsed.push({ excluded, execDate, purpose, seomok, category,
-                      planCat, amount, year, execId, status, restored,
-                      isDup: false }); // isDup은 2단계에서 설정
+        parsed.push({
+          excluded, execDate, purpose, seomok,
+          category, planCat, amount, year,
+          execId, status, restored, isDup: false,
+        });
       }
 
-      // ── 2단계: Firebase 중복 체크 (제외 아닌 건만) ──
-      // execId 목록을 10개씩 나눠서 where-in 쿼리 (Firestore 한도 10개)
-      const checkTargets = parsed.filter(r => !r.excluded && r.execId);
-      const execIds = checkTargets.map(r => r.execId);
+      if (parsed.length === 0) {
+        throw new Error('유효한 데이터 행이 없습니다.');
+      }
 
-      const dupSet = new Set();
+      // ── 2단계: Firebase 중복 체크 (execId 기준, 10개씩 in 쿼리) ──
+      const checkTargets = parsed.filter(r => !r.excluded && r.execId);
+      const execIds = [...new Set(checkTargets.map(r => r.execId))];
+      const dupSet  = new Set();
+
       for (let i = 0; i < execIds.length; i += 10) {
         const chunk = execIds.slice(i, i + 10);
         try {
           const snap = await db.collection('expenses')
             .where('execId', 'in', chunk).get();
-          snap.forEach(doc => dupSet.add(doc.data().execId));
-        } catch(e) { /* 인덱스 없어도 무시 */ }
+          snap.forEach(doc => {
+            const eid = doc.data().execId;
+            if (eid) dupSet.add(eid);
+          });
+        } catch(qErr) {
+          console.warn('중복체크 쿼리 오류 (무시):', qErr.message);
+        }
       }
-
-      // isDup 설정
-      parsed.forEach(r => { if (dupSet.has(r.execId)) r.isDup = true; });
+      parsed.forEach(r => { if (r.execId && dupSet.has(r.execId)) r.isDup = true; });
 
       importedRows = parsed;
 
-      // ── 요약 텍스트 ──
-      const total    = parsed.length;
-      const excluded = parsed.filter(r => r.excluded).length;
-      const dup      = parsed.filter(r => !r.excluded && r.isDup).length;
-      const newRows  = parsed.filter(r => !r.excluded && !r.isDup).length;
-      const needSel  = parsed.filter(r => !r.excluded && !r.isDup && !r.planCat).length;
-      document.getElementById('import-summary').textContent =
-        `전체 ${total}건 | 제외 ${excluded}건 | 중복 ${dup}건 | 신규 ${newRows}건${needSel>0?` (분류 필요 ${needSel}건)`:''}`;
+      // ── 요약 ──
+      const total   = parsed.length;
+      const excl    = parsed.filter(r => r.excluded).length;
+      const dup     = parsed.filter(r => !r.excluded && r.isDup).length;
+      const newRows = parsed.filter(r => !r.excluded && !r.isDup).length;
+      const needSel = parsed.filter(r => !r.excluded && !r.isDup && !r.planCat).length;
+      if (elSummary) elSummary.textContent =
+        `전체 ${total}건 | 제외 ${excl}건 | 중복 ${dup}건 | 신규 ${newRows}건${needSel > 0 ? ` (분류 필요 ${needSel}건)` : ''}`;
 
-      lbl.style.borderColor = '#cbd5e1';
-      document.getElementById('import-file-name').textContent = file.name;
+      if (elDropLabel) elDropLabel.style.borderColor = '#cbd5e1';
+      elFileName.textContent = file.name;
       renderImportPreview();
 
     } catch(err) {
-      lbl.style.borderColor = '#ef4444';
-      document.getElementById('import-file-name').textContent = '파일 오류: ' + err.message;
+      console.error('processImportFile 오류:', err);
+      if (elDropLabel) elDropLabel.style.borderColor = '#ef4444';
+      elFileName.textContent = '⚠ 파일 오류: ' + err.message;
+      if (elSummary) elSummary.textContent = '';
     }
   };
+
+  reader.onerror = () => {
+    elFileName.textContent = '⚠ 파일 읽기 실패';
+  };
+
   reader.readAsArrayBuffer(file);
 }
 
 function renderImportPreview() {
+  const tbody = document.getElementById('import-tbody');
+  const elCount = document.getElementById('import-count');
+  const elWrap  = document.getElementById('import-preview-wrap');
+  if (!tbody) { console.error('import-tbody 없음'); return; }
+
   const planCats = currentPlanCats.length > 0
     ? currentPlanCats
     : ['인건비','수용비','용역비','시설장비비','연구활동비','학생지원비','행사운영비','여비','기타'];
-  const tbody  = document.getElementById('import-tbody');
   const YEAR_KO = {1:'1차년도',2:'2차년도',3:'3차년도',4:'4차년도',5:'5차년도'};
 
   tbody.innerHTML = importedRows.map((r, i) => {
@@ -915,10 +972,9 @@ function renderImportPreview() {
 
   const newRows  = importedRows.filter(r => !r.excluded && !r.isDup).length;
   const needSel  = importedRows.filter(r => !r.excluded && !r.isDup && !r.planCat).length;
-  document.getElementById('import-count').textContent =
-    `신규 ${newRows}건 저장 예정${needSel>0 ? ` — ⚠ 노란 행 ${needSel}건 선택 필요` : ' ✓ 모두 분류됨'}`;
-
-  document.getElementById('import-preview-wrap').style.display = 'block';
+  if (elCount) elCount.textContent =
+    `신규 ${newRows}건 저장 예정${needSel > 0 ? ` — ⚠ 노란 행 ${needSel}건 선택 필요` : ' ✓ 모두 분류됨'}`;
+  if (elWrap) elWrap.style.display = 'block';
 }
 
 async function saveImport() {
@@ -938,6 +994,7 @@ async function saveImport() {
   }
 
   const btn = document.getElementById('btn-save-import');
+  if (!btn) { console.error('btn-save-import 없음'); return; }
   btn.textContent = '저장 중…'; btn.disabled = true;
 
   let saved = 0, err = 0;
@@ -982,9 +1039,12 @@ async function saveImport() {
   toast(msg, err > 0);
 
   if (saved > 0) {
-    document.getElementById('import-preview-wrap').style.display = 'none';
-    document.getElementById('import-file-name').textContent = '엑셀 파일 선택 (클릭 또는 드래그)';
-    document.getElementById('import-file').value = '';
+    const _pw = document.getElementById('import-preview-wrap');
+    const _fn = document.getElementById('import-file-name');
+    const _fi = document.getElementById('import-file');
+    if (_pw) _pw.style.display = 'none';
+    if (_fn) _fn.textContent = '엑셀 파일 선택 (클릭 또는 드래그)';
+    if (_fi) _fi.value = '';
     importedRows = [];
   }
 }
