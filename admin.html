@@ -342,6 +342,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <div class="form-card-title"><span class="dot-indicator" style="background:#d97706"></span>이나라도움 집행내역 가져오기</div>
         <p class="info-text">이나라도움에서 내보낸 <b>보조금 집행내역 엑셀 파일</b>을 업로드하면 자동으로 파싱합니다.<br>
         집행용도에서 사업계획서 구분을 자동 추출하며, 매핑이 불확실한 항목은 드롭다운으로 직접 선택할 수 있습니다.</p>
+
+        <!-- ★ 사업 선택 (필수) -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px">
+          <span style="font-size:13px;font-weight:700;color:#92400e;white-space:nowrap">📌 사업 선택 (필수)</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="setImportProject('localrd',this)"  id="imp-proj-localrd"  class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #2563eb;background:#eff6ff;color:#2563eb">🔬 로컬R&amp;D</button>
+            <button onclick="setImportProject('overseas',this)" id="imp-proj-overseas" class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">✈️ 해외인재유치</button>
+            <button onclick="setImportProject('common',this)"   id="imp-proj-common"   class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">📦 공통운영경비</button>
+            <button onclick="setImportProject('city',this)"     id="imp-proj-city"     class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">🏛️ 시비</button>
+          </div>
+          <span id="imp-proj-label" style="font-size:12px;font-family:var(--mono);color:#059669;font-weight:600"></span>
+        </div>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px">
           <label style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:10px;padding:16px 28px;cursor:pointer;font-size:13px;color:#64748b;display:flex;align-items:center;gap:10px;transition:all .2s" id="import-drop-label" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#cbd5e1'">
             <span style="font-size:24px">📂</span>
@@ -741,6 +753,7 @@ function extractPlanCat(purpose) {
 
 // ── 파싱된 데이터 저장 ──
 let importedRows = [];
+let importProject = '';  // 이나라도움 탭에서 선택한 사업
 
 // 드래그앤드롭
 const dropLabel = document.getElementById('import-drop-label');
@@ -760,6 +773,29 @@ function handleImportFile(input) {
   if (file) processImportFile(file);
 }
 
+function setImportProject(proj, btn) {
+  importProject = proj;
+  // 버튼 스타일 초기화
+  document.querySelectorAll('.imp-proj-btn').forEach(b => {
+    b.style.border = '2px solid #e2e8f0';
+    b.style.background = '#fff';
+    b.style.color = '#64748b';
+  });
+  // 선택된 버튼 강조
+  const colors = {localrd:'#2563eb', overseas:'#059669', common:'#d97706', city:'#7c3aed'};
+  const color = colors[proj] || '#2563eb';
+  btn.style.border = `2px solid ${color}`;
+  btn.style.background = color + '15';
+  btn.style.color = color;
+  // 라벨 업데이트
+  const labels = {localrd:'로컬R&D', overseas:'해외인재유치', common:'공통운영경비', city:'시비'};
+  const el = document.getElementById('imp-proj-label');
+  if (el) el.textContent = `✓ ${labels[proj]} 선택됨`;
+  // 파일이 이미 올라가 있으면 재파싱
+  const fileEl = document.getElementById('import-file');
+  if (fileEl && fileEl.files[0]) processImportFile(fileEl.files[0]);
+}
+
 async function processImportFile(file) {
   // ── 요소 참조 (null 방어) ──
   const elFileName    = document.getElementById('import-file-name');
@@ -770,6 +806,12 @@ async function processImportFile(file) {
   const elSkipNC      = document.getElementById('skip-notcomplete');
 
   if (!elFileName) { console.error('import-file-name 요소 없음'); return; }
+
+  // 사업 미선택 체크
+  if (!importProject) {
+    toast('📌 먼저 사업을 선택해주세요 (로컬R&D / 해외인재유치 / 공통운영경비 / 시비)', true);
+    return;
+  }
 
   elFileName.textContent = file.name;
   if (elPreview) elPreview.style.display = 'none';
@@ -1012,7 +1054,7 @@ async function saveImport() {
 
     try {
       await db.collection('expenses').add({
-        project: currentProject,
+        project: importProject,
         year: r.year || 1,
         date: r.execDate || '',
         title: r.purpose || '',
@@ -1046,6 +1088,7 @@ async function saveImport() {
     if (_fn) _fn.textContent = '엑셀 파일 선택 (클릭 또는 드래그)';
     if (_fi) _fi.value = '';
     importedRows = [];
+    // 사업 선택은 유지 (연속 업로드 편의를 위해 리셋 안 함)
   }
 }
 
