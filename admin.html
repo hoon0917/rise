@@ -343,16 +343,31 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <p class="info-text">이나라도움에서 내보낸 <b>보조금 집행내역 엑셀 파일</b>을 업로드하면 자동으로 파싱합니다.<br>
         집행용도에서 사업계획서 구분을 자동 추출하며, 매핑이 불확실한 항목은 드롭다운으로 직접 선택할 수 있습니다.</p>
 
-        <!-- ★ 사업 선택 (필수) -->
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px">
-          <span style="font-size:13px;font-weight:700;color:#92400e;white-space:nowrap">📌 사업 선택 (필수)</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onclick="setImportProject('localrd',this)"  id="imp-proj-localrd"  class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #2563eb;background:#eff6ff;color:#2563eb">🔬 로컬R&amp;D</button>
-            <button onclick="setImportProject('overseas',this)" id="imp-proj-overseas" class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">✈️ 해외인재유치</button>
-            <button onclick="setImportProject('common',this)"   id="imp-proj-common"   class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">📦 공통운영경비</button>
-            <button onclick="setImportProject('city',this)"     id="imp-proj-city"     class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">🏛️ 시비</button>
+        <!-- ★ 사업 + 차년도 선택 (필수) -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px">
+          <!-- 사업 선택 -->
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700;color:#92400e;white-space:nowrap">📌 사업 선택 (필수)</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="setImportProject('localrd',this)"  id="imp-proj-localrd"  class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #2563eb;background:#eff6ff;color:#2563eb">🔬 로컬R&amp;D</button>
+              <button onclick="setImportProject('overseas',this)" id="imp-proj-overseas" class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">✈️ 해외인재유치</button>
+              <button onclick="setImportProject('common',this)"   id="imp-proj-common"   class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">📦 공통운영경비</button>
+              <button onclick="setImportProject('city',this)"     id="imp-proj-city"     class="imp-proj-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">🏛️ 시비</button>
+            </div>
+            <span id="imp-proj-label" style="font-size:12px;font-family:var(--mono);color:#059669;font-weight:600"></span>
           </div>
-          <span id="imp-proj-label" style="font-size:12px;font-family:var(--mono);color:#059669;font-weight:600"></span>
+          <!-- 차년도 선택 -->
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700;color:#92400e;white-space:nowrap">📌 차년도 선택 (필수)</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="setImportYear(1,this)" id="imp-year-1" class="imp-year-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">1차년도</button>
+              <button onclick="setImportYear(2,this)" id="imp-year-2" class="imp-year-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">2차년도</button>
+              <button onclick="setImportYear(3,this)" id="imp-year-3" class="imp-year-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">3차년도</button>
+              <button onclick="setImportYear(4,this)" id="imp-year-4" class="imp-year-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">4차년도</button>
+              <button onclick="setImportYear(5,this)" id="imp-year-5" class="imp-year-btn" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid #e2e8f0;background:#fff;color:#64748b">5차년도</button>
+            </div>
+            <span id="imp-year-label" style="font-size:12px;font-family:var(--mono);color:#059669;font-weight:600"></span>
+          </div>
         </div>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px">
           <label style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:10px;padding:16px 28px;cursor:pointer;font-size:13px;color:#64748b;display:flex;align-items:center;gap:10px;transition:all .2s" id="import-drop-label" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#cbd5e1'">
@@ -754,6 +769,7 @@ function extractPlanCat(purpose) {
 // ── 파싱된 데이터 저장 ──
 let importedRows = [];
 let importProject = '';  // 이나라도움 탭에서 선택한 사업
+let importYear    = 0;   // 이나라도움 탭에서 선택한 차년도
 
 // 드래그앤드롭
 const dropLabel = document.getElementById('import-drop-label');
@@ -796,6 +812,26 @@ function setImportProject(proj, btn) {
   if (fileEl && fileEl.files[0]) processImportFile(fileEl.files[0]);
 }
 
+function setImportYear(year, btn) {
+  importYear = year;
+  // 버튼 스타일 초기화
+  document.querySelectorAll('.imp-year-btn').forEach(b => {
+    b.style.border = '2px solid #e2e8f0';
+    b.style.background = '#fff';
+    b.style.color = '#64748b';
+  });
+  // 선택된 버튼 강조
+  btn.style.border = '2px solid #7c3aed';
+  btn.style.background = '#f5f3ff';
+  btn.style.color = '#7c3aed';
+  // 라벨 업데이트
+  const el = document.getElementById('imp-year-label');
+  if (el) el.textContent = `✓ ${year}차년도 선택됨`;
+  // 파일이 이미 올라가 있으면 재파싱
+  const fileEl = document.getElementById('import-file');
+  if (fileEl && fileEl.files[0]) processImportFile(fileEl.files[0]);
+}
+
 async function processImportFile(file) {
   // ── 요소 참조 (null 방어) ──
   const elFileName    = document.getElementById('import-file-name');
@@ -810,6 +846,11 @@ async function processImportFile(file) {
   // 사업 미선택 체크
   if (!importProject) {
     toast('📌 먼저 사업을 선택해주세요 (로컬R&D / 해외인재유치 / 공통운영경비 / 시비)', true);
+    return;
+  }
+  // 차년도 미선택 체크
+  if (!importYear) {
+    toast('📌 먼저 차년도를 선택해주세요 (1차년도 ~ 5차년도)', true);
     return;
   }
 
@@ -886,7 +927,7 @@ async function processImportFile(file) {
                          (skipNotComplete && status !== '이체완료');
         const planCat  = extractPlanCat(purpose);
         const category = SEOMOK_MAP[seomok] || '수용비';
-        const year     = dateToYear(execDate);
+        const year     = importYear;  // 사용자가 직접 선택한 차년도
 
         parsed.push({
           excluded, execDate, purpose, seomok,
@@ -1008,7 +1049,7 @@ function renderImportPreview() {
       </td>
       <td style="padding:8px 10px;min-width:170px">${planCell}</td>
       <td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-weight:600;white-space:nowrap">${r.amount.toLocaleString()}</td>
-      <td style="padding:8px 10px;font-family:var(--mono);font-size:11px;white-space:nowrap">${r.year?YEAR_KO[r.year]:'<span style="color:#ef4444">미해당</span>'}</td>
+      <td style="padding:8px 10px;font-family:var(--mono);font-size:11px;white-space:nowrap">${YEAR_KO[importYear]||importYear+'차년도'}</td>
     </tr>`;
   }).join('');
 
