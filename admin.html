@@ -462,7 +462,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
 const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDomain:"rise-81dab.firebaseapp.com",projectId:"rise-81dab",storageBucket:"rise-81dab.firebasestorage.app",messagingSenderId:"1059201705038",appId:"1:1059201705038:web:810d08d1e34b37dd51cf1f"};
-const ADMIN_PASSWORD="0";
+const ADMIN_PASSWORD="rise2024!";
 const PERIODS={1:"2025.12 ~ 2026.02",2:"2026.03 ~ 2027.02",3:"2027.03 ~ 2028.02",4:"2028.03 ~ 2029.02",5:"2029.03 ~ 2030.02"};
 const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
 const DEFAULT_EXP_CATS=["인건비","수용비","용역비","시설장비비","연구활동비","학생지원비","행사운영비","여비","기타"];
@@ -1100,24 +1100,23 @@ function renderImportPreview() {
       rowBg = '#ffffff'; textColor = '#0f172a';
       checkCell = `<input type="checkbox" checked id="imp-chk-${i}" style="accent-color:var(--blue);width:15px;height:15px">`;
 
-      // 집행과목: 자동분류 성공 → 텍스트, 실패(null) → 드롭다운
-      if (r.category) {
-        catCell = `<span style="font-size:12px;font-weight:600;color:#059669">✓ ${r.category}</span>`;
-      } else {
-        rowBg = '#fef9c3';
-        catCell = `<select id="imp-cat-${i}"
-          style="font-size:11px;padding:4px 6px;border:1px solid #f59e0b;border-radius:5px;background:#fffbeb;color:#92400e;width:100%;min-width:120px"
-          onchange="importedRows[${i}].category=this.value;this.style.border='1px solid #86efac';this.style.background='#f0fdf4';this.style.color='#059669'">
-          <option value="">⚠ 직접 선택</option>
-          ${expCatList.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-        </select>`;
-      }
+      // 집행과목: 항상 드롭다운, 자동분류값 미리 선택
+      // 분류 실패(null)면 노란색 강조
+      if (!r.category) rowBg = '#fef9c3';
+      catCell = `<select id="imp-cat-${i}"
+        style="font-size:11px;padding:4px 6px;border:1px solid ${r.category?'#86efac':'#f59e0b'};border-radius:5px;background:${r.category?'#f0fdf4':'#fffbeb'};color:${r.category?'#059669':'#92400e'};width:100%;min-width:120px"
+        onchange="importedRows[${i}].category=this.value;this.style.border='1px solid #86efac';this.style.background='#f0fdf4';this.style.color='#059669'">
+        <option value="" ${!r.category?'':'hidden'}>⚠ 직접 선택</option>
+        ${expCatList.map(cat => `<option value="${cat}" ${r.category===cat?'selected':''}>${cat}</option>`).join('')}
+      </select>`;
 
-      // 사업계획서 구분: 항상 드롭다운 (자동분류 성공 시 선택된 상태)
+      // 사업계획서 구분: 항상 드롭다운, 자동추출값 미리 선택
+      // 추출 실패(null)면 노란색 강조
+      if (!r.planCat) rowBg = '#fef9c3';
       planCell = `<select id="imp-plan-${i}"
-        style="font-size:11px;padding:4px 6px;border:1px solid ${r.planCat?'#e2e8f0':'#f59e0b'};border-radius:5px;background:${r.planCat?'#fff':'#fffbeb'};color:${r.planCat?'#0f172a':'#92400e'};width:100%;min-width:160px"
+        style="font-size:11px;padding:4px 6px;border:1px solid ${r.planCat?'#86efac':'#f59e0b'};border-radius:5px;background:${r.planCat?'#f0fdf4':'#fffbeb'};color:${r.planCat?'#059669':'#92400e'};width:100%;min-width:160px"
         onchange="importedRows[${i}].planCat=this.value;this.style.border='1px solid #86efac';this.style.background='#f0fdf4';this.style.color='#059669'">
-        <option value="">${r.planCat?'':'⚠ 직접 선택하세요'}</option>
+        <option value="" ${!r.planCat?'':'hidden'}>⚠ 직접 선택하세요</option>
         ${planCats.map(cat => `<option value="${cat}" ${r.planCat===cat?'selected':''}>${cat}</option>`).join('')}
       </select>`;
     }
