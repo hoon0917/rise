@@ -1059,51 +1059,66 @@ async function processImportFile(file) {
 }
 
 function renderImportPreview() {
-  const tbody = document.getElementById('import-tbody');
+  const tbody   = document.getElementById('import-tbody');
   const elCount = document.getElementById('import-count');
   const elWrap  = document.getElementById('import-preview-wrap');
   if (!tbody) { console.error('import-tbody 없음'); return; }
 
+  // 사업계획서 구분 목록 (사업계획서 구분 컬럼용)
   const planCats = currentPlanCats.length > 0
     ? currentPlanCats
-    : ['인건비','수용비','용역비','시설장비비','연구활동비','학생지원비','행사운영비','여비','기타'];
+    : DEFAULT_PLAN_CATS;
+
+  // 집행 과목 목록 (집행과목 컬럼 — 자산취득비 노란색 행용)
+  const _projCats = (EXP_CATS_BY_PROJECT[importProject] || {})[importYear] || [];
+  const expCatList = _projCats.length > 0
+    ? _projCats
+    : (currentExpCats.length > 0 ? currentExpCats : DEFAULT_EXP_CATS);
+
   const YEAR_KO = {1:'1차년도',2:'2차년도',3:'3차년도',4:'4차년도',5:'5차년도'};
 
   tbody.innerHTML = importedRows.map((r, i) => {
     // ── 행 상태 결정 ──
-    // 1) 제외(복원/미완료): 회색, 체크박스 없음
-    // 2) 중복(Firebase에 이미 있음): 회색-파란톤, 체크박스 없음
-    // 3) 신규+분류성공: 흰색, 체크박스O, 텍스트 표시(드롭다운 X)
-    // 4) 신규+분류실패: 노란색, 체크박스O, 드롭다운 필수
-    let rowBg, textColor, statusBadge, checkCell, planCell;
+    let rowBg, textColor, checkCell, catCell, planCell;
 
     if (r.excluded) {
+      // 회색: 복원/미완료 제외
       rowBg = '#f8fafc'; textColor = '#94a3b8';
-      statusBadge = `<span style="background:#f1f5f9;color:#94a3b8;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px">제외</span>`;
-      checkCell = statusBadge;
+      checkCell = `<span style="background:#f1f5f9;color:#94a3b8;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px">제외</span>`;
+      catCell   = `<span style="color:#94a3b8;font-size:11px">—</span>`;
       planCell  = `<span style="color:#94a3b8;font-size:11px">—</span>`;
 
     } else if (r.isDup) {
+      // 파란색: Firebase 중복
       rowBg = '#f0f9ff'; textColor = '#64748b';
-      statusBadge = `<span style="background:#dbeafe;color:#2563eb;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px">중복</span>`;
-      checkCell = statusBadge;
+      checkCell = `<span style="background:#dbeafe;color:#2563eb;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px">중복</span>`;
+      catCell   = `<span style="font-size:12px;font-weight:600;color:#64748b">${r.category||'—'}</span>`;
       planCell  = `<span style="font-size:11px;color:#64748b">${r.planCat||'—'}</span>`;
 
-    } else if (r.planCat) {
-      // 신규 + 분류 성공 → 드롭다운 없이 텍스트 표시
+    } else {
+      // 신규 행
       rowBg = '#ffffff'; textColor = '#0f172a';
       checkCell = `<input type="checkbox" checked id="imp-chk-${i}" style="accent-color:var(--blue);width:15px;height:15px">`;
-      planCell  = `<span style="font-size:12px;color:#059669;font-weight:600">✓ ${r.planCat}</span>`;
 
-    } else {
-      // 신규 + 분류 실패 → 드롭다운 필수
-      rowBg = '#fef9c3'; textColor = '#0f172a';
-      checkCell = `<input type="checkbox" checked id="imp-chk-${i}" style="accent-color:var(--blue);width:15px;height:15px">`;
-      planCell  = `<select id="imp-plan-${i}"
-        style="font-size:11px;padding:4px 6px;border:1px solid #f59e0b;border-radius:5px;background:#fffbeb;color:#92400e;width:100%;min-width:160px"
-        onchange="importedRows[${i}].planCat=this.value;this.closest('tr').style.background='#f0fdf4';this.style.border='1px solid #86efac';this.style.background='#fff';this.style.color='#059669'">
-        <option value="">⚠ 직접 선택하세요</option>
-        ${planCats.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+      // 집행과목: 자동분류 성공 → 텍스트, 실패(null) → 드롭다운
+      if (r.category) {
+        catCell = `<span style="font-size:12px;font-weight:600;color:#059669">✓ ${r.category}</span>`;
+      } else {
+        rowBg = '#fef9c3';
+        catCell = `<select id="imp-cat-${i}"
+          style="font-size:11px;padding:4px 6px;border:1px solid #f59e0b;border-radius:5px;background:#fffbeb;color:#92400e;width:100%;min-width:120px"
+          onchange="importedRows[${i}].category=this.value;this.style.border='1px solid #86efac';this.style.background='#f0fdf4';this.style.color='#059669'">
+          <option value="">⚠ 직접 선택</option>
+          ${expCatList.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+        </select>`;
+      }
+
+      // 사업계획서 구분: 항상 드롭다운 (자동분류 성공 시 선택된 상태)
+      planCell = `<select id="imp-plan-${i}"
+        style="font-size:11px;padding:4px 6px;border:1px solid ${r.planCat?'#e2e8f0':'#f59e0b'};border-radius:5px;background:${r.planCat?'#fff':'#fffbeb'};color:${r.planCat?'#0f172a':'#92400e'};width:100%;min-width:160px"
+        onchange="importedRows[${i}].planCat=this.value;this.style.border='1px solid #86efac';this.style.background='#f0fdf4';this.style.color='#059669'">
+        <option value="">${r.planCat?'':'⚠ 직접 선택하세요'}</option>
+        ${planCats.map(cat => `<option value="${cat}" ${r.planCat===cat?'selected':''}>${cat}</option>`).join('')}
       </select>`;
     }
 
@@ -1113,7 +1128,7 @@ function renderImportPreview() {
       <td style="padding:8px 10px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.purpose||''}">${r.purpose||'—'}</td>
       <td style="padding:8px 10px;white-space:nowrap">
         <div style="font-size:10px;color:#94a3b8;margin-bottom:1px">${r.seomok||'—'}</div>
-        <div style="font-size:12px;font-weight:600">${r.category}</div>
+        ${catCell}
       </td>
       <td style="padding:8px 10px;min-width:170px">${planCell}</td>
       <td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-weight:600;white-space:nowrap">${r.amount.toLocaleString()}</td>
@@ -1122,25 +1137,32 @@ function renderImportPreview() {
   }).join('');
 
   const newRows  = importedRows.filter(r => !r.excluded && !r.isDup).length;
-  const needSel  = importedRows.filter(r => !r.excluded && !r.isDup && !r.planCat).length;
+  const needCat  = importedRows.filter(r => !r.excluded && !r.isDup && !r.category).length;
+  const needPlan = importedRows.filter(r => !r.excluded && !r.isDup && !r.planCat).length;
+  const needSel  = needCat + needPlan;
   if (elCount) elCount.textContent =
-    `신규 ${newRows}건 저장 예정${needSel > 0 ? ` — ⚠ 노란 행 ${needSel}건 선택 필요` : ' ✓ 모두 분류됨'}`;
+    `신규 ${newRows}건 저장 예정${needSel > 0 ? ` — ⚠ ${needSel}건 선택 필요 (집행과목 ${needCat}건, 구분 ${needPlan}건)` : ' ✓ 모두 분류됨'}`;
   if (elWrap) elWrap.style.display = 'block';
 }
 
 async function saveImport() {
-  // 노란 행(분류 필요) 중 미선택 건 확인
-  const needSel = importedRows.filter((r, i) => {
-    if (r.excluded || r.isDup) return false;
+  // 미선택 항목 검사 (집행과목 + 사업계획서 구분 둘 다)
+  let unselCat = 0, unselPlan = 0;
+  for (let i = 0; i < importedRows.length; i++) {
+    const r = importedRows[i];
+    if (r.excluded || r.isDup) continue;
     const chk = document.getElementById(`imp-chk-${i}`);
-    if (chk && !chk.checked) return false;
-    const sel = document.getElementById(`imp-plan-${i}`);
-    const planCat = sel ? sel.value : r.planCat;
-    return !planCat;
-  });
-
-  if (needSel.length > 0) {
-    toast(`사업계획서 구분을 선택하지 않은 항목이 ${needSel.length}건 있습니다.`, true);
+    if (chk && !chk.checked) continue;
+    const selCat  = document.getElementById(`imp-cat-${i}`);
+    const selPlan = document.getElementById(`imp-plan-${i}`);
+    if (!(selCat ? selCat.value : r.category))  unselCat++;
+    if (!(selPlan ? selPlan.value : r.planCat)) unselPlan++;
+  }
+  if (unselCat > 0 || unselPlan > 0) {
+    let msg = '';
+    if (unselCat > 0)  msg += `집행과목 미선택 ${unselCat}건 `;
+    if (unselPlan > 0) msg += `사업계획서 구분 미선택 ${unselPlan}건`;
+    toast(`⚠ ${msg.trim()} — 선택 후 저장해주세요.`, true);
     return;
   }
 
@@ -1152,28 +1174,29 @@ async function saveImport() {
 
   for (let i = 0; i < importedRows.length; i++) {
     const r = importedRows[i];
-    // 제외 건, 중복 건 건너뜀 (파싱 시 이미 판별됨)
     if (r.excluded || r.isDup) continue;
     const chk = document.getElementById(`imp-chk-${i}`);
     if (chk && !chk.checked) continue;
 
-    // 드롭다운(노란 행) 또는 자동분류값 사용
-    const sel = document.getElementById(`imp-plan-${i}`);
-    const planCat = (sel ? sel.value : '') || r.planCat || '';
+    // 집행과목: 드롭다운 선택값 우선, 없으면 자동분류값
+    const selCat  = document.getElementById(`imp-cat-${i}`);
+    const selPlan = document.getElementById(`imp-plan-${i}`);
+    const finalCat  = (selCat  ? selCat.value  : '') || r.category  || '';
+    const finalPlan = (selPlan ? selPlan.value : '') || r.planCat || '';
 
     try {
       await db.collection('expenses').add({
-        project: importProject,
-        year: r.year || 1,
-        date: r.execDate || '',
-        title: r.purpose || '',
-        category: r.category || '',
-        planCategory: planCat,
-        amount: r.amount || 0,
-        note: r.seomok || '',
-        execId: r.execId || '',
-        source: 'enaraDohoom',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        project:     importProject,
+        year:        importYear,
+        date:        r.execDate    || '',
+        title:       r.purpose     || '',
+        category:    finalCat,
+        planCategory:finalPlan,
+        amount:      r.amount      || 0,
+        note:        r.seomok      || '',
+        execId:      r.execId      || '',
+        source:      'enaraDohoom',
+        createdAt:   firebase.firestore.FieldValue.serverTimestamp(),
       });
       saved++;
     } catch(e) {
@@ -1185,7 +1208,6 @@ async function saveImport() {
   btn.textContent = '✓ Firebase에 저장'; btn.disabled = false;
 
   let msg = `✓ ${saved}건 저장 완료`;
-  if (dup > 0) msg += ` (중복 ${dup}건 제외)`;
   if (err > 0) msg += ` (오류 ${err}건)`;
   toast(msg, err > 0);
 
@@ -1201,6 +1223,3 @@ async function saveImport() {
   }
 }
 
-</script>
-</body>
-</html>
