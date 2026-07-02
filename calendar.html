@@ -150,7 +150,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="sidebar">
     <!-- 일정 등록 -->
     <div class="side-card">
-      <div class="side-title">일정 등록</div>
+      <div class="side-title" id="form-title">일정 등록</div>
       <label class="f-label">유형</label>
       <div class="type-btns">
         <button class="type-btn active-schedule" data-type="schedule" onclick="selectType('schedule',this)">📌 일정</button>
@@ -168,7 +168,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <input type="date" class="f-input" id="ev-end">
       <label class="f-label">메모 (선택)</label>
       <textarea class="f-textarea" id="ev-memo" placeholder="추가 메모"></textarea>
-      <button class="btn-primary" onclick="saveEvent()">등록하기</button>
+      <button class="btn-primary" id="save-btn" onclick="saveEvent()">등록하기</button>
+      <button class="btn-secondary" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none;width:100%;margin-top:8px">수정 취소</button>
     </div>
 
     <!-- 이번 달 일정 -->
@@ -188,6 +189,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div id="modal-body"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">닫기</button>
+      <button class="btn-secondary" id="modal-edit-btn">수정</button>
       <button class="btn-danger" id="modal-del-btn">삭제</button>
     </div>
   </div>
@@ -217,7 +219,7 @@ const TYPE_LABELS={schedule:'📌 일정',leave:'🌿 휴가',deadline:'🔴 마
 const TYPE_COLORS={schedule:'#2563eb',leave:'#059669',deadline:'#dc2626',etc:'#7c3aed'};
 
 let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
-let allEvents=[], selectedType='schedule', selectedEventId=null;
+let allEvents=[], selectedType='schedule', selectedEventId=null, editingId=null;
 const today=new Date();
 
 // 오늘 날짜 기본 설정
@@ -294,7 +296,7 @@ function renderEventList(){
     </div>`).join('');
 }
 
-function selectType(type,btn){
+function selectType(type){
   selectedType=type;
   document.querySelectorAll('.type-btn').forEach(b=>{
     b.className='type-btn';
@@ -314,14 +316,51 @@ async function saveEvent(){
   const memo=document.getElementById('ev-memo').value.trim();
   if(!title||!date){toast('제목과 날짜를 입력하세요.',true);return}
   try{
-    await db.collection('calendarEvents').add({
-      type:selectedType, author, title, date, endDate, memo,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    document.getElementById('ev-title').value='';
-    document.getElementById('ev-memo').value='';
-    toast('✓ 일정이 등록되었습니다');
+    if(editingId){
+      await db.collection('calendarEvents').doc(editingId).update({
+        type:selectedType, author, title, date, endDate, memo,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      cancelEdit();
+      toast('✓ 일정이 수정되었습니다');
+    }else{
+      await db.collection('calendarEvents').add({
+        type:selectedType, author, title, date, endDate, memo,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('ev-title').value='';
+      document.getElementById('ev-memo').value='';
+      toast('✓ 일정이 등록되었습니다');
+    }
   }catch(e){toast('저장 실패: '+e.message,true)}
+}
+
+function startEdit(id){
+  const ev=allEvents.find(e=>e.id===id);
+  if(!ev) return;
+  editingId=id;
+  selectType(ev.type||'schedule');
+  document.getElementById('ev-author').value=ev.author||'';
+  document.getElementById('ev-title').value=ev.title||'';
+  document.getElementById('ev-date').value=ev.date||'';
+  document.getElementById('ev-end').value=(ev.endDate&&ev.endDate!==ev.date)?ev.endDate:'';
+  document.getElementById('ev-memo').value=ev.memo||'';
+  document.getElementById('form-title').textContent='일정 수정';
+  document.getElementById('save-btn').textContent='수정 저장';
+  document.getElementById('cancel-edit-btn').style.display='block';
+  closeModal();
+  document.querySelector('.sidebar').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function cancelEdit(){
+  editingId=null;
+  document.getElementById('ev-title').value='';
+  document.getElementById('ev-memo').value='';
+  document.getElementById('ev-end').value='';
+  selectType('schedule');
+  document.getElementById('form-title').textContent='일정 등록';
+  document.getElementById('save-btn').textContent='등록하기';
+  document.getElementById('cancel-edit-btn').style.display='none';
 }
 
 function openEventModal(id){
@@ -338,6 +377,7 @@ function openEventModal(id){
     </div>`;
   document.getElementById('event-modal').classList.add('open');
   document.getElementById('modal-del-btn').onclick=()=>deleteEvent(id);
+  document.getElementById('modal-edit-btn').onclick=()=>startEdit(id);
 }
 
 async function deleteEvent(id){
