@@ -21,7 +21,7 @@
 }
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
 .nav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--border);padding:0 40px;box-shadow:var(--shadow)}
-.nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
+.nav-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .nav-chip{background:var(--pc);color:#fff;font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
 .nav-title{font-size:15px;font-weight:700;color:var(--text)}
@@ -31,49 +31,96 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* PROJ TABS */
 .proj-tab-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 40px}
-.proj-tabs{max-width:1400px;margin:0 auto;display:flex;gap:0}
+.proj-tabs{max-width:1600px;margin:0 auto;display:flex;gap:0;flex-wrap:wrap}
 .proj-tab{padding:12px 20px;font-size:14px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;text-decoration:none;display:block}
 .proj-tab:hover{color:var(--text)}
 .proj-tab.active{color:var(--pc);border-bottom-color:var(--pc);font-weight:600}
 
-.main{max-width:1400px;margin:0 auto;padding:32px 40px 60px}
+.main{max-width:1600px;margin:0 auto;padding:32px 40px 60px}
 .sh{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .sh-label{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;font-weight:600}
 .sh-line{flex:1;height:1px;background:var(--border)}
 .sh-count{font-family:var(--mono);font-size:11px;color:var(--text3)}
 
+/* 업로드 존 */
+.upload-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:16px}
+.upload-zone{border:2px dashed var(--border2);border-radius:10px;padding:26px 20px;text-align:center;cursor:pointer;transition:all .18s;background:#fcfdfe}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--pc);background:var(--pc-l)}
+.uz-icon{font-size:30px;line-height:1;margin-bottom:8px}
+.uz-title{font-size:14px;font-weight:600;color:var(--text2)}
+.uz-title b{color:var(--pc)}
+.uz-sub{font-size:12px;color:var(--text3);margin-top:5px;font-family:var(--mono)}
+
 /* 입력 폼 */
 .form-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow);margin-bottom:24px}
-.form-row{display:grid;grid-template-columns:160px 1fr 140px 120px;gap:12px;align-items:end}
+.form-row{display:grid;grid-template-columns:150px 130px 1fr 130px 120px;gap:12px;align-items:end}
 .f-group{display:flex;flex-direction:column;gap:6px}
 .f-label{font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
-.f-input{background:#fff;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;border-radius:8px;transition:border-color .15s,box-shadow .15s;outline:none;width:100%}
-.f-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.btn-primary{background:var(--pc);color:#fff;font-size:13px;font-weight:600;padding:9px 20px;border:none;border-radius:8px;cursor:pointer;transition:background .15s;white-space:nowrap;height:38px}
+.f-input,.f-select{background:#fff;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;border-radius:8px;transition:border-color .15s,box-shadow .15s;outline:none;width:100%}
+.f-input:focus,.f-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn-primary{background:var(--pc);color:#fff;font-size:13px;font-weight:600;padding:9px 20px;border:none;border-radius:8px;cursor:pointer;transition:filter .15s;white-space:nowrap;height:38px}
 .btn-primary:hover{filter:brightness(.9)}
 
-/* 검색 */
-.search-bar{display:flex;gap:10px;margin-bottom:16px;align-items:center}
-.search-input{flex:1;background:#fff;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 14px;border-radius:8px;outline:none;transition:border-color .15s,box-shadow .15s}
+/* 툴바 */
+.toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;background:#fff;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 14px;border-radius:8px;outline:none;transition:border-color .15s,box-shadow .15s}
 .search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .search-hint{font-size:12px;color:var(--text3);font-family:var(--mono)}
+.seg{display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.seg button{background:#fff;border:none;font-family:var(--mono);font-size:12px;color:var(--text3);padding:8px 14px;cursor:pointer;transition:all .12s}
+.seg button.on{background:var(--pc);color:#fff}
+.seg button+button{border-left:1px solid var(--border2)}
+.btn-tool{background:#fff;border:1px solid var(--border2);color:var(--text3);font-size:12px;font-family:var(--mono);padding:8px 14px;border-radius:8px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.btn-tool:hover{border-color:var(--pc);color:var(--pc)}
+.btn-dl{background:#059669;border:none;color:#fff;font-size:12px;font-family:var(--mono);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 
 /* 테이블 */
-.doc-table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-.doc-table{width:100%;border-collapse:collapse}
+.doc-table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;box-shadow:var(--shadow)}
+.doc-table{width:100%;border-collapse:collapse;min-width:820px}
+.doc-table.detail{min-width:1320px}
 .doc-table thead tr{background:#f8fafc;border-bottom:2px solid var(--border)}
-.doc-table th{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);padding:11px 16px;text-align:left;font-weight:600;white-space:nowrap}
-.doc-table td{padding:13px 16px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);transition:background .12s;vertical-align:middle}
+.doc-table th{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:11px 14px;text-align:left;font-weight:600;white-space:nowrap}
+.doc-table td{padding:12px 14px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:middle}
 .doc-table tr:hover td{background:#fafbfc}
 .doc-table tr:last-child td{border-bottom:none}
-.doc-num{font-family:var(--mono);font-size:12px;color:var(--pc);font-weight:600}
-.doc-title{color:var(--text);font-weight:500}
+.col-detail{display:none}
+.doc-table.detail .col-detail{display:table-cell}
+.doc-table.detail .col-simple{display:none}
+.doc-num{font-family:var(--mono);font-size:12px;color:var(--pc);font-weight:600;white-space:nowrap}
+.doc-title{color:var(--text);font-weight:500;min-width:240px}
 .doc-date{font-family:var(--mono);font-size:12px;color:var(--text3);white-space:nowrap}
+.doc-idx{font-family:var(--mono);font-size:12px;color:var(--text4)}
+.cell-sm{font-size:12px;color:var(--text3)}
+.badge{display:inline-block;font-size:11px;font-weight:600;font-family:var(--mono);padding:2px 8px;border-radius:5px;white-space:nowrap}
+.scan-o{color:var(--green);font-weight:700} .scan-x{color:var(--red);font-weight:700}
 .btn-del{background:#fef2f2;border:1px solid #fecaca;color:var(--red);font-size:11px;font-family:var(--mono);padding:3px 10px;border-radius:6px;cursor:pointer;transition:background .15s}
 .btn-del:hover{background:#fee2e2}
 .no-data{text-align:center;padding:48px;color:var(--text3);font-size:14px}
 .spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue);animation:spin .9s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* 모달 */
+.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.show{display:flex}
+.modal{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:920px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal-head h3{font-size:16px;font-weight:700;color:var(--text)}
+.modal-head .x{background:none;border:none;font-size:22px;color:var(--text4);cursor:pointer;line-height:1}
+.modal-body{padding:20px 24px;overflow-y:auto}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mp-stat{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.mp-stat .b{background:var(--pc-l);border:1px solid var(--pc-b);border-radius:8px;padding:8px 14px}
+.mp-stat .b .n{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--pc);line-height:1}
+.mp-stat .b .l{font-size:11px;color:var(--text3);margin-top:3px}
+.prev-table{width:100%;border-collapse:collapse;font-size:12px}
+.prev-table th{background:#f8fafc;font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0}
+.prev-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+.prev-wrap{max-height:320px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+.opt-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.opt{display:flex;align-items:center;gap:7px;border:1px solid var(--border2);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s}
+.opt.on{border-color:var(--pc);background:var(--pc-l);color:var(--pc);font-weight:600}
+.btn-ghost{background:#fff;border:1px solid var(--border2);color:var(--text3);font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer;font-weight:500}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
 
 /* 네비 리모콘 */
 .nav-remote{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:300;display:flex;flex-direction:column;gap:6px}
@@ -89,7 +136,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 @media(max-width:768px){
   .nav,.proj-tab-bar{padding-left:16px;padding-right:16px}
   .main{padding:24px 16px 48px}
-  .form-row{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr 1fr}
   .nav-remote{display:none}
 }
 </style>
@@ -114,25 +161,46 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <a href="document.html?p=localrd"  class="proj-tab" id="tab-localrd" >🔬 로컬R&amp;D</a>
     <a href="document.html?p=overseas" class="proj-tab" id="tab-overseas">✈️ 해외인재유치</a>
     <a href="document.html?p=common"   class="proj-tab" id="tab-common"  >📦 공통운영경비</a>
+    <a href="document.html?p=city"     class="proj-tab" id="tab-city"    >🏛️ 시비</a>
   </div>
 </div>
 
 <div class="main">
-  <!-- 등록 폼 -->
+
+  <!-- 엑셀 업로드 -->
+  <div class="upload-card">
+    <div class="sh" style="margin-bottom:14px"><span class="sh-label">엑셀 일괄 등록</span><div class="sh-line"></div></div>
+    <div class="upload-zone" id="upload-zone">
+      <div class="uz-icon">📄</div>
+      <div class="uz-title"><b>엑셀 색인표 파일</b>을 끌어다 놓거나 클릭해서 선택하세요</div>
+      <div class="uz-sub">.xlsx / .xls · 문서번호·제목·날짜·구분·비목 등 자동 인식</div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
+  </div>
+
+  <!-- 개별 등록 폼 -->
   <div class="form-card">
-    <div class="sh" style="margin-bottom:16px"><span class="sh-label">공문 등록</span><div class="sh-line"></div></div>
+    <div class="sh" style="margin-bottom:16px"><span class="sh-label">개별 등록</span><div class="sh-line"></div></div>
     <div class="form-row">
-      <div class="f-group">
-        <label class="f-label">공문 번호</label>
-        <input type="text" class="f-input" id="d-num" placeholder="예) 제2026-001호">
-      </div>
-      <div class="f-group">
-        <label class="f-label">공문 제목 <span style="color:var(--red)">*</span></label>
-        <input type="text" class="f-input" id="d-title" placeholder="공문 제목을 입력하세요">
-      </div>
       <div class="f-group">
         <label class="f-label">날짜 <span style="color:var(--red)">*</span></label>
         <input type="date" class="f-input" id="d-date">
+      </div>
+      <div class="f-group">
+        <label class="f-label">문서번호</label>
+        <input type="text" class="f-input" id="d-num" placeholder="예) 001">
+      </div>
+      <div class="f-group">
+        <label class="f-label">제목 <span style="color:var(--red)">*</span></label>
+        <input type="text" class="f-input" id="d-title" placeholder="공문 제목을 입력하세요">
+      </div>
+      <div class="f-group">
+        <label class="f-label">구분</label>
+        <select class="f-select" id="d-type">
+          <option value="">—</option>
+          <option>계획</option><option>지출</option><option>출장</option>
+          <option>보고</option><option>급여</option><option>휴가</option><option>기타</option>
+        </select>
       </div>
       <div class="f-group">
         <label class="f-label" style="opacity:0">등록</label>
@@ -146,29 +214,77 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <span class="sh-label">공문 목록</span>
     <div class="sh-line"></div>
     <span class="sh-count" id="doc-count">0건</span>
-    <button onclick="downloadDocExcel()" id="btn-doc-dl" style="background:#059669;border:none;color:#fff;font-size:12px;font-family:var(--mono);padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)">⬇ 엑셀 다운로드</button>
   </div>
 
-  <div class="search-bar">
-    <input type="text" class="search-input" id="search-input" placeholder="공문 번호 또는 제목으로 검색…" oninput="applySearch()">
+  <div class="toolbar">
+    <input type="text" class="search-input" id="search-input" placeholder="문서번호·제목·구분·비목으로 검색…" oninput="applySearch()">
     <span class="search-hint" id="search-hint"></span>
+    <div class="seg" id="view-seg">
+      <button class="on" data-view="simple" onclick="setView('simple')">간단히</button>
+      <button data-view="detail" onclick="setView('detail')">상세히</button>
+    </div>
+    <button class="btn-tool" id="sort-btn" onclick="toggleSort()">↑ 오름차순</button>
+    <button class="btn-dl" onclick="downloadDocExcel()" id="btn-doc-dl">⬇ 엑셀 다운로드</button>
   </div>
 
   <div class="doc-table-wrap">
-    <table class="doc-table">
+    <table class="doc-table" id="doc-table">
       <thead>
         <tr>
-          <th style="width:48px">No.</th>
-          <th style="width:180px">공문 번호</th>
+          <th style="width:44px">No.</th>
+          <th class="col-detail" style="width:56px">스캔</th>
+          <th style="width:112px">날짜</th>
+          <th style="width:110px">문서번호</th>
+          <th class="col-detail" style="width:64px">구분</th>
+          <th class="col-detail" style="width:70px">로컬/해외</th>
+          <th class="col-detail" style="width:150px">항목</th>
+          <th class="col-detail" style="width:100px">비목</th>
+          <th class="col-detail" style="width:110px">세목</th>
+          <th class="col-detail" style="width:90px">역량</th>
           <th>제목</th>
-          <th style="width:120px">날짜</th>
-          <th style="width:70px">관리</th>
+          <th class="col-simple" style="width:64px">구분</th>
+          <th style="width:66px">관리</th>
         </tr>
       </thead>
       <tbody id="doc-tbody">
-        <tr><td colspan="5" class="no-data"><div class="spin"></div></td></tr>
+        <tr><td colspan="13" class="no-data"><div class="spin"></div></td></tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- 업로드 미리보기 모달 -->
+<div class="modal-ov" id="prev-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="prev-title">엑셀 미리보기</h3>
+      <button class="x" onclick="closePreview()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="mp-stat" id="mp-stat"></div>
+      <div style="margin-bottom:12px">
+        <div class="f-label" style="margin-bottom:8px">등록 방식</div>
+        <div class="opt-row" id="mode-opts">
+          <div class="opt on" data-mode="new" onclick="setMode('new')">✨ 신규만 추가 <span style="opacity:.65;font-weight:400">· 이미 등록된 공문 자동 제외</span></div>
+          <div class="opt" data-mode="replace" onclick="setMode('replace')">♻️ 전체 교체 <span style="opacity:.65;font-weight:400">· 기존 삭제 후 등록</span></div>
+        </div>
+      </div>
+      <div class="prev-wrap">
+        <table class="prev-table">
+          <thead><tr>
+            <th>No</th><th>상태</th><th>날짜</th><th>문서번호</th><th>구분</th><th>제목</th>
+          </tr></thead>
+          <tbody id="prev-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="search-hint" id="prev-note"></span>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="closePreview()">취소</button>
+        <button class="btn-primary" id="prev-confirm" onclick="confirmUpload()">등록하기</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -185,6 +301,14 @@ const PROJECTS={
   localrd: {label:'로컬R&D',    color:'#2563eb',light:'#eff6ff',border:'#bfdbfe'},
   overseas:{label:'해외인재유치',color:'#059669',light:'#ecfdf5',border:'#a7f3d0'},
   common:  {label:'공통운영경비',color:'#d97706',light:'#fffbeb',border:'#fde68a'},
+  city:    {label:'시비',        color:'#7c3aed',light:'#f5f3ff',border:'#ddd6fe'},
+};
+// 구분 배지 색상
+const TYPE_STYLE={
+  '계획':{bg:'#eff6ff',c:'#2563eb'}, '지출':{bg:'#ecfdf5',c:'#059669'},
+  '출장':{bg:'#f5f3ff',c:'#7c3aed'}, '보고':{bg:'#ecfeff',c:'#0891b2'},
+  '급여':{bg:'#fffbeb',c:'#d97706'}, '휴가':{bg:'#fdf2f8',c:'#db2777'},
+  '기타':{bg:'#f1f5f9',c:'#64748b'},
 };
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
@@ -198,11 +322,7 @@ document.documentElement.style.setProperty('--pc-l',proj.light);
 document.documentElement.style.setProperty('--pc-b',proj.border);
 document.title=`공문 색인표 — ${proj.label}`;
 document.getElementById('nav-chip').textContent=proj.label;
-
-// 탭 active
 document.getElementById('tab-'+P)?.classList.add('active');
-
-// 오늘 날짜 기본값
 document.getElementById('d-date').value=new Date().toISOString().split('T')[0];
 
 // 네비 리모콘
@@ -217,49 +337,106 @@ document.getElementById('nav-remote').innerHTML=[
   {href:'admin.html',icon:'⚙️',tip:'관리자'},
 ].map(it=>`<a href="${it.href}" class="nr-btn${it.active?' active':''}">${it.icon}<span class="nr-tooltip">${it.tip}</span></a>`).join('');
 
-let allDocs=[], searchQuery='';
+let allDocs=[], searchQuery='', viewMode='simple', sortAsc=true;
 
-// 실시간 구독
+/* ── 실시간 구독 ── */
 db.collection(`${P}_documents`).onSnapshot(snap=>{
   allDocs=snap.docs.map(d=>({id:d.id,...d.data()}));
-  allDocs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  sortDocs();
   render();
 },()=>{allDocs=[];render()});
+
+function docNumOf(d){ return d.docNum ?? d.num ?? ''; }
+function seqOf(d){ return (typeof d.seq==='number') ? d.seq : (d.createdAt?.seconds || 0); }
+
+function sortDocs(){
+  allDocs.sort((a,b)=>{
+    const ad=a.date||'9999-99-99', bd=b.date||'9999-99-99';   // 날짜 없는 건 맨 뒤로
+    const dc=ad.localeCompare(bd);
+    if(dc!==0) return sortAsc?dc:-dc;
+    const sc=seqOf(a)-seqOf(b);
+    return sortAsc?sc:-sc;
+  });
+}
 
 function applySearch(){
   searchQuery=document.getElementById('search-input').value.trim().toLowerCase();
   render();
 }
+function setView(v){
+  viewMode=v;
+  document.querySelectorAll('#view-seg button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  document.getElementById('doc-table').classList.toggle('detail',v==='detail');
+  render();
+}
+function toggleSort(){
+  sortAsc=!sortAsc;
+  document.getElementById('sort-btn').textContent=sortAsc?'↑ 오름차순':'↓ 내림차순';
+  sortDocs(); render();
+}
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function typeBadge(t){
+  if(!t) return '<span class="cell-sm">—</span>';
+  const st=TYPE_STYLE[t]||TYPE_STYLE['기타'];
+  return `<span class="badge" style="background:${st.bg};color:${st.c}">${esc(t)}</span>`;
+}
 
 function render(){
   const filtered=searchQuery
-    ? allDocs.filter(d=>(d.num||'').toLowerCase().includes(searchQuery)||(d.title||'').toLowerCase().includes(searchQuery))
+    ? allDocs.filter(d=>[docNumOf(d),d.title,d.type,d.bimok,d.item,d.semok,d.capability].some(v=>String(v||'').toLowerCase().includes(searchQuery)))
     : allDocs;
   document.getElementById('doc-count').textContent=filtered.length+'건';
   document.getElementById('search-hint').textContent=searchQuery&&filtered.length!==allDocs.length?`전체 ${allDocs.length}건 중 ${filtered.length}건`:'';
   const tbody=document.getElementById('doc-tbody');
-  if(!filtered.length){tbody.innerHTML=`<tr><td colspan="5" class="no-data">${searchQuery?'검색 결과가 없습니다':'등록된 공문이 없습니다'}</td></tr>`;return}
-  tbody.innerHTML=filtered.map((d,i)=>`<tr>
-    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${allDocs.indexOf(d)+1}</td>
-    <td class="doc-num">${d.num||'—'}</td>
-    <td class="doc-title">${d.title||'—'}</td>
-    <td class="doc-date">${d.date||'—'}</td>
-    <td><button class="btn-del" onclick="delDoc('${d.id}','${(d.title||'').replace(/'/g,"\\'")}')">삭제</button></td>
-  </tr>`).join('');
+  if(!filtered.length){tbody.innerHTML=`<tr><td colspan="13" class="no-data">${searchQuery?'검색 결과가 없습니다':'등록된 공문이 없습니다 · 엑셀을 업로드해 일괄 등록해보세요'}</td></tr>`;return}
+  const posMap=new Map(); allDocs.forEach((d,i)=>posMap.set(d,i));
+  tbody.innerHTML=filtered.map((d)=>{
+    const pos=posMap.get(d);
+    const idx = sortAsc ? pos+1 : allDocs.length-pos;
+    const sv=String(d.scan==null?'':d.scan).trim().toUpperCase();
+    const scan=(sv==='0'||sv==='O'||sv==='✓'||sv==='Y')?'<span class="scan-o">✓</span>'
+             :(sv==='X'||sv==='✗')?'<span class="scan-x">✗</span>':'<span class="cell-sm">—</span>';
+    return `<tr>
+      <td class="doc-idx">${idx}</td>
+      <td class="col-detail" style="text-align:center">${scan}</td>
+      <td class="doc-date">${esc(d.date)||'—'}</td>
+      <td class="doc-num">${esc(docNumOf(d))||'—'}</td>
+      <td class="col-detail">${typeBadge(d.type)}</td>
+      <td class="col-detail cell-sm">${esc(d.region)||'—'}</td>
+      <td class="col-detail cell-sm">${esc(d.item)||'—'}</td>
+      <td class="col-detail cell-sm">${esc(d.bimok)||'—'}</td>
+      <td class="col-detail cell-sm">${esc(d.semok)||'—'}</td>
+      <td class="col-detail cell-sm">${esc(d.capability)||'—'}</td>
+      <td class="doc-title">${esc(d.title)||'—'}</td>
+      <td class="col-simple">${typeBadge(d.type)}</td>
+      <td><button class="btn-del" data-id="${d.id}" data-title="${esc(d.title)}">삭제</button></td>
+    </tr>`;
+  }).join('');
 }
 
+// 삭제 이벤트 위임(제목에 따옴표가 있어도 안전)
+document.getElementById('doc-tbody').addEventListener('click',e=>{
+  const btn=e.target.closest('.btn-del'); if(!btn) return;
+  delDoc(btn.dataset.id, btn.dataset.title);
+});
+
+/* ── 개별 등록 ── */
 async function saveDoc(){
+  const date=document.getElementById('d-date').value;
   const num=document.getElementById('d-num').value.trim();
   const title=document.getElementById('d-title').value.trim();
-  const date=document.getElementById('d-date').value;
+  const type=document.getElementById('d-type').value;
   if(!title||!date){toast('제목과 날짜를 입력하세요.',true);return}
   try{
     await db.collection(`${P}_documents`).add({
-      num, title, date,
+      docNum:num, title, date, type,
+      seq:Date.now(),
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('d-num').value='';
     document.getElementById('d-title').value='';
+    document.getElementById('d-type').value='';
     toast('✓ 공문이 등록되었습니다');
   }catch(e){toast('저장 실패: '+e.message,true)}
 }
@@ -275,24 +452,217 @@ function toast(msg,isErr=false){
   requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>el.classList.remove('show'),2800);
 }
 
+/* ══════════ 엑셀 업로드 파서 ══════════ */
+const zone=document.getElementById('upload-zone');
+const fileInput=document.getElementById('file-input');
+zone.addEventListener('click',()=>fileInput.click());
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);e.target.value=''});
+
+// 미리보기 창: 바깥 클릭·ESC로 닫기 (단, 등록 진행 중에는 유지)
+function tryClosePreview(){ if(!document.getElementById('prev-confirm').disabled) closePreview(); }
+document.getElementById('prev-modal').addEventListener('click',e=>{ if(e.target.id==='prev-modal') tryClosePreview(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.getElementById('prev-modal').classList.contains('show')) tryClosePreview(); });
+
+function normH(s){ return String(s==null?'':s).replace(/\s+/g,'').replace(/[.]/g,''); }
+function isHeaderRow(row){
+  const j=row.map(c=>normH(c)).join('|');
+  return j.includes('제목') && (j.includes('문서번호')||j.includes('NO'));
+}
+function mapHeader(row){
+  const m={};
+  row.forEach((cell,idx)=>{
+    if(cell==null) return;
+    const h=normH(cell);
+    if(m.note===undefined && (h.includes('중복')||h.includes('공란'))){m.note=idx;return}
+    if(m.title===undefined && h.includes('제목')){m.title=idx;return}
+    if(m.docNum===undefined && h.includes('문서번호')){m.docNum=idx;return}
+    if(m.scan===undefined && h.includes('스캔')){m.scan=idx;return}
+    if(m.region===undefined && (h.includes('로컬')||h.includes('해외'))){m.region=idx;return}
+    if(m.type===undefined && h.includes('계획')&&h.includes('지출')){m.type=idx;return}
+    if(m.item===undefined && h.includes('항목')){m.item=idx;return}
+    if(m.bimok===undefined && h.includes('비목')){m.bimok=idx;return}
+    if(m.semok===undefined && h.includes('세목')){m.semok=idx;return}
+    if(m.capability===undefined && (h.includes('체험')||h.includes('역량')||h.includes('직업능력'))){m.capability=idx;return}
+    if(m.date===undefined && (h.includes('월일')||h.includes('날짜')||h.includes('일자')||h.includes('작성일'))){m.date=idx;return}
+    if(m.no===undefined && h==='NO'){m.no=idx;return}
+  });
+  return m;
+}
+function fmtDate(v){
+  if(v==null||v==='') return '';
+  if(v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+  if(typeof v==='number' && XLSX.SSF){
+    const o=XLSX.SSF.parse_date_code(v);
+    if(o) return `${o.y}-${String(o.m).padStart(2,'0')}-${String(o.d).padStart(2,'0')}`;
+  }
+  const s=String(v).trim();
+  const m=s.match(/^(\d{4})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})/);  // 2026.3.3 / 2026/03/03 등
+  if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  return s;
+}
+function cell(r,idx){ return (idx!=null && r[idx]!=null) ? String(r[idx]).trim() : ''; }
+
+let pendingRows=[], uploadMode='new';
+
+// 중복 대조 키 (날짜·문서번호·제목이 모두 같으면 동일 공문으로 간주)
+function dupKey(date,docNum,title){
+  return `${String(date||'').trim()}|${String(docNum||'').trim()}|${String(title||'').trim()}`;
+}
+
+function handleFile(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+      const rows=[]; const sheetInfo=[];
+      wb.SheetNames.forEach(name=>{
+        const arr=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,raw:true,cellDates:true,defval:null});
+        let h=-1;
+        for(let i=0;i<arr.length;i++){ if(isHeaderRow(arr[i])){h=i;break} }
+        if(h<0) return;
+        const map=mapHeader(arr[h]);
+        let cnt=0;
+        for(let i=h+1;i<arr.length;i++){
+          const r=arr[i];
+          const title=map.title!=null?r[map.title]:null;
+          const dn=map.docNum!=null?r[map.docNum]:null;
+          if((title==null||String(title).trim()==='')&&(dn==null||String(dn).trim()===''))continue;
+          rows.push({
+            date:fmtDate(map.date!=null?r[map.date]:''),
+            docNum:cell(r,map.docNum),
+            title:cell(r,map.title),
+            type:cell(r,map.type),
+            region:cell(r,map.region),
+            item:cell(r,map.item),
+            bimok:cell(r,map.bimok),
+            semok:cell(r,map.semok),
+            capability:cell(r,map.capability),
+            scan:cell(r,map.scan),
+            note:cell(r,map.note),
+          });
+          cnt++;
+        }
+        sheetInfo.push({name,cnt});
+      });
+      if(!rows.length){toast('색인표 형식을 인식하지 못했습니다. 제목·문서번호 열이 있는지 확인하세요.',true);return}
+      // 업로드 내 동일(날짜·문서번호·제목) 행 중복 제거
+      const seen=new Set(), deduped=[];
+      rows.forEach(r=>{ const k=`${r.date}|${r.docNum}|${r.title}`; if(seen.has(k))return; seen.add(k); deduped.push(r); });
+      const dupCount=rows.length-deduped.length;
+      pendingRows=deduped;
+      openPreview(deduped,sheetInfo,dupCount);
+    }catch(err){toast('파일을 읽지 못했습니다: '+err.message,true)}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function openPreview(rows,sheetInfo,fileDup=0){
+  // 기존 DB(allDocs)와 대조 → 각 행에 신규 여부 표시
+  const existing=new Set(allDocs.map(d=>dupKey(d.date,docNumOf(d),d.title)));
+  rows.forEach(r=>{ r._new = !existing.has(dupKey(r.date,r.docNum,r.title)); });
+  const newCount=rows.filter(r=>r._new).length;
+  const existCount=rows.length-newCount;
+
+  document.getElementById('prev-title').textContent=`엑셀 미리보기 — ${proj.label}`;
+  document.getElementById('mp-stat').innerHTML=`
+    <div class="b"><div class="n">${rows.length}</div><div class="l">인식된 공문</div></div>
+    <div class="b" style="background:#ecfdf5;border-color:#a7f3d0"><div class="n" style="color:#059669">${newCount}</div><div class="l">신규 (등록 대상)</div></div>
+    <div class="b" style="background:#f8fafc;border-color:#e2e8f0"><div class="n" style="color:#64748b">${existCount}</div><div class="l">이미 등록됨</div></div>`
+    + (fileDup>0?`<div class="b"><div class="n">${fileDup}</div><div class="l">파일 내 중복 제외</div></div>`:'');
+
+  // 신규를 위로 정렬해 무엇이 등록될지 먼저 보이게
+  const disp=[...rows].sort((a,b)=>(b._new?1:0)-(a._new?1:0)).slice(0,60);
+  document.getElementById('prev-tbody').innerHTML=disp.map((r,i)=>`<tr style="${r._new?'':'opacity:.5'}">
+    <td>${i+1}</td>
+    <td>${r._new
+        ?'<span class="badge" style="background:#ecfdf5;color:#059669">신규</span>'
+        :'<span class="badge" style="background:#f1f5f9;color:#64748b">등록됨</span>'}</td>
+    <td>${esc(r.date)||'—'}</td><td>${esc(r.docNum)||'—'}</td>
+    <td>${esc(r.type)||'—'}</td><td>${esc(r.title)||'—'}</td>
+  </tr>`).join('');
+
+  const notes=[];
+  if(rows.length>60) notes.push(`상위 60건만 미리보기`);
+  notes.push('신규만 추가: 이미 등록된 공문은 제외 · 전체 교체: 기존 삭제 후 등록');
+  document.getElementById('prev-note').textContent='※ '+notes.join(' · ');
+  setMode('new');
+  document.getElementById('prev-modal').classList.add('show');
+}
+function setMode(m){
+  uploadMode=m;
+  document.querySelectorAll('#mode-opts .opt').forEach(o=>o.classList.toggle('on',o.dataset.mode===m));
+}
+function closePreview(){ document.getElementById('prev-modal').classList.remove('show'); pendingRows=[]; }
+
+async function confirmUpload(){
+  if(!pendingRows.length){closePreview();return}
+  const col=db.collection(`${P}_documents`);
+
+  // 신규만 모드: 등록 직전 최신 DB와 다시 대조해 이미 있는 공문 제외
+  let toInsert=pendingRows;
+  if(uploadMode==='new'){
+    const existing=new Set(allDocs.map(d=>dupKey(d.date,docNumOf(d),d.title)));
+    toInsert=pendingRows.filter(r=>!existing.has(dupKey(r.date,r.docNum,r.title)));
+    if(!toInsert.length){ toast('추가할 신규 공문이 없습니다 · 모두 이미 등록됨'); closePreview(); return; }
+  }
+  const n=toInsert.length;
+  const skipped=pendingRows.length-n;
+
+  if(uploadMode==='replace'){
+    if(!confirm(`기존 ${proj.label} 공문 목록을 전부 삭제하고 ${n}건으로 교체합니다.\n계속하시겠습니까?`)) return;
+  }
+  const btn=document.getElementById('prev-confirm');
+  btn.disabled=true; btn.textContent='등록 중…';
+  try{
+    // 교체 모드: 기존 문서를 먼저 확보해 두고, 신규 등록이 끝난 뒤에 삭제
+    // (삭제를 먼저 하면 등록 중 오류 시 데이터가 통째로 사라질 수 있음)
+    let oldDocs=null;
+    if(uploadMode==='replace'){ oldDocs=(await col.get()).docs; }
+    const base=Date.now();
+    await commitInChunks(toInsert,(batch,row,i)=>{
+      const {_new,...clean}=row;   // 내부 표시용 플래그는 저장 제외
+      batch.set(col.doc(),{
+        ...clean, seq:base+i,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    if(oldDocs&&oldDocs.length){ await commitInChunks(oldDocs,(batch,d)=>batch.delete(d.ref)); }
+    closePreview();
+    toast(`✓ ${n}건 등록${skipped>0?` · ${skipped}건 중복 제외`:''}`);
+  }catch(e){toast('등록 실패: '+e.message,true)}
+  finally{btn.disabled=false;btn.textContent='등록하기'}
+}
+
+// Firestore 배치 최대 500 → 400 단위로 분할 커밋
+async function commitInChunks(items,apply){
+  for(let i=0;i<items.length;i+=400){
+    const batch=db.batch();
+    items.slice(i,i+400).forEach((it,j)=>apply(batch,it,i+j));
+    await batch.commit();
+  }
+}
+
 /* ── 엑셀 다운로드 ── */
 function downloadDocExcel(){
   const btn=document.getElementById('btn-doc-dl');
   btn.textContent='생성 중…';btn.disabled=true;
-  const today=new Date();
-  const todayStr=`${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-  const wb=XLSX.utils.book_new();
+  const t=new Date();
+  const today=`${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')}`;
   const rows=[];
-  rows.push([`${proj.label} 공문 색인표`, '', '', '', `생성일: ${todayStr}`]);
+  rows.push([`${proj.label} 공문 색인표`,'','','','','','','','','',`생성일: ${today}`]);
   rows.push([]);
-  rows.push(['No.','공문 번호','제목','날짜']);
+  rows.push(['No.','스캔','날짜','문서번호','로컬/해외','구분','항목','비목','세목','역량','제목']);
   allDocs.forEach((d,i)=>{
-    rows.push([i+1, d.num||'', d.title||'', d.date||'']);
+    rows.push([i+1,d.scan||'',d.date||'',docNumOf(d),d.region||'',d.type||'',d.item||'',d.bimok||'',d.semok||'',d.capability||'',d.title||'']);
   });
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:6},{wch:22},{wch:60},{wch:14}];
-  XLSX.utils.book_append_sheet(wb,ws,'공문목록');
-  XLSX.writeFile(wb,`RISE사업_공문색인_${proj.label}_${todayStr.replace(/\./g,'')}.xlsx`);
+  ws['!cols']=[{wch:6},{wch:6},{wch:12},{wch:12},{wch:9},{wch:8},{wch:20},{wch:14},{wch:14},{wch:12},{wch:56}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'공문색인표');
+  XLSX.writeFile(wb,`RISE_공문색인_${proj.label}_${today.replace(/\./g,'')}.xlsx`);
   btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
 }
 </script>
