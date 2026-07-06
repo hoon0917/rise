@@ -83,6 +83,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .doc-table td{padding:12px 14px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:middle}
 .doc-table tr:hover td{background:#fafbfc}
 .doc-table tr:last-child td{border-bottom:none}
+/* 연차 구분줄 */
+.group-row td{background:var(--pc-l)!important;border-top:2px solid var(--pc-b);border-bottom:1px solid var(--pc-b);padding:9px 14px;cursor:pointer;user-select:none}
+.group-row:first-child td{border-top:none}
+.gr-caret{display:inline-block;width:14px;color:var(--pc);font-size:11px}
+.gr-label{font-weight:700;color:var(--pc);font-size:13px;margin-right:8px}
+.gr-range{font-family:var(--mono);font-size:11px;color:var(--text3);margin-right:8px}
+.gr-count{font-family:var(--mono);font-size:11px;color:var(--pc);background:#fff;border:1px solid var(--pc-b);padding:1px 8px;border-radius:20px}
 .col-detail{display:none}
 .doc-table.detail .col-detail{display:table-cell}
 .doc-table.detail .col-simple{display:none}
@@ -337,7 +344,7 @@ document.getElementById('nav-remote').innerHTML=[
   {href:'admin.html',icon:'⚙️',tip:'관리자'},
 ].map(it=>`<a href="${it.href}" class="nr-btn${it.active?' active':''}">${it.icon}<span class="nr-tooltip">${it.tip}</span></a>`).join('');
 
-let allDocs=[], searchQuery='', viewMode='simple', sortAsc=true;
+let allDocs=[], searchQuery='', viewMode='simple', sortAsc=true, collapsedFY=new Set();
 
 /* ── 실시간 구독 ── */
 db.collection(`${P}_documents`).onSnapshot(snap=>{
@@ -349,13 +356,58 @@ db.collection(`${P}_documents`).onSnapshot(snap=>{
 function docNumOf(d){ return d.docNum ?? d.num ?? ''; }
 function seqOf(d){ return (typeof d.seq==='number') ? d.seq : (d.createdAt?.seconds || 0); }
 
+/* ── 연차(회계연도) 구분 — 3월 1일 시작, 1차년도 = 2025.03 ~ 2026.02 ── */
+const FY_START=2025;                 // 1차년도 시작 연도
+const FY_INFO={
+  1:{label:'1차년도', range:'2025.03 ~ 2026.02'},
+  2:{label:'2차년도', range:'2026.03 ~ 2027.02'},
+  3:{label:'3차년도', range:'2027.03 ~ 2028.02'},
+  4:{label:'4차년도', range:'2028.03 ~ 2029.02'},
+  5:{label:'5차년도', range:'2029.03 ~ 2030.02'},
+};
+function fiscalYear(dateStr){          // 1~5 반환, 범위 밖·날짜없음 → null
+  if(!dateStr) return null;
+  const m=String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);   // 한 자리 월·일도 허용
+  if(!m) return null;
+  const y=+m[1], mo=+m[2];
+  if(mo<1||mo>12) return null;
+  const startY = (mo>=3) ? y : y-1;   // 1~2월은 전년도 회계연도
+  const fy = startY - FY_START + 1;
+  return (fy>=1 && fy<=5) ? fy : null;
+}
+function fyKey(d){ const fy=fiscalYear(d.date); return fy==null?'x':String(fy); }
+function fyOrder(d){ const fy=fiscalYear(d.date); return fy==null?99:fy; }   // 미분류는 항상 맨 뒤
+
+// 문서번호 자연 정렬 (055 < 057, 018 < 018-1 < 019, 숫자없음/공란은 맨 뒤)
+function docNumKey(dn){
+  const s=String(dn||'').trim();
+  const m=s.match(/(\d+)(?:\s*-\s*(\d+))?/);
+  if(!m) return [Infinity, Infinity, s];
+  return [parseInt(m[1],10), m[2]?parseInt(m[2],10):-1, s];
+}
+function cmpDocNum(a,b){
+  const ka=docNumKey(a), kb=docNumKey(b);
+  if(ka[0]!==kb[0]) return ka[0]-kb[0];
+  if(ka[1]!==kb[1]) return ka[1]-kb[1];
+  return ka[2].localeCompare(kb[2]);
+}
+
 function sortDocs(){
   allDocs.sort((a,b)=>{
-    const ad=a.date||'9999-99-99', bd=b.date||'9999-99-99';   // 날짜 없는 건 맨 뒤로
-    const dc=ad.localeCompare(bd);
-    if(dc!==0) return sortAsc?dc:-dc;
-    const sc=seqOf(a)-seqOf(b);
-    return sortAsc?sc:-sc;
+    // 1) 연차 (미분류는 항상 맨 뒤, 오름/내림 무관)
+    const fa=fyOrder(a), fb=fyOrder(b);
+    if(fa!==fb){
+      if(fa===99) return 1;
+      if(fb===99) return -1;
+      return sortAsc? fa-fb : fb-fa;
+    }
+    // 2) 문서번호
+    const c=cmpDocNum(docNumOf(a),docNumOf(b));
+    if(c!==0) return sortAsc? c : -c;
+    // 3) 날짜  4) 입력순
+    const dc=(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99');
+    if(dc!==0) return sortAsc? dc : -dc;
+    return sortAsc? seqOf(a)-seqOf(b) : seqOf(b)-seqOf(a);
   });
 }
 
@@ -382,22 +434,11 @@ function typeBadge(t){
   return `<span class="badge" style="background:${st.bg};color:${st.c}">${esc(t)}</span>`;
 }
 
-function render(){
-  const filtered=searchQuery
-    ? allDocs.filter(d=>[docNumOf(d),d.title,d.type,d.bimok,d.item,d.semok,d.capability].some(v=>String(v||'').toLowerCase().includes(searchQuery)))
-    : allDocs;
-  document.getElementById('doc-count').textContent=filtered.length+'건';
-  document.getElementById('search-hint').textContent=searchQuery&&filtered.length!==allDocs.length?`전체 ${allDocs.length}건 중 ${filtered.length}건`:'';
-  const tbody=document.getElementById('doc-tbody');
-  if(!filtered.length){tbody.innerHTML=`<tr><td colspan="13" class="no-data">${searchQuery?'검색 결과가 없습니다':'등록된 공문이 없습니다 · 엑셀을 업로드해 일괄 등록해보세요'}</td></tr>`;return}
-  const posMap=new Map(); allDocs.forEach((d,i)=>posMap.set(d,i));
-  tbody.innerHTML=filtered.map((d)=>{
-    const pos=posMap.get(d);
-    const idx = sortAsc ? pos+1 : allDocs.length-pos;
-    const sv=String(d.scan==null?'':d.scan).trim().toUpperCase();
-    const scan=(sv==='0'||sv==='O'||sv==='✓'||sv==='Y')?'<span class="scan-o">✓</span>'
-             :(sv==='X'||sv==='✗')?'<span class="scan-x">✗</span>':'<span class="cell-sm">—</span>';
-    return `<tr>
+function docRowHtml(d,idx){
+  const sv=String(d.scan==null?'':d.scan).trim().toUpperCase();
+  const scan=(sv==='0'||sv==='O'||sv==='✓'||sv==='Y')?'<span class="scan-o">✓</span>'
+           :(sv==='X'||sv==='✗')?'<span class="scan-x">✗</span>':'<span class="cell-sm">—</span>';
+  return `<tr>
       <td class="doc-idx">${idx}</td>
       <td class="col-detail" style="text-align:center">${scan}</td>
       <td class="doc-date">${esc(d.date)||'—'}</td>
@@ -412,14 +453,54 @@ function render(){
       <td class="col-simple">${typeBadge(d.type)}</td>
       <td><button class="btn-del" data-id="${d.id}" data-title="${esc(d.title)}">삭제</button></td>
     </tr>`;
-  }).join('');
+}
+function groupRowHtml(key,count){
+  const info = key==='x' ? {label:'미분류', range:'날짜 미입력 또는 사업기간 외'} : FY_INFO[+key];
+  const collapsed=collapsedFY.has(key) && !searchQuery;   // 검색 중엔 항상 펼침
+  return `<tr class="group-row" data-fy="${key}">
+      <td colspan="13">
+        <span class="gr-caret">${collapsed?'▸':'▾'}</span>
+        <span class="gr-label">${info.label}</span>
+        <span class="gr-range">${info.range}</span>
+        <span class="gr-count">${count}건</span>
+      </td>
+    </tr>`;
 }
 
-// 삭제 이벤트 위임(제목에 따옴표가 있어도 안전)
+function render(){
+  const filtered=searchQuery
+    ? allDocs.filter(d=>[docNumOf(d),d.title,d.type,d.bimok,d.item,d.semok,d.capability].some(v=>String(v||'').toLowerCase().includes(searchQuery)))
+    : allDocs;
+  document.getElementById('doc-count').textContent=filtered.length+'건';
+  document.getElementById('search-hint').textContent=searchQuery&&filtered.length!==allDocs.length?`전체 ${allDocs.length}건 중 ${filtered.length}건`:'';
+  const tbody=document.getElementById('doc-tbody');
+  if(!filtered.length){tbody.innerHTML=`<tr><td colspan="13" class="no-data">${searchQuery?'검색 결과가 없습니다':'등록된 공문이 없습니다 · 엑셀을 업로드해 일괄 등록해보세요'}</td></tr>`;return}
+
+  // 연차별 건수 집계
+  const counts={};
+  filtered.forEach(d=>{ const k=fyKey(d); counts[k]=(counts[k]||0)+1; });
+
+  // allDocs가 이미 (연차→문서번호) 순으로 정렬돼 있어, 그 순서대로 그룹 헤더를 끼워 렌더
+  let html='', curKey=null, nInGroup=0;
+  filtered.forEach(d=>{
+    const k=fyKey(d);
+    if(k!==curKey){ curKey=k; nInGroup=0; html+=groupRowHtml(k,counts[k]); }
+    if(collapsedFY.has(k) && !searchQuery) return;   // 접힌 연차는 생략(단, 검색 중엔 표시)
+    nInGroup++;
+    html+=docRowHtml(d,nInGroup);
+  });
+  tbody.innerHTML=html;
+}
+
+// 삭제 · 연차 접기 이벤트 위임
 document.getElementById('doc-tbody').addEventListener('click',e=>{
-  const btn=e.target.closest('.btn-del'); if(!btn) return;
-  delDoc(btn.dataset.id, btn.dataset.title);
+  const del=e.target.closest('.btn-del'); if(del){ delDoc(del.dataset.id, del.dataset.title); return; }
+  const grp=e.target.closest('.group-row'); if(grp){ toggleGroup(grp.dataset.fy); return; }
 });
+function toggleGroup(key){
+  if(collapsedFY.has(key)) collapsedFY.delete(key); else collapsedFY.add(key);
+  render();
+}
 
 /* ── 개별 등록 ── */
 async function saveDoc(){
@@ -428,6 +509,11 @@ async function saveDoc(){
   const title=document.getElementById('d-title').value.trim();
   const type=document.getElementById('d-type').value;
   if(!title||!date){toast('제목과 날짜를 입력하세요.',true);return}
+  // 이미 같은 공문(날짜·문서번호·제목)이 있으면 확인
+  const key=dupKey(date,num,title);
+  if(allDocs.some(d=>dupKey(d.date,docNumOf(d),d.title)===key)){
+    if(!confirm('이미 같은 공문이 등록되어 있습니다.\n그래도 추가하시겠습니까?')) return;
+  }
   try{
     await db.collection(`${P}_documents`).add({
       docNum:num, title, date, type,
@@ -645,23 +731,36 @@ async function commitInChunks(items,apply){
   }
 }
 
-/* ── 엑셀 다운로드 ── */
+/* ── 엑셀 다운로드 (연차별 시트) ── */
 function downloadDocExcel(){
   const btn=document.getElementById('btn-doc-dl');
   btn.textContent='생성 중…';btn.disabled=true;
   const t=new Date();
   const today=`${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')}`;
-  const rows=[];
-  rows.push([`${proj.label} 공문 색인표`,'','','','','','','','','',`생성일: ${today}`]);
-  rows.push([]);
-  rows.push(['No.','스캔','날짜','문서번호','로컬/해외','구분','항목','비목','세목','역량','제목']);
-  allDocs.forEach((d,i)=>{
-    rows.push([i+1,d.scan||'',d.date||'',docNumOf(d),d.region||'',d.type||'',d.item||'',d.bimok||'',d.semok||'',d.capability||'',d.title||'']);
-  });
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:6},{wch:6},{wch:12},{wch:12},{wch:9},{wch:8},{wch:20},{wch:14},{wch:14},{wch:12},{wch:56}];
+  const header=['No.','스캔','날짜','문서번호','로컬/해외','구분','항목','비목','세목','역량','제목'];
+  const cols=[{wch:6},{wch:6},{wch:12},{wch:12},{wch:9},{wch:8},{wch:20},{wch:14},{wch:14},{wch:12},{wch:56}];
+
+  // 연차별로 분류
+  const groups={};   // key: '1'~'5' 또는 'x'
+  allDocs.forEach(d=>{ const k=fyKey(d); (groups[k]||(groups[k]=[])).push(d); });
+
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'공문색인표');
+  let any=false;
+  ['1','2','3','4','5','x'].forEach(k=>{
+    const list=groups[k]; if(!list||!list.length) return;
+    list.sort((a,b)=>cmpDocNum(docNumOf(a),docNumOf(b)));   // 문서번호 순
+    const info = k==='x' ? {label:'미분류',range:''} : FY_INFO[+k];
+    const rows=[];
+    rows.push([`${proj.label} 공문 색인표 — ${info.label}${info.range?` (${info.range})`:''}`,'','','','','','','','','',`생성일: ${today}`]);
+    rows.push([]);
+    rows.push(header);
+    list.forEach((d,i)=>rows.push([i+1,d.scan||'',d.date||'',docNumOf(d),d.region||'',d.type||'',d.item||'',d.bimok||'',d.semok||'',d.capability||'',d.title||'']));
+    const ws=XLSX.utils.aoa_to_sheet(rows); ws['!cols']=cols;
+    XLSX.utils.book_append_sheet(wb,ws,k==='x'?'미분류':`${k}차년도`);
+    any=true;
+  });
+  if(!any){ const ws=XLSX.utils.aoa_to_sheet([header]); ws['!cols']=cols; XLSX.utils.book_append_sheet(wb,ws,'공문색인표'); }
+
   XLSX.writeFile(wb,`RISE_공문색인_${proj.label}_${today.replace(/\./g,'')}.xlsx`);
   btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
 }
