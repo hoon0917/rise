@@ -99,6 +99,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+#pw-modal{z-index:600}   /* 다른 모달 위에서도 항상 최상단 */
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:440px;box-shadow:var(--shadow-md)}
 .modal h3{font-size:16px;font-weight:700;margin-bottom:18px}
@@ -111,6 +112,45 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .toast.err{background:var(--red)}
 .spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue);animation:spin .9s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* 휴가 입력 필드 */
+#leave-fields{display:none}
+.leave-kind-btns{display:flex;gap:6px;margin-bottom:12px}
+.leave-kind-btn{flex:1;font-size:12px;padding:7px;border-radius:8px;border:1px solid var(--border2);background:#fff;color:var(--text3);cursor:pointer;transition:all .15s;font-family:var(--mono)}
+.leave-kind-btn.on{background:var(--green-l);color:var(--green);border-color:#a7f3d0;font-weight:600}
+.days-hint{font-size:11px;color:var(--text3);margin:-6px 0 12px}
+
+/* 잔여 현황 패널 */
+.member-row{padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:border-color .15s}
+.member-row:hover{border-color:var(--border2)}
+.member-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.member-name{font-size:14px;font-weight:700;color:var(--text)}
+.member-remain{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)}
+.member-remain.low{color:var(--red)}
+.member-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:3px}
+.member-bar{height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden}
+.member-bar > i{display:block;height:100%;background:var(--green);border-radius:3px}
+.member-actions{display:flex;gap:6px;margin-top:9px}
+.mini-btn{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:#fff;color:var(--text3);cursor:pointer;transition:all .12s}
+.mini-btn:hover{border-color:var(--blue);color:var(--blue)}
+.add-member-btn{width:100%;border:1px dashed var(--border2);background:#fcfdfe;color:var(--text3);font-size:12px;font-family:var(--mono);padding:9px;border-radius:8px;cursor:pointer;transition:all .15s}
+.add-member-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
+
+/* 지급내역 행 */
+.grant-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:12px}
+.grant-info{color:var(--text2)}
+.grant-info b{font-family:var(--mono);color:var(--text)}
+.grant-del{background:none;border:none;color:var(--text4);cursor:pointer;font-size:15px;line-height:1}
+.grant-del:hover{color:var(--red)}
+.grant-add{display:grid;grid-template-columns:1fr 68px 34px;gap:6px;margin-top:10px}
+.locked-note{background:var(--green-l);border:1px solid #a7f3d0;color:var(--green);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+/* 기존 휴가 정리 행 */
+.fix-row{display:grid;grid-template-columns:1fr 108px 60px auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px}
+.fix-row:last-child{border-bottom:none}
+.fix-info b{color:var(--text)}
+.fix-info span{color:var(--text3);font-size:11px}
+.fix-warn{background:#fffbeb;border:1px solid #fde68a;color:var(--yellow);font-size:12px;font-family:var(--mono);padding:9px;border-radius:8px;margin-bottom:8px;cursor:pointer;width:100%;text-align:center;transition:all .15s}
+.fix-warn:hover{background:#fef3c7}
 @media(max-width:900px){.main{grid-template-columns:1fr}.nav-remote{display:none}.nav{padding:0 16px}.main{padding:24px 16px 48px}}
 </style>
 </head>
@@ -158,8 +198,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="type-btn" data-type="deadline" onclick="selectType('deadline',this)">🔴 마감</button>
         <button class="type-btn" data-type="etc" onclick="selectType('etc',this)">💜 기타</button>
       </div>
-      <label class="f-label">작성자</label>
-      <input type="text" class="f-input" id="ev-author" placeholder="이름">
+      <!-- 일반 작성자 (휴가 외) -->
+      <div id="author-field">
+        <label class="f-label">작성자</label>
+        <input type="text" class="f-input" id="ev-author" placeholder="이름">
+      </div>
+      <!-- 휴가 전용 -->
+      <div id="leave-fields">
+        <label class="f-label">누구</label>
+        <select class="f-select" id="ev-member"></select>
+        <label class="f-label">휴가 종류</label>
+        <div class="leave-kind-btns">
+          <button type="button" class="leave-kind-btn on" data-kind="연차" onclick="selectKind('연차')">연차 (1일)</button>
+          <button type="button" class="leave-kind-btn" data-kind="반차" onclick="selectKind('반차')">반차 (0.5일)</button>
+        </div>
+        <label class="f-label">사용 일수</label>
+        <input type="number" class="f-input" id="ev-leavedays" min="0.5" step="0.5" value="1">
+        <div class="days-hint" id="days-hint">여러 날이면 일수를 조정하세요 (주말·공휴일 제외)</div>
+      </div>
       <label class="f-label">제목</label>
       <input type="text" class="f-input" id="ev-title" placeholder="일정 제목">
       <label class="f-label">날짜</label>
@@ -170,6 +226,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <textarea class="f-textarea" id="ev-memo" placeholder="추가 메모"></textarea>
       <button class="btn-primary" id="save-btn" onclick="saveEvent()">등록하기</button>
       <button class="btn-secondary" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none;width:100%;margin-top:8px">수정 취소</button>
+    </div>
+
+    <!-- 휴가 현황 -->
+    <div class="side-card">
+      <div class="side-title" style="justify-content:space-between">휴가 현황</div>
+      <div id="member-list"><div class="spin"></div></div>
+      <div id="unlinked-bar"></div>
+      <button class="add-member-btn" onclick="openMemberModal()" style="margin-top:4px">+ 구성원 추가</button>
     </div>
 
     <!-- 이번 달 일정 -->
@@ -196,6 +260,71 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- 구성원 추가 모달 -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <h3>구성원 추가</h3>
+    <label class="f-label">이름</label>
+    <input type="text" class="f-input" id="mm-name" placeholder="예) 박지훈">
+    <label class="f-label">비밀번호 (본인 휴가 등록·조회용)</label>
+    <input type="password" class="f-input" id="mm-pw" placeholder="비밀번호">
+    <label class="f-label">최초 연차 부여 (선택)</label>
+    <div class="grant-add" style="margin-top:0">
+      <input type="text" class="f-input" id="mm-glabel" placeholder="예) 2025년 상반기" style="margin:0">
+      <input type="number" class="f-input" id="mm-gdays" placeholder="일수" min="0" step="0.5" style="margin:0">
+      <div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAny('member-modal')">취소</button>
+      <button class="btn-primary" style="width:auto;padding:8px 16px" onclick="addMember()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- 지급내역 관리 모달 -->
+<div class="modal-overlay" id="grants-modal">
+  <div class="modal">
+    <h3 id="gm-title">지급내역 관리</h3>
+    <div class="locked-note">🔓 <span id="gm-unlocked-name"></span> 님 인증됨 · 지급내역을 관리할 수 있습니다</div>
+    <div id="gm-summary" class="member-sub" style="margin-bottom:12px"></div>
+    <div id="gm-grants"></div>
+    <div class="grant-add">
+      <input type="text" class="f-input" id="gm-label" placeholder="예) 2025년 하반기" style="margin:0">
+      <input type="number" class="f-input" id="gm-days" placeholder="일수" min="0" step="0.5" style="margin:0">
+      <button class="btn-primary" style="width:auto;padding:0" onclick="addGrant()">+</button>
+    </div>
+    <div class="modal-actions" style="justify-content:space-between">
+      <button class="btn-danger" onclick="deleteMember()">구성원 삭제</button>
+      <button class="btn-secondary" onclick="closeAny('grants-modal')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 비밀번호 모달 -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal" style="max-width:360px">
+    <h3 id="pw-title">비밀번호 입력</h3>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:12px" id="pw-desc"></p>
+    <input type="password" class="f-input" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')pwSubmit()">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="pwCancel()">취소</button>
+      <button class="btn-primary" style="width:auto;padding:8px 16px" onclick="pwSubmit()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 기존 휴가 정리 모달 -->
+<div class="modal-overlay" id="fix-modal">
+  <div class="modal" style="max-width:560px">
+    <h3>기존 휴가 정리</h3>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:14px">구성원에 연결하면 잔여에서 자동 차감됩니다. 일수는 기본 1일이며, 연결 후 목록에서 개별 수정할 수 있습니다.</p>
+    <div id="fix-list" style="max-height:340px;overflow:auto"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAny('fix-modal')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 네비 리모콘 -->
 <div class="nav-remote">
   <a href="index.html" class="nr-btn"><span class="nr-tooltip">전체 현황</span>🏠</a>
@@ -220,7 +349,18 @@ const TYPE_COLORS={schedule:'#2563eb',leave:'#059669',deadline:'#dc2626',etc:'#7
 
 let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
 let allEvents=[], selectedType='schedule', selectedEventId=null, editingId=null;
+let members=[], selectedKind='연차';
+const unlocked=new Set();      // 이번 세션에서 비밀번호 인증된 이름
 const today=new Date();
+
+// 비밀번호 해시 (SHA-256)
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function memberByName(n){ return members.find(m=>m.name===n); }
+function grantTotal(m){ return (m.grants||[]).reduce((s,g)=>s+(+g.days||0),0); }
+function usedDays(name){ return allEvents.filter(e=>e.type==='leave'&&e.author===name).reduce((s,e)=>s+(+e.leaveDays||0),0); }
 
 // 오늘 날짜 기본 설정
 document.getElementById('ev-date').value=today.toISOString().split('T')[0];
@@ -230,7 +370,18 @@ db.collection('calendarEvents').onSnapshot(snap=>{
   allEvents=snap.docs.map(d=>({id:d.id,...d.data()}));
   renderCalendar();
   renderEventList();
+  renderMembers();
+  if(document.getElementById('fix-modal').classList.contains('open')) renderFixList();
 },()=>{allEvents=[];renderCalendar();renderEventList()});
+
+// 구성원(연차) 실시간 구독
+db.collection('leaveMembers').onSnapshot(snap=>{
+  members=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  renderMembers();
+  fillMemberSelect();
+  if(document.getElementById('grants-modal').classList.contains('open')) renderGrants();
+  if(document.getElementById('fix-modal').classList.contains('open')) renderFixList();
+},()=>{members=[];renderMembers();fillMemberSelect()});
 
 function moveMonth(d){
   curMonth+=d;
@@ -291,8 +442,10 @@ function renderEventList(){
         <span class="event-item-title">${e.title||'—'}</span>
         <span class="event-badge" style="background:${TYPE_COLORS[e.type||'schedule']}22;color:${TYPE_COLORS[e.type||'schedule']}">${TYPE_LABELS[e.type||'schedule']}</span>
       </div>
-      <div class="event-item-date">${e.date}${e.endDate&&e.endDate!==e.date?' ~ '+e.endDate:''} ${e.author?'· '+e.author:''}</div>
-      ${e.memo?`<div class="event-item-desc">${e.memo}</div>`:''}
+      <div class="event-item-date">${e.date}${e.endDate&&e.endDate!==e.date?' ~ '+e.endDate:''} ${e.author?'· '+esc(e.author):''}</div>
+      ${e.type==='leave'
+        ? `<div class="event-item-desc">🌿 ${esc(e.leaveKind||'연차')} ${fmtDays(+e.leaveDays||0)}일 · 상세 잠금</div>`
+        : (e.memo?`<div class="event-item-desc">${esc(e.memo)}</div>`:'')}
     </div>`).join('');
 }
 
@@ -302,36 +455,75 @@ function selectType(type){
     b.className='type-btn';
     if(b.dataset.type===type) b.className='type-btn active-'+type;
   });
+  const isLeave=type==='leave';
+  document.getElementById('leave-fields').style.display=isLeave?'block':'none';
+  document.getElementById('author-field').style.display=isLeave?'none':'block';
+  if(isLeave){ fillMemberSelect(); updateDaysDefault(); }
 }
+function selectKind(kind){
+  selectedKind=kind;
+  document.querySelectorAll('.leave-kind-btn').forEach(b=>b.classList.toggle('on',b.dataset.kind===kind));
+  const days=document.getElementById('ev-leavedays');
+  if(kind==='반차'){ days.value='0.5'; days.disabled=true; }
+  else{ days.disabled=false; updateDaysDefault(); }
+}
+function updateDaysDefault(){
+  if(selectedKind==='반차'){ document.getElementById('ev-leavedays').value='0.5'; return; }
+  const s=document.getElementById('ev-date').value, e=document.getElementById('ev-end').value||s;
+  if(s&&e){
+    const diff=Math.round((new Date(e)-new Date(s))/86400000)+1;
+    document.getElementById('ev-leavedays').value=Math.max(1,diff);
+  }
+}
+function fillMemberSelect(){
+  const sel=document.getElementById('ev-member'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">이름 선택…</option>'+members.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+  if(cur) sel.value=cur;
+}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function clickDate(dateStr){
   document.getElementById('ev-date').value=dateStr;
+  if(selectedType==='leave') updateDaysDefault();
 }
+document.getElementById('ev-date').addEventListener('change',()=>{ if(selectedType==='leave') updateDaysDefault(); });
+document.getElementById('ev-end').addEventListener('change',()=>{ if(selectedType==='leave') updateDaysDefault(); });
+
+function ts(){ return firebase.firestore.FieldValue.serverTimestamp(); }
+function resetForm(){ document.getElementById('ev-title').value=''; document.getElementById('ev-memo').value=''; }
 
 async function saveEvent(){
-  const author=document.getElementById('ev-author').value.trim();
-  const title=document.getElementById('ev-title').value.trim();
   const date=document.getElementById('ev-date').value;
   const endDate=document.getElementById('ev-end').value||date;
   const memo=document.getElementById('ev-memo').value.trim();
+  let title=document.getElementById('ev-title').value.trim();
+
+  // ── 휴가 ──
+  if(selectedType==='leave'){
+    const name=document.getElementById('ev-member').value;
+    const days=parseFloat(document.getElementById('ev-leavedays').value);
+    if(!name){toast('휴가 낼 구성원을 선택하세요.',true);return}
+    if(!date){toast('날짜를 입력하세요.',true);return}
+    if(!(days>0)){toast('사용 일수를 확인하세요.',true);return}
+    const ok=await verifyMember(name);       // 본인 비밀번호 확인
+    if(!ok) return;
+    if(!title) title=`${name} ${selectedKind}`;
+    const payload={type:'leave',author:name,title,date,endDate,memo,leaveKind:selectedKind,leaveDays:days};
+    try{
+      if(editingId){ await db.collection('calendarEvents').doc(editingId).update({...payload,updatedAt:ts()}); cancelEdit(); toast('✓ 휴가가 수정되었습니다'); }
+      else{ await db.collection('calendarEvents').add({...payload,createdAt:ts()}); resetForm(); toast('✓ 휴가가 등록되었습니다'); }
+    }catch(e){toast('저장 실패: '+e.message,true)}
+    return;
+  }
+
+  // ── 일반 일정 ──
+  const author=document.getElementById('ev-author').value.trim();
   if(!title||!date){toast('제목과 날짜를 입력하세요.',true);return}
+  const payload={type:selectedType,author,title,date,endDate,memo};
   try{
-    if(editingId){
-      await db.collection('calendarEvents').doc(editingId).update({
-        type:selectedType, author, title, date, endDate, memo,
-        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
-      cancelEdit();
-      toast('✓ 일정이 수정되었습니다');
-    }else{
-      await db.collection('calendarEvents').add({
-        type:selectedType, author, title, date, endDate, memo,
-        createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
-      document.getElementById('ev-title').value='';
-      document.getElementById('ev-memo').value='';
-      toast('✓ 일정이 등록되었습니다');
-    }
+    if(editingId){ await db.collection('calendarEvents').doc(editingId).update({...payload,updatedAt:ts()}); cancelEdit(); toast('✓ 일정이 수정되었습니다'); }
+    else{ await db.collection('calendarEvents').add({...payload,createdAt:ts()}); resetForm(); toast('✓ 일정이 등록되었습니다'); }
   }catch(e){toast('저장 실패: '+e.message,true)}
 }
 
@@ -340,12 +532,19 @@ function startEdit(id){
   if(!ev) return;
   editingId=id;
   selectType(ev.type||'schedule');
-  document.getElementById('ev-author').value=ev.author||'';
+  if(ev.type==='leave'){
+    fillMemberSelect();
+    document.getElementById('ev-member').value=ev.author||'';
+    selectKind(ev.leaveKind||'연차');
+    if(ev.leaveDays!=null) document.getElementById('ev-leavedays').value=ev.leaveDays;
+  }else{
+    document.getElementById('ev-author').value=ev.author||'';
+  }
   document.getElementById('ev-title').value=ev.title||'';
   document.getElementById('ev-date').value=ev.date||'';
   document.getElementById('ev-end').value=(ev.endDate&&ev.endDate!==ev.date)?ev.endDate:'';
   document.getElementById('ev-memo').value=ev.memo||'';
-  document.getElementById('form-title').textContent='일정 수정';
+  document.getElementById('form-title').textContent=ev.type==='leave'?'휴가 수정':'일정 수정';
   document.getElementById('save-btn').textContent='수정 저장';
   document.getElementById('cancel-edit-btn').style.display='block';
   closeModal();
@@ -357,23 +556,33 @@ function cancelEdit(){
   document.getElementById('ev-title').value='';
   document.getElementById('ev-memo').value='';
   document.getElementById('ev-end').value='';
+  document.getElementById('ev-member').value='';
+  selectKind('연차');
   selectType('schedule');
   document.getElementById('form-title').textContent='일정 등록';
   document.getElementById('save-btn').textContent='등록하기';
   document.getElementById('cancel-edit-btn').style.display='none';
 }
 
-function openEventModal(id){
+async function openEventModal(id){
   const ev=allEvents.find(e=>e.id===id);
   if(!ev) return;
+  if(ev.type==='leave' && memberByName(ev.author)){   // 구성원 기록이 있을 때만 잠금
+    const ok=await verifyMember(ev.author);
+    if(!ok) return;
+  }
   selectedEventId=id;
   document.getElementById('modal-title').textContent=ev.title||'—';
+  const leaveInfo = ev.type==='leave'
+    ? `<div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">휴가</span><br>${esc(ev.leaveKind||'연차')} · ${fmtDays(+ev.leaveDays||0)}일</div>`
+    : '';
   document.getElementById('modal-body').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text2)">
       <div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">유형</span><br>${TYPE_LABELS[ev.type||'schedule']}</div>
-      <div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">날짜</span><br>${ev.date}${ev.endDate&&ev.endDate!==ev.date?' ~ '+ev.endDate:''}</div>
-      ${ev.author?`<div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">작성자</span><br>${ev.author}</div>`:''}
-      ${ev.memo?`<div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">메모</span><br>${ev.memo}</div>`:''}
+      <div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">날짜</span><br>${esc(ev.date)}${ev.endDate&&ev.endDate!==ev.date?' ~ '+esc(ev.endDate):''}</div>
+      ${ev.author?`<div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">${ev.type==='leave'?'구성원':'작성자'}</span><br>${esc(ev.author)}</div>`:''}
+      ${leaveInfo}
+      ${ev.memo?`<div><span style="color:var(--text3);font-family:var(--mono);font-size:11px">메모</span><br>${esc(ev.memo)}</div>`:''}
     </div>`;
   document.getElementById('event-modal').classList.add('open');
   document.getElementById('modal-del-btn').onclick=()=>deleteEvent(id);
@@ -390,6 +599,184 @@ async function deleteEvent(id){
 
 function closeModal(){document.getElementById('event-modal').classList.remove('open')}
 document.getElementById('event-modal').addEventListener('click',e=>{if(e.target===document.getElementById('event-modal'))closeModal()});
+
+/* ══════════ 휴가 현황 · 구성원 · 비밀번호 ══════════ */
+function fmtDays(n){ n=+n||0; return Number.isInteger(n)?String(n):n.toFixed(1); }
+
+function renderMembers(){
+  const el=document.getElementById('member-list'); if(!el) return;
+  if(!members.length){ el.innerHTML=`<div style="text-align:center;padding:14px 0;color:var(--text4);font-size:12px">등록된 구성원이 없습니다<br>아래 버튼으로 추가하세요</div>`; }
+  else{
+    el.innerHTML=members.map(m=>{
+      const total=grantTotal(m), used=usedDays(m.name), remain=total-used;
+      const pct=total>0?Math.max(0,Math.min(100,remain/total*100)):0;
+      const low=total>0&&remain<=total*0.2;
+      return `<div class="member-row">
+        <div class="member-top">
+          <span class="member-name">${esc(m.name)}</span>
+          <span class="member-remain${low?' low':''}">잔여 ${fmtDays(remain)}일</span>
+        </div>
+        <div class="member-sub">총 부여 ${fmtDays(total)}일 · 사용 ${fmtDays(used)}일</div>
+        <div class="member-bar"><i style="width:${pct}%${low?';background:var(--red)':''}"></i></div>
+        <div class="member-actions">
+          <button class="mini-btn" onclick="manageMember('${m.id}')">지급내역 · 관리</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // 잔여에 안 잡힌 기존 휴가 안내
+  const bar=document.getElementById('unlinked-bar');
+  if(bar){
+    const n=unlinkedLeaves().length;
+    bar.innerHTML = n ? `<button class="fix-warn" onclick="openFixModal()">⚠ 잔여에 안 잡힌 기존 휴가 ${n}건 정리</button>` : '';
+  }
+}
+
+/* 미연결 휴가 = 구성원과 이름이 안 맞거나 일수가 없는 휴가 */
+function unlinkedLeaves(){
+  return allEvents.filter(e=>e.type==='leave' && (!memberByName(e.author) || e.leaveDays==null));
+}
+function openFixModal(){ renderFixList(); document.getElementById('fix-modal').classList.add('open'); }
+function renderFixList(){
+  const box=document.getElementById('fix-list'); if(!box) return;
+  if(!members.length){ box.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:8px 0">먼저 구성원을 추가한 뒤 정리할 수 있습니다.</div>`; return; }
+  const un=unlinkedLeaves();
+  if(!un.length){ box.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:8px 0">정리할 휴가가 없습니다. 모두 연결되었습니다 ✓</div>`; return; }
+  box.innerHTML=un.map(e=>{
+    const preName=memberByName(e.author)?e.author:'';
+    return `<div class="fix-row" data-id="${e.id}">
+      <div class="fix-info"><b>${esc(e.title||'휴가')}</b><br><span>${esc(e.date)}${e.endDate&&e.endDate!==e.date?' ~ '+esc(e.endDate):''} · 작성자 ${esc(e.author||'—')}</span></div>
+      <select class="f-select fix-member" style="margin:0">
+        <option value="">구성원…</option>
+        ${members.map(m=>`<option value="${esc(m.name)}"${m.name===preName?' selected':''}>${esc(m.name)}</option>`).join('')}
+      </select>
+      <input type="number" class="f-input fix-days" style="margin:0" min="0.5" step="0.5" value="${e.leaveDays!=null?e.leaveDays:1}">
+      <button class="mini-btn" onclick="linkLeave('${e.id}')">연결</button>
+    </div>`;
+  }).join('');
+}
+async function linkLeave(id){
+  const row=document.querySelector(`.fix-row[data-id="${id}"]`); if(!row) return;
+  const name=row.querySelector('.fix-member').value;
+  const days=parseFloat(row.querySelector('.fix-days').value);
+  if(!name){toast('연결할 구성원을 선택하세요.',true);return}
+  if(!(days>0)){toast('일수를 확인하세요.',true);return}
+  const ok=await verifyMember(name); if(!ok) return;   // 그 구성원 비밀번호 확인
+  const ev=allEvents.find(e=>e.id===id);
+  try{
+    await db.collection('calendarEvents').doc(id).update({
+      author:name, leaveDays:days, leaveKind:(ev&&ev.leaveKind)||'연차', updatedAt:ts()
+    });
+    toast('✓ 연결되었습니다 · 잔여에 반영됩니다');
+  }catch(e){toast('연결 실패: '+e.message,true)}
+}
+
+/* 구성원 추가 */
+function openMemberModal(){
+  ['mm-name','mm-pw','mm-glabel','mm-gdays'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('member-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('mm-name').focus(),50);
+}
+async function addMember(){
+  const name=document.getElementById('mm-name').value.trim();
+  const pw=document.getElementById('mm-pw').value;
+  if(!name){toast('이름을 입력하세요.',true);return}
+  if(!pw){toast('비밀번호를 입력하세요.',true);return}
+  if(memberByName(name)){toast('이미 등록된 이름입니다.',true);return}
+  const gLabel=document.getElementById('mm-glabel').value.trim();
+  const gDays=parseFloat(document.getElementById('mm-gdays').value);
+  const grants=(gDays>0)?[{label:gLabel||'최초 부여',days:gDays,date:new Date().toISOString().split('T')[0]}]:[];
+  try{
+    const passwordHash=await sha256(pw);
+    await db.collection('leaveMembers').add({name,passwordHash,grants,createdAt:ts()});
+    unlocked.add(name);
+    closeAny('member-modal');
+    toast('✓ 구성원이 추가되었습니다');
+  }catch(e){toast('저장 실패: '+e.message,true)}
+}
+
+/* 지급내역 관리 (비밀번호 인증 후) */
+let managedName=null;
+async function manageMember(id){
+  const m=members.find(x=>x.id===id); if(!m) return;
+  const ok=await verifyMember(m.name); if(!ok) return;
+  managedName=m.name;
+  document.getElementById('gm-title').textContent=`${m.name} · 지급내역`;
+  document.getElementById('gm-unlocked-name').textContent=m.name;
+  renderGrants();
+  document.getElementById('grants-modal').classList.add('open');
+}
+function renderGrants(){
+  const m=memberByName(managedName); if(!m) return;
+  const total=grantTotal(m), used=usedDays(m.name);
+  document.getElementById('gm-summary').textContent=`총 부여 ${fmtDays(total)}일 · 사용 ${fmtDays(used)}일 · 잔여 ${fmtDays(total-used)}일`;
+  const grants=m.grants||[];
+  document.getElementById('gm-grants').innerHTML=grants.length
+    ? grants.map((gr,i)=>`<div class="grant-row">
+        <span class="grant-info"><b>${fmtDays(+gr.days||0)}일</b> · ${esc(gr.label||'(무제목)')}${gr.date?` <span style="color:var(--text4)">${esc(gr.date)}</span>`:''}</span>
+        <button class="grant-del" onclick="deleteGrant(${i})" title="삭제">×</button>
+      </div>`).join('')
+    : `<div style="font-size:12px;color:var(--text4);padding:6px 0">아직 지급내역이 없습니다</div>`;
+}
+async function addGrant(){
+  const m=memberByName(managedName); if(!m) return;
+  const label=document.getElementById('gm-label').value.trim();
+  const days=parseFloat(document.getElementById('gm-days').value);
+  if(!(days>0)){toast('부여 일수를 입력하세요.',true);return}
+  const grants=[...(m.grants||[]),{label:label||'연차 부여',days,date:new Date().toISOString().split('T')[0]}];
+  try{
+    await db.collection('leaveMembers').doc(m.id).update({grants});
+    document.getElementById('gm-label').value=''; document.getElementById('gm-days').value='';
+    toast('✓ 지급내역이 추가되었습니다');
+  }catch(e){toast('저장 실패: '+e.message,true)}
+}
+async function deleteGrant(i){
+  const m=memberByName(managedName); if(!m) return;
+  const grants=(m.grants||[]).filter((_,idx)=>idx!==i);
+  try{ await db.collection('leaveMembers').doc(m.id).update({grants}); toast('삭제되었습니다'); }
+  catch(e){toast('삭제 실패: '+e.message,true)}
+}
+async function deleteMember(){
+  const m=memberByName(managedName); if(!m) return;
+  if(!confirm(`${m.name} 구성원을 삭제하시겠습니까?\n(이미 등록된 휴가 일정은 캘린더에 남습니다)`)) return;
+  try{ await db.collection('leaveMembers').doc(m.id).delete(); closeAny('grants-modal'); toast('구성원이 삭제되었습니다'); }
+  catch(e){toast('삭제 실패: '+e.message,true)}
+}
+
+/* 비밀번호 확인 */
+async function verifyMember(name){
+  if(unlocked.has(name)) return true;
+  const m=memberByName(name);
+  if(!m){ toast('먼저 구성원으로 등록해주세요.',true); return false; }
+  const pw=await askPassword(`${name} 비밀번호`, `${name} 님의 비밀번호를 입력하세요.`);
+  if(pw===null) return false;
+  let hash;
+  try{ hash=await sha256(pw); }
+  catch(e){ toast('비밀번호 확인 불가 · HTTPS 주소에서 열어주세요.',true); return false; }
+  const ok=hash===m.passwordHash;
+  if(ok) unlocked.add(name); else toast('비밀번호가 틀렸습니다.',true);
+  return ok;
+}
+let pwResolve=null;
+function askPassword(title,desc){
+  return new Promise(res=>{
+    pwResolve=res;
+    document.getElementById('pw-title').textContent=title||'비밀번호 입력';
+    document.getElementById('pw-desc').textContent=desc||'';
+    const inp=document.getElementById('pw-input'); inp.value='';
+    document.getElementById('pw-modal').classList.add('open');
+    setTimeout(()=>inp.focus(),50);
+  });
+}
+function pwSubmit(){ const v=document.getElementById('pw-input').value; document.getElementById('pw-modal').classList.remove('open'); document.getElementById('pw-input').value=''; if(pwResolve){pwResolve(v);pwResolve=null;} }
+function pwCancel(){ document.getElementById('pw-modal').classList.remove('open'); document.getElementById('pw-input').value=''; if(pwResolve){pwResolve(null);pwResolve=null;} }
+
+function closeAny(id){ document.getElementById(id).classList.remove('open'); }
+['member-modal','grants-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{ if(e.target.id===id) closeAny(id); });
+});
+document.getElementById('fix-modal').addEventListener('click',e=>{ if(e.target.id==='fix-modal') closeAny('fix-modal'); });
+document.getElementById('pw-modal').addEventListener('click',e=>{ if(e.target.id==='pw-modal') pwCancel(); });
 
 function toast(msg,isErr=false){
   const el=document.getElementById('toast');el.textContent=msg;el.className='toast'+(isErr?' err':'');
