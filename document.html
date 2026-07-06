@@ -96,6 +96,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .doc-num{font-family:var(--mono);font-size:12px;color:var(--pc);font-weight:600;white-space:nowrap}
 .doc-title{color:var(--text);font-weight:500;min-width:240px}
 .doc-date{font-family:var(--mono);font-size:12px;color:var(--text3);white-space:nowrap}
+/* 인라인 날짜 편집 */
+.date-edit{font-family:var(--mono);font-size:12px;color:var(--text3);border:1px solid transparent;background:transparent;padding:3px 5px;border-radius:6px;cursor:pointer;width:100%;outline:none;transition:all .12s}
+.date-edit:hover{border-color:var(--border2);background:#fff}
+.date-edit:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1);cursor:text}
+.date-edit.date-empty{border-color:var(--pc-b);background:var(--pc-l);color:var(--pc);font-weight:600}
 .doc-idx{font-family:var(--mono);font-size:12px;color:var(--text4)}
 .cell-sm{font-size:12px;color:var(--text3)}
 .badge{display:inline-block;font-size:11px;font-weight:600;font-family:var(--mono);padding:2px 8px;border-radius:5px;white-space:nowrap}
@@ -240,7 +245,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <tr>
           <th style="width:44px">No.</th>
           <th class="col-detail" style="width:56px">스캔</th>
-          <th style="width:112px">날짜</th>
+          <th style="width:132px">날짜</th>
           <th style="width:110px">문서번호</th>
           <th class="col-detail" style="width:64px">구분</th>
           <th class="col-detail" style="width:70px">로컬/해외</th>
@@ -441,7 +446,7 @@ function docRowHtml(d,idx){
   return `<tr>
       <td class="doc-idx">${idx}</td>
       <td class="col-detail" style="text-align:center">${scan}</td>
-      <td class="doc-date">${esc(d.date)||'—'}</td>
+      <td><input type="date" class="date-edit${d.date?'':' date-empty'}" data-id="${d.id}" value="${esc(d.date)||''}" title="클릭해 날짜를 지정하면 해당 연차로 이동합니다"></td>
       <td class="doc-num">${esc(docNumOf(d))||'—'}</td>
       <td class="col-detail">${typeBadge(d.type)}</td>
       <td class="col-detail cell-sm">${esc(d.region)||'—'}</td>
@@ -497,6 +502,22 @@ document.getElementById('doc-tbody').addEventListener('click',e=>{
   const del=e.target.closest('.btn-del'); if(del){ delDoc(del.dataset.id, del.dataset.title); return; }
   const grp=e.target.closest('.group-row'); if(grp){ toggleGroup(grp.dataset.fy); return; }
 });
+// 인라인 날짜 편집 → 저장하면 연차/정렬이 실시간으로 재배치됨
+document.getElementById('doc-tbody').addEventListener('change',e=>{
+  const inp=e.target.closest('.date-edit'); if(!inp) return;
+  updateDate(inp.dataset.id, inp.value);
+});
+async function updateDate(id,newDate){
+  try{
+    await db.collection(`${P}_documents`).doc(id).update({date:newDate});
+    if(newDate){
+      const fy=fiscalYear(newDate);
+      toast(fy?`✓ ${fy}차년도로 이동했습니다`:'✓ 날짜 저장 (사업기간 밖 → 미분류)');
+    }else{
+      toast('날짜를 비웠습니다 · 미분류로 이동');
+    }
+  }catch(e){toast('날짜 변경 실패: '+e.message,true)}
+}
 function toggleGroup(key){
   if(collapsedFY.has(key)) collapsedFY.delete(key); else collapsedFY.add(key);
   render();
