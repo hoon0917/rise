@@ -35,11 +35,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .cal-nav-btn{background:none;border:1px solid var(--border);color:var(--text3);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .cal-nav-btn:hover{border-color:var(--blue);color:var(--blue)}
 .cal-month-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .cal-day-header{text-align:center;padding:10px 4px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);letter-spacing:.05em}
 .cal-day-header:first-child{color:var(--red)}
 .cal-day-header:last-child{color:var(--blue)}
-.cal-cell{min-height:90px;padding:6px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;vertical-align:top}
+.cal-cell{min-height:90px;min-width:0;overflow:hidden;padding:6px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;vertical-align:top}
 .cal-cell:nth-child(7n){border-right:none}
 .cal-cell:hover{background:var(--blue-l)}
 .cal-cell.today .cal-date{background:var(--blue);color:#fff;border-radius:50%}
@@ -47,14 +47,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .cal-cell.sunday .cal-date{color:var(--red)}
 .cal-cell.saturday .cal-date{color:var(--blue)}
 .cal-date{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:500;margin-bottom:4px}
-.cal-events{display:flex;flex-direction:column;gap:2px}
-.cal-event{font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;cursor:pointer}
+.cal-events{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cal-event{display:block;max-width:100%;font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;cursor:pointer}
 .cal-event.type-schedule{background:var(--blue-l);color:var(--blue);border-left:2px solid var(--blue)}
 .cal-event.type-leave{background:var(--green-l);color:var(--green);border-left:2px solid var(--green)}
 .cal-event.type-deadline{background:#fef2f2;color:var(--red);border-left:2px solid var(--red)}
 .cal-event.type-etc{background:#f5f3ff;color:var(--purple);border-left:2px solid var(--purple)}
-.cal-more{font-size:10px;color:var(--text3);padding:2px 6px;cursor:pointer}
-.cal-more:hover{color:var(--blue)}
+.cal-more{font-size:10px;color:var(--text3);padding:2px 6px;cursor:pointer;border-radius:4px}
+.cal-more:hover{color:var(--blue);background:var(--blue-l)}
+/* 하루 전체 일정 모달 */
+.day-row{display:flex;align-items:flex-start;gap:9px;padding:10px 8px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .12s}
+.day-row:last-child{border-bottom:none}
+.day-row:hover{background:#f8fafc}
+.day-dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;margin-top:6px}
+.day-dot.type-schedule{background:var(--blue)} .day-dot.type-leave{background:var(--green)}
+.day-dot.type-deadline{background:var(--red)} .day-dot.type-etc{background:var(--purple)}
+.day-row-title{font-size:13px;font-weight:500;color:var(--text);word-break:break-word}
+.day-row-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px}
 
 /* SIDEBAR */
 .sidebar{display:flex;flex-direction:column;gap:16px}
@@ -102,7 +111,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 #pw-modal{z-index:600}   /* 다른 모달 위에서도 항상 최상단 */
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:440px;box-shadow:var(--shadow-md)}
-.modal h3{font-size:16px;font-weight:700;margin-bottom:18px}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:18px;word-break:break-word}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 .btn-secondary{background:#fff;border:1px solid var(--border);color:var(--text3);font-size:13px;padding:8px 16px;border-radius:8px;cursor:pointer}
 .btn-danger{background:#fef2f2;border:1px solid #fecaca;color:var(--red);font-size:13px;padding:8px 16px;border-radius:8px;cursor:pointer}
@@ -314,6 +323,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
+<!-- 하루 전체 일정 모달 -->
+<div class="modal-overlay" id="day-modal">
+  <div class="modal" style="max-width:420px">
+    <h3 id="day-title">일정</h3>
+    <div id="day-list" style="max-height:60vh;overflow:auto;margin-top:4px"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAny('day-modal')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 내 휴가 확인 모달 -->
 <div class="modal-overlay" id="unlock-modal">
   <div class="modal" style="max-width:360px">
@@ -434,8 +454,8 @@ function renderCalendar(){
     html+=`<div class="${classes}" onclick="clickDate('${dateStr}')">
       <div class="cal-date">${d}</div>
       <div class="cal-events">
-        ${dayEvents.slice(0,3).map(e=>`<div class="cal-event type-${e.type||'schedule'}" onclick="event.stopPropagation();openEventModal('${e.id}')" title="${e.title}">${e.title}</div>`).join('')}
-        ${dayEvents.length>3?`<div class="cal-more">+${dayEvents.length-3}개</div>`:''}
+        ${dayEvents.slice(0,3).map(e=>`<div class="cal-event type-${e.type||'schedule'}" onclick="event.stopPropagation();openEventModal('${e.id}')" title="${esc(e.title)}">${esc(e.title)}</div>`).join('')}
+        ${dayEvents.length>3?`<div class="cal-more" onclick="event.stopPropagation();openDayModal('${dateStr}')">+${dayEvents.length-3}개 더보기</div>`:''}
       </div>
     </div>`;
   }
@@ -799,6 +819,25 @@ function pwCancel(){ document.getElementById('pw-modal').classList.remove('open'
 
 function closeAny(id){ document.getElementById(id).classList.remove('open'); }
 
+/* 하루 전체 일정 보기 */
+function openDayModal(dateStr){
+  const list=allEvents.filter(e=>{
+    const s=e.date, en=e.endDate||e.date;
+    return s && dateStr>=s && dateStr<=en;
+  });
+  document.getElementById('day-title').textContent=dateStr+' 일정 '+list.length+'건';
+  document.getElementById('day-list').innerHTML=list.length
+    ? list.map(e=>`<div class="day-row" onclick="closeAny('day-modal');openEventModal('${e.id}')">
+        <span class="day-dot type-${e.type||'schedule'}"></span>
+        <div style="min-width:0">
+          <div class="day-row-title">${esc(e.title)}</div>
+          <div class="day-row-sub">${TYPE_LABELS[e.type||'schedule']}${e.author?' · '+esc(e.author):''}</div>
+        </div>
+      </div>`).join('')
+    : `<div style="color:var(--text3);font-size:13px;padding:8px 0">일정이 없습니다</div>`;
+  document.getElementById('day-modal').classList.add('open');
+}
+
 /* 내 휴가 확인 (이름+비밀번호로 본인 카드만 펼침) */
 function openUnlockModal(){
   document.getElementById('ul-name').value='';
@@ -829,6 +868,7 @@ function lockAll(){ unlocked.clear(); renderMembers(); toast('휴가 현황을 �
 });
 document.getElementById('fix-modal').addEventListener('click',e=>{ if(e.target.id==='fix-modal') closeAny('fix-modal'); });
 document.getElementById('unlock-modal').addEventListener('click',e=>{ if(e.target.id==='unlock-modal') closeAny('unlock-modal'); });
+document.getElementById('day-modal').addEventListener('click',e=>{ if(e.target.id==='day-modal') closeAny('day-modal'); });
 document.getElementById('pw-modal').addEventListener('click',e=>{ if(e.target.id==='pw-modal') pwCancel(); });
 
 function toast(msg,isErr=false){
