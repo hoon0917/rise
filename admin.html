@@ -689,44 +689,47 @@ document.getElementById('edit-modal').addEventListener('click',e=>{if(e.target==
    이나라도움 집행내역 가져오기
 ════════════════════════════════════════════════════════ */
 
-// ── 사업계획서 구분 자동 매핑 규칙 ──
-const PLAN_MAP_RULES = [
-  // [검색 키워드(집행용도), planCategory]  — 위에서부터 우선 적용
-  ['인건비',                          '인건비'],
-  ['성과 활용·확산',                  '성과 활용·확산 지원비'],
-  ['성과 활용 확산',                  '성과 활용·확산 지원비'],
-  ['성과활용확산',                    '성과 활용·확산 지원비'],
-  ['기업 지원 협력',                  '기업 지원·협력 활동비'],
-  ['기업 지원·협력',                  '기업 지원·협력 활동비'],
-  ['기업지원협력',                    '기업 지원·협력 활동비'],
-  ['지역 연계·협업',                  '지역 연계·협업 지원비'],
-  ['지역 연계 협업',                  '지역 연계·협업 지원비'],
-  ['지역연계',                        '지역 연계·협업 지원비'],
-  ['실험·실습장비',                   '실험·실습장비 및 기자재 구입·운영비'],
-  ['실험ㆍ실습장비',                  '실험·실습장비 및 기자재 구입·운영비'],
-  ['실험-실습장비',                   '실험·실습장비 및 기자재 구입·운영비'],
-  ['실험 실습장비',                   '실험·실습장비 및 기자재 구입·운영비'],
-  ['교육ㆍ연구 환경',                 '교육·연구 환경개선비'],
-  ['교육,연구 환경',                  '교육·연구 환경개선비'],
-  ['교육·연구 환경',                  '교육·연구 환경개선비'],
-  ['환경 개선',                       '교육·연구 환경개선비'],
-  ['교육ㆍ연구 프로그램',             '교육·연구프로그램개발·운영비'],
-  ['교육·연구프로그램',               '교육·연구프로그램개발·운영비'],
-  ['교육,연구 프로그램',              '교육·연구프로그램개발·운영비'],
-  ['AI 플랫폼',                       '교육·연구프로그램개발·운영비'],
-  ['심리검사',                        '교육·연구프로그램개발·운영비'],
-  ['심리적응',                        '교육·연구프로그램개발·운영비'],
-  ['프로토 진단',                     '교육·연구프로그램개발·운영비'],
-  ['디자인 용역',                     '교육·연구프로그램개발·운영비'],
-  ['그 밖의 사업운영',                '그 밖의 사업운영 경비'],
-  ['그밖의 사업운영',                 '그 밖의 사업운영 경비'],
-  // 공통운영경비 파일의 붙여쓰기 패턴
-  ['그밖의사업운영경비',              '그 밖의 사업운영 경비'],
-  ['운영비기타운영비',                '그 밖의 사업운영 경비'],
-  ['기타운영비',                      '그 밖의 사업운영 경비'],
-  // 공통운영경비 형식: '대신대-공통운영경비-XXX'
-  ['공통운영경비-그밖',               '그 밖의 사업운영 경비'],
-  ['공통운영경비-운영비',             '그 밖의 사업운영 경비'],
+// ── 사업계획서 구분 자동 매핑 ──
+// 이나라도움 집행용도는 입력자마다 표기가 제각각이다.
+//   교육·연구프로그램개발·운영비 / 교육.연구프로그램개발.운영비 / 교육, 연구프로그램 개발, 운영비
+//   교육연구프로그램개발운영비 / 교육ㆍ연구 … / 대신대－해외인재유치－… (전각 하이픈)
+// 그래서 문자열을 그대로 비교하지 않고, 공백·가운뎃점·마침표·쉼표·하이픈 등을 모두 지운
+// "정규화 키"끼리 비교한다. 예) '교육, 연구프로그램 개발. 운영비' → '교육연구프로그램개발운영비'
+const normKey = s => String(s ?? '')
+  .normalize('NFKC')                                   // 전각 문자(－，（ 등) → 반각
+  .replace(/[\s·ㆍ・•∙‧.,、;:\-–—_\/()\[\]{}<>'"`~!?]/g, '')
+  .toLowerCase();
+
+// [planCategory, [키워드…]] — 키워드는 정규화된 집행용도 안에서 찾는다.
+// 구분명 자체(점 없이 붙인 형태)는 아래 extractPlanCat에서 자동으로 함께 검사하므로
+// 여기에는 일부가 빠지거나 오타가 난 경우를 잡기 위한 '핵심 조각'만 둔다.
+const PLAN_KEYWORDS = [
+  ['인건비',                               ['인건비']],
+  ['장학금',                               ['장학금']],
+  ['교육·연구프로그램개발·운영비',         ['연구프로그램', '프로그램개발운영', '교육프로그램']],
+  ['교육·연구 환경개선비',                 ['환경개선']],
+  ['실험·실습장비 및 기자재 구입·운영비',  ['실험실습', '실습장비', '기자재구입']],
+  ['지역 연계·협업 지원비',                ['연계협업', '협업지원', '지역연계']],
+  ['기업 지원·협력 활동비',                ['기업지원', '협력활동']],
+  ['성과 활용·확산 지원비',                ['성과활용', '활용확산', '확산지원']],
+  ['그 밖의 사업운영 경비',                ['그밖의사업운영', '사업운영경비', '그밖의']],
+];
+
+// 위에서 아무것도 못 찾았을 때만 쓰는 보조 규칙 (집행용도에 구분명이 아예 없는 경우)
+const PLAN_FALLBACK_KEYWORDS = [
+  // 공통운영경비 파일: '대신대-공통운영경비-운영비-기타운영비' 형태
+  ['공통운영경비운영비',  '그 밖의 사업운영 경비'],
+  ['기타운영비',          '그 밖의 사업운영 경비'],
+  // 해외인재유치 과제명만 적힌 경우
+  ['ai플랫폼',            '교육·연구프로그램개발·운영비'],
+  ['심리검사',            '교육·연구프로그램개발·운영비'],
+  ['심리적응',            '교육·연구프로그램개발·운영비'],
+  ['프로토진단',          '교육·연구프로그램개발·운영비'],
+  ['디자인용역',          '교육·연구프로그램개발·운영비'],
+  // 'N월 인건비'처럼 구분 없이 급여만 적힌 경우
+  ['급여',                '인건비'],
+  ['퇴직금',              '인건비'],
+  ['4대보험',             '인건비'],
 ];
 
 // ══════════════════════════════════════════════════
@@ -826,11 +829,48 @@ function dateToYear(dateStr) {
   return null;
 }
 
-function extractPlanCat(purpose) {
-  if (!purpose) return null;
-  for (const [kw, cat] of PLAN_MAP_RULES) {
-    if (purpose.includes(kw)) return cat;
+// 찾은 구분명을 현재 항목 관리에 등록된 이름으로 맞춘다 (드롭다운 선택값과 일치시키기 위함)
+function resolvePlanCat(name) {
+  const list = currentPlanCats.length > 0 ? currentPlanCats : DEFAULT_PLAN_CATS;
+  const k = normKey(name);
+  return list.find(c => normKey(c) === k) || name;
+}
+
+function extractPlanCat(purpose, seomok) {
+  const text = normKey(purpose);
+  if (!text) return null;
+
+  // 1) 항목 관리의 구분명 + 핵심 조각 키워드를 모두 검사하고,
+  //    집행용도 '앞쪽'에 나온 것을 채택한다.
+  //    (구분명은 항상 '대신대-사업명-' 바로 뒤에 오므로, 괄호 속 설명에
+  //     다른 구분의 단어가 섞여 있어도 앞에 나온 진짜 구분이 이긴다)
+  const list = currentPlanCats.length > 0 ? currentPlanCats : DEFAULT_PLAN_CATS;
+  const candidates = [
+    ...list.map(c => [c, [c]]),
+    ...PLAN_KEYWORDS,
+  ];
+  let best = null, bestPos = Infinity, bestLen = 0;
+  for (const [cat, kws] of candidates) {
+    for (const kw of kws) {
+      const k = normKey(kw);
+      if (!k) continue;
+      const pos = text.indexOf(k);
+      if (pos < 0) continue;
+      if (pos < bestPos || (pos === bestPos && k.length > bestLen)) {
+        best = cat; bestPos = pos; bestLen = k.length;
+      }
+    }
   }
+  if (best) return resolvePlanCat(best);
+
+  // 2) 보조 규칙
+  for (const [kw, cat] of PLAN_FALLBACK_KEYWORDS) {
+    if (text.includes(normKey(kw))) return resolvePlanCat(cat);
+  }
+
+  // 3) 보조세목이 '인건비-…'이면 인건비
+  if (normKey(seomok).startsWith('인건비')) return resolvePlanCat('인건비');
+
   return null; // 매핑 실패 → 노란색 표시, 수동 선택
 }
 
@@ -993,7 +1033,7 @@ async function processImportFile(file) {
 
         const excluded = (skipRestored && restored === '전체복원') ||
                          (skipNotComplete && status !== '이체완료');
-        const planCat  = extractPlanCat(purpose);
+        const planCat  = extractPlanCat(purpose, seomok);
         const category = getCategory(seomok, purpose, importProject, importYear);
         const year     = importYear;  // 사용자가 직접 선택한 차년도
 
