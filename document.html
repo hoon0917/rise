@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>공문 색인표 — RISE사업단</title>
+<title>공문 색인표 — 앵커사업단</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -152,13 +152,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   .nav-remote{display:none}
 }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span class="nav-chip" id="nav-chip">RISE</span>
+      <span class="nav-chip" id="nav-chip">앵커</span>
       <span class="nav-title">공문 색인표</span>
     </a>
     <div class="nav-right">
@@ -782,9 +783,10 @@ function downloadDocExcel(){
   });
   if(!any){ const ws=XLSX.utils.aoa_to_sheet([header]); ws['!cols']=cols; XLSX.utils.book_append_sheet(wb,ws,'공문색인표'); }
 
-  XLSX.writeFile(wb,`RISE_공문색인_${proj.label}_${today.replace(/\./g,'')}.xlsx`);
+  XLSX.writeFile(wb,`앵커_공문색인_${proj.label}_${today.replace(/\./g,'')}.xlsx`);
   btn.textContent='⬇ 엑셀 다운로드';btn.disabled=false;
 }
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

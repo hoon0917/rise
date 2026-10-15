@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>공용 캘린더 — RISE사업단</title>
+<title>공용 캘린더 — 앵커사업단</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -162,13 +162,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .fix-warn:hover{background:#fef3c7}
 @media(max-width:900px){.main{grid-template-columns:1fr}.nav-remote{display:none}.nav{padding:0 16px}.main{padding:24px 16px 48px}}
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span class="nav-chip">RISE</span>
+      <span class="nav-chip">앵커</span>
       <span class="nav-title">공용 캘린더</span>
     </a>
     <a href="index.html" class="btn-back">← 전체 현황</a>
@@ -876,5 +877,6 @@ function toast(msg,isErr=false){
   requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>el.classList.remove('show'),2800);
 }
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

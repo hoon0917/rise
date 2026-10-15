@@ -3,124 +3,111 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RISE사업단 — 대신대학교</title>
+<title>앵커사업단 — 대신대학교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#f5f7fa;--surface:#fff;
-  --border:#e2e8f0;--border2:#cbd5e1;
-  --text:#0f172a;--text2:#334155;--text3:#64748b;--text4:#94a3b8;
-  --blue:#2563eb;--blue-l:#eff6ff;--blue-b:#bfdbfe;
-  --green:#059669;--green-l:#ecfdf5;--green-b:#a7f3d0;
-  --yellow:#d97706;--yellow-l:#fffbeb;--yellow-b:#fde68a;
-  --purple:#7c3aed;--purple-l:#f5f3ff;--purple-b:#ddd6fe;
-  --red:#dc2626;--teal:#0891b2;
-  --mono:'DM Mono',monospace;--sans:'Noto Sans KR',sans-serif;
-  --radius:12px;--radius-sm:8px;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 16px rgba(0,0,0,.09),0 2px 4px rgba(0,0,0,.04);
-}
 html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+body{min-height:100vh;line-height:1.6;background:#fff}
+a{text-decoration:none;color:inherit}
 
 /* NAV */
-.nav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--border);padding:0 40px;box-shadow:var(--shadow)}
-.nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-chip{background:var(--blue);color:#fff;font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
-.nav-title{font-size:15px;font-weight:700;color:var(--text)}
-.nav-links{display:flex;gap:2px;list-style:none}
-.nav-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all .15s}
-.nav-links a:hover{background:var(--blue-l);color:var(--blue)}
-.nav-links a.active{background:var(--blue-l);color:var(--blue);font-weight:600}
-.btn-admin{background:var(--blue);color:#fff;font-size:12px;font-family:var(--mono);padding:7px 14px;border-radius:6px;text-decoration:none;transition:background .15s}
-.btn-admin:hover{background:#1d4ed8}
+.nav{position:sticky;top:0;z-index:200;padding:0 24px}
+.nav-inner{margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-links{display:flex;gap:2px;list-style:none;flex-wrap:wrap}
 
 /* HERO */
-.hero{max-width:1400px;margin:0 auto;padding:48px 40px 36px}
-.hero-eyebrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
-.hero-eyebrow::before{content:'';width:22px;height:1.5px;background:var(--blue)}
-.hero h1{font-size:clamp(24px,3.5vw,40px);font-weight:900;letter-spacing:-.04em;color:var(--text);margin-bottom:8px}
-.hero h1 em{font-style:normal;color:var(--blue)}
-.hero-desc{color:var(--text3);font-size:15px}
-.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-.pill{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 12px;border-radius:50px;font-size:12px;color:var(--text3);font-family:var(--mono);box-shadow:var(--shadow)}
-.pill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hero{max-width:1200px;margin:0 auto;padding:88px 24px 0}
+.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.hero-eyebrow::before{content:''}
+.hero h1{font-size:clamp(36px,5vw,56px)}
+.hero-desc{margin-top:20px;font-size:18px;line-height:1.6;max-width:560px}
 
-/* SUMMARY STRIP */
-.summary{max-width:1400px;margin:0 auto 36px;padding:0 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.s-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
-.s-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-.s-value{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);letter-spacing:-.02em;line-height:1}
-.s-value.blue{color:var(--blue)} .s-value.green{color:var(--green)}
-.s-sub{font-size:12px;color:var(--text3);margin-top:5px}
+/* KPI */
+.kpi{max-width:1200px;margin:56px auto 72px;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.kpi-card{padding:32px;border-radius:20px;background:var(--bg)}
+.kpi-label{font-size:15px;font-weight:500;color:var(--text3)}
+.kpi-value{margin-top:12px;font-size:44px;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1.15}
+.kpi-value small{font-size:24px;font-weight:700;margin-left:4px}
+.kpi-sub{margin-top:8px;font-size:14px;color:var(--text4)}
+.kpi-card.dark{background:var(--ink)}
+.kpi-card.dark .kpi-label{color:#b0b8c1}
+.kpi-card.dark .kpi-value{color:#fff}
+.kpi-track{margin-top:18px;height:8px;border-radius:99px;background:#3a3f48;overflow:hidden}
+.kpi-bar{height:100%;width:0;border-radius:99px;background:var(--accent);transition:width 1s cubic-bezier(.16,1,.3,1)}
+
+/* TABS */
+.tabs{border-bottom:1px solid var(--border)}
+.tabs-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;gap:28px;overflow-x:auto}
+.tabs a{padding:16px 2px;font-size:16px;font-weight:500;color:var(--text4);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a.active{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
 
 /* SECTION */
-.section{max-width:1400px;margin:0 auto;padding:0 40px 52px}
-.sh{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.sh-label{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;font-weight:600}
-.sh-line{flex:1;height:1px;background:var(--border)}
+.band{background:var(--bg)}
+.section{max-width:1200px;margin:0 auto;padding:72px 24px 88px}
+.sec-title{font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-.03em}
+.sec-desc{margin-top:12px;font-size:16px;color:var(--text3)}
 
 /* PROJECT CARDS */
-.project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-.proj-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:16px;transition:all .2s;position:relative;overflow:hidden}
-.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--proj-color,var(--blue));opacity:1}
-.proj-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--proj-border,var(--blue-b))}
-.proj-header{display:flex;align-items:center;gap:12px}
-.proj-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--proj-light,var(--blue-l))}
-.proj-name{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
-.proj-sub{font-size:12px;color:var(--text3);margin-top:2px}
-.proj-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.proj-stat{background:var(--bg);border-radius:8px;padding:10px 12px}
-.proj-stat-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
-.proj-stat-value{font-size:15px;font-weight:600;font-family:var(--mono);color:var(--text)}
-.proj-stat-value.colored{color:var(--proj-color,var(--blue))}
-.proj-bar-wrap{background:var(--bg);border:1px solid var(--border);border-radius:50px;height:5px;overflow:hidden}
-.proj-bar{height:100%;border-radius:50px;background:var(--proj-color,var(--blue));transition:width 1s cubic-bezier(.16,1,.3,1)}
-.proj-rate{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right;margin-top:4px}
-.proj-rate span{font-weight:600;color:var(--proj-color,var(--blue))}
-.proj-arrow{position:absolute;top:24px;right:20px;color:var(--text4);font-size:14px;transition:all .2s}
-.proj-card:hover .proj-arrow{transform:translateX(3px);color:var(--proj-color,var(--blue))}
-.proj-years{display:flex;gap:6px;flex-wrap:wrap}
-.proj-yr-btn{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;background:var(--proj-light,var(--blue-l));color:var(--proj-color,var(--blue));border:1px solid var(--proj-border,var(--blue-b));text-decoration:none;transition:all .15s}
-.proj-yr-btn:hover{opacity:.8}
+.project-grid{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
+.proj-card{padding:32px;border-radius:24px;display:flex;flex-direction:column;gap:28px;transition:all .2s}
+.proj-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.proj-meta{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text4)}
+.proj-dot{width:8px;height:8px;border-radius:50%}
+.proj-name{margin-top:8px;font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.03em}
+.proj-go{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--bg);color:var(--ink);flex-shrink:0;transition:all .2s}
+.proj-card:hover .proj-go{background:var(--ink);color:#fff}
+.proj-go svg{width:18px;height:18px}
+.proj-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.proj-stat-label{font-size:14px;color:var(--text4)}
+.proj-stat-value{margin-top:6px;font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.proj-rate{display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:var(--text3)}
+.proj-rate b{color:var(--ink)}
+.proj-bar-wrap{margin-top:10px;overflow:hidden}
+.proj-bar{height:100%;width:0;background:var(--accent);transition:width 1s cubic-bezier(.16,1,.3,1)}
+.proj-years{display:flex;gap:8px;flex-wrap:wrap}
+.proj-yr-btn{display:inline-flex;align-items:center;background:var(--bg);border-color:transparent;color:var(--text3)}
+.proj-yr-btn:hover{background:var(--border);color:var(--ink)}
+.proj-yr-btn.now{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
 
 /* QUICK LINKS */
-.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-.quick-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:all .2s}
-.quick-card:hover{box-shadow:var(--shadow-md);border-color:var(--border2);transform:translateY(-1px)}
-.quick-icon{font-size:24px;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.quick-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
-.quick-sub{font-size:11px;color:var(--text3)}
+.quick-grid{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px}
+.quick-card{display:flex;flex-direction:column;gap:14px;padding:32px;border-radius:24px;transition:all .2s}
+.quick-icon{width:32px;height:32px;color:var(--ink)}
+.quick-icon svg{width:100%;height:100%}
+.quick-label{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.quick-sub{font-size:15px;line-height:1.6;color:var(--text3)}
+.quick-more{margin-top:auto;font-size:14px;font-weight:600;color:var(--ink)}
 
 /* SPIN */
-.spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--blue);animation:spin .9s linear infinite;margin:0 auto}
+.spin{width:22px;height:22px;border-radius:50%;border:2px solid;animation:spin .9s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* FOOTER */
-.footer{border-top:1px solid var(--border);padding:24px 40px;max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-.footer-copy{font-size:12px;color:var(--text3);font-family:var(--mono)}
-.footer-live{font-size:11px;color:var(--green);font-family:var(--mono);display:flex;align-items:center;gap:6px}
-.footer-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.footer{padding:32px 24px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.footer-live{color:var(--text3);display:flex;align-items:center;gap:6px}
+.footer-live::before{content:'';width:6px;height:6px;border-radius:50%;background:#0f9f6e}
 
-/* NAV REMOTE (우측 고정 네비) */
+/* NAV REMOTE */
 .nav-remote{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:300;display:flex;flex-direction:column;gap:6px}
-.nr-btn{width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--text3)}
-.nr-btn:hover{border-color:var(--blue);color:var(--blue);transform:scale(1.1)}
-.nr-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.nr-tooltip{position:absolute;right:52px;background:var(--text);color:#fff;font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.nr-btn{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;position:relative}
+.nr-tooltip{position:absolute;right:52px;color:#fff;padding:4px 10px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
 .nr-btn:hover .nr-tooltip{opacity:1}
 
+@media(max-width:1300px){.nav-remote{display:none}}
 @media(max-width:768px){
   .nav{padding:0 16px}.nav-links{display:none}
-  .hero,.summary,.section{padding-left:16px;padding-right:16px}
-  .footer{padding:20px 16px;flex-direction:column;align-items:flex-start}
-  .nav-remote{display:none}
-  .project-grid{grid-template-columns:1fr}
+  .hero{padding:56px 16px 0}
+  .kpi{padding:0 16px;margin:40px auto 56px}
+  .tabs-inner,.section{padding-left:16px;padding-right:16px}
+  .section{padding-top:56px;padding-bottom:64px}
+  .proj-card,.quick-card,.kpi-card{padding:24px}
 }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
@@ -128,85 +115,95 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span class="nav-chip">RISE</span>
-      <span class="nav-title">대신대학교 RISE사업단</span>
+      <span class="nav-chip">앵커</span>
+      <span class="nav-title">대신대학교 앵커사업단</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html" class="active">전체 현황</a></li>
-      <li><a href="budget.html?p=localrd">로컬R&D</a></li>
-      <li><a href="budget.html?p=overseas">해외인재유치</a></li>
-      <li><a href="budget.html?p=common">공통운영경비</a></li>
-      <li><a href="budget.html?p=city">시비</a></li>
+      <li><a href="index.html" class="active">대시보드</a></li>
+      <li><a href="budget.html?p=localrd">예산 현황</a></li>
+      <li><a href="document.html?p=localrd">공문 색인표</a></li>
       <li><a href="calendar.html">캘린더</a></li>
     </ul>
-    <a href="admin.html" class="btn-admin">⚙ 관리자</a>
+    <a href="admin.html" class="btn-admin">관리자</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">대신대학교 RISE사업단</div>
-  <h1>사업 현황 <em>통합 대시보드</em></h1>
-  <p class="hero-desc">4개 사업의 예산 배정 및 집행 현황을 한눈에 확인합니다.</p>
-  <div class="hero-pills">
-    <div class="pill"><span class="pill-dot" style="background:var(--green)"></span>실시간 동기화</div>
-    <div class="pill"><span class="pill-dot" style="background:var(--blue)"></span>5차년도 사업</div>
-    <div class="pill"><span class="pill-dot" style="background:var(--yellow)"></span><span id="today-pill">—</span></div>
-  </div>
+  <div class="hero-eyebrow">실시간 동기화 · <span id="today-pill">—</span> 기준</div>
+  <h1>사업 예산 현황을<br>한눈에 확인하세요</h1>
+  <p class="hero-desc">4개 사업, 5개 차년도의 예산 배정과 집행 현황을 이나라도움 데이터 기준으로 공유합니다.</p>
 </section>
 
-<!-- SUMMARY -->
-<div class="summary">
-  <div class="s-card">
-    <div class="s-label">전체 배정 예산</div>
-    <div class="s-value blue" id="s-total-budget">—</div>
-    <div class="s-sub">4개 사업 합계</div>
+<!-- KPI -->
+<div class="kpi">
+  <div class="kpi-card">
+    <div class="kpi-label">전체 배정 예산</div>
+    <div class="kpi-value" id="s-total-budget">—</div>
+    <div class="kpi-sub">4개 사업 합계</div>
   </div>
-  <div class="s-card">
-    <div class="s-label">전체 집행액</div>
-    <div class="s-value green" id="s-total-spent">—</div>
-    <div class="s-sub" id="s-total-rate">전체 대비 —%</div>
+  <div class="kpi-card">
+    <div class="kpi-label">전체 집행액</div>
+    <div class="kpi-value" id="s-total-spent">—</div>
+    <div class="kpi-sub" id="s-total-remain">잔액 —</div>
+  </div>
+  <div class="kpi-card dark">
+    <div class="kpi-label">전체 집행률</div>
+    <div class="kpi-value" id="s-total-rate">—</div>
+    <div class="kpi-track"><div class="kpi-bar" id="s-total-bar"></div></div>
+  </div>
+</div>
+
+<!-- 사업 탭 -->
+<div class="tabs">
+  <div class="tabs-inner">
+    <a href="index.html" class="active">전체</a>
+    <a href="budget.html?p=localrd">로컬R&amp;D</a>
+    <a href="budget.html?p=overseas">해외인재유치</a>
+    <a href="budget.html?p=common">공통운영경비</a>
+    <a href="budget.html?p=city">시비</a>
   </div>
 </div>
 
 <!-- 사업별 카드 -->
-<section class="section">
-  <div class="sh"><span class="sh-label">사업별 예산 현황</span><div class="sh-line"></div></div>
-  <div class="project-grid" id="project-grid">
-    <div style="grid-column:1/-1;text-align:center;padding:48px"><div class="spin"></div></div>
-  </div>
-</section>
+<div class="band">
+  <section class="section">
+    <h2 class="sec-title">사업별 예산 현황</h2>
+    <p class="sec-desc" id="cur-year-desc">현재 진행 중인 차년도를 확인하는 중입니다.</p>
+    <div class="project-grid" id="project-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:48px"><div class="spin"></div></div>
+    </div>
+  </section>
+</div>
 
 <!-- 바로가기 -->
 <section class="section">
-  <div class="sh"><span class="sh-label">바로가기</span><div class="sh-line"></div></div>
+  <h2 class="sec-title">업무 바로가기</h2>
   <div class="quick-grid">
     <a href="calendar.html" class="quick-card">
-      <div class="quick-icon" style="background:#eff6ff">📅</div>
-      <div><div class="quick-label">공용 캘린더</div><div class="quick-sub">일정 · 휴가 등록</div></div>
+      <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span class="quick-label">공용 캘린더</span>
+      <span class="quick-sub">부서 일정과 마감, 연차·반차를 등록하고 잔여 연차를 확인합니다.</span>
+      <span class="quick-more">바로가기 →</span>
     </a>
     <a href="document.html?p=localrd" class="quick-card">
-      <div class="quick-icon" style="background:#eff6ff">📋</div>
-      <div><div class="quick-label">공문 색인표 — 로컬R&D</div><div class="quick-sub">공문 번호 · 제목 · 날짜</div></div>
-    </a>
-    <a href="document.html?p=overseas" class="quick-card">
-      <div class="quick-icon" style="background:#ecfdf5">📋</div>
-      <div><div class="quick-label">공문 색인표 — 해외인재유치</div><div class="quick-sub">공문 번호 · 제목 · 날짜</div></div>
-    </a>
-    <a href="document.html?p=common" class="quick-card">
-      <div class="quick-icon" style="background:#fffbeb">📋</div>
-      <div><div class="quick-label">공문 색인표 — 공통운영경비</div><div class="quick-sub">공문 번호 · 제목 · 날짜</div></div>
+      <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>
+      <span class="quick-label">공문 색인표</span>
+      <span class="quick-sub">사업별 수기결재 공문을 문서번호, 비목, 회계연도별로 찾아봅니다.</span>
+      <span class="quick-more">바로가기 →</span>
     </a>
     <a href="admin.html" class="quick-card">
-      <div class="quick-icon" style="background:#f5f3ff">⚙️</div>
-      <div><div class="quick-label">관리자 페이지</div><div class="quick-sub">예산 배정 · 집행 입력</div></div>
+      <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
+      <span class="quick-label">예산 입력 · 이나라도움 가져오기</span>
+      <span class="quick-sub">예산을 배정하고, 집행현황 엑셀을 올려 비세목과 사업계획서 구분을 자동 연동합니다.</span>
+      <span class="quick-more">관리자 페이지 →</span>
     </a>
   </div>
 </section>
 
 <footer>
   <div class="footer">
-    <span class="footer-copy">© 대신대학교 RISE사업단 — 내부 공유용</span>
+    <span class="footer-copy">© 대신대학교 앵커사업단 — 내부 공유용</span>
     <span class="footer-live">실시간 업데이트</span>
   </div>
 </footer>
@@ -244,9 +241,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <script>
 const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDomain:"rise-81dab.firebaseapp.com",projectId:"rise-81dab",storageBucket:"rise-81dab.firebasestorage.app",messagingSenderId:"1059201705038",appId:"1:1059201705038:web:810d08d1e34b37dd51cf1f"};
 const PROJECTS={
-  localrd: {id:'localrd', label:'로컬R&D',    icon:'🔬', color:'#2563eb', light:'#eff6ff', border:'#bfdbfe'},
-  overseas:{id:'overseas',label:'해외인재유치',icon:'✈️', color:'#059669', light:'#ecfdf5', border:'#a7f3d0'},
-  common:  {id:'common',  label:'공통운영경비',icon:'📦', color:'#d97706', light:'#fffbeb', border:'#fde68a'},
+  localrd: {id:'localrd', label:'로컬R&D',    icon:'🔬', color:'#3b5bff', light:'#eff6ff', border:'#bfdbfe'},
+  overseas:{id:'overseas',label:'해외인재유치',icon:'✈️', color:'#0f9f6e', light:'#ecfdf5', border:'#a7f3d0'},
+  common:  {id:'common',  label:'공통운영경비',icon:'📦', color:'#e08a00', light:'#fffbeb', border:'#fde68a'},
   city:    {id:'city',    label:'시비',         icon:'🏛️', color:'#7c3aed', light:'#f5f3ff', border:'#ddd6fe'},
 };
 const PERIODS={1:"2025.12~2026.02",2:"2026.03~2027.02",3:"2027.03~2028.02",4:"2028.03~2029.02",5:"2029.03~2030.02"};
@@ -254,6 +251,12 @@ const won=v=>!v?'—':v>=100000000?(v/100000000).toFixed(1).replace(/\.0$/,'')+'
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 const d=new Date();
 document.getElementById('today-pill').textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+// 오늘 날짜가 속한 차년도
+const ym=d.getFullYear()*100+d.getMonth()+1;
+const CUR_YEAR=(()=>{for(const [y,p] of Object.entries(PERIODS)){const [a,b]=p.split('~').map(x=>{const [yy,mm]=x.split('.');return +yy*100+ +mm});if(ym>=a&&ym<=b)return +y}return 0})();
+const unitWon=v=>{const t=won(v);const m=t.match(/^([\d.,]+)(억|만)$/);return m?`${m[1]}<small>${m[2]}</small>`:t};
+if(CUR_YEAR)document.getElementById('cur-year-desc').textContent=`현재 ${CUR_YEAR}차년도 (${PERIODS[CUR_YEAR].replace('~',' ~ ')}) 진행 중입니다.`;
+else document.getElementById('cur-year-desc').textContent='사업기간 2025.12 ~ 2030.02';
 
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
@@ -282,9 +285,12 @@ Object.keys(PROJECTS).forEach(pid=>{
 function renderAll(){
   const totalBudget=Object.values(budgetByProj).reduce((a,b)=>a+b,0);
   const totalSpent=Object.values(spentByProj).reduce((a,b)=>a+b,0);
-  document.getElementById('s-total-budget').textContent=won(totalBudget);
-  document.getElementById('s-total-spent').textContent=won(totalSpent);
-  document.getElementById('s-total-rate').textContent='전체 대비 '+pct(totalSpent,totalBudget)+'%';
+  const totalRate=pct(totalSpent,totalBudget);
+  document.getElementById('s-total-budget').innerHTML=unitWon(totalBudget);
+  document.getElementById('s-total-spent').innerHTML=unitWon(totalSpent);
+  document.getElementById('s-total-remain').textContent='잔액 '+won(Math.max(totalBudget-totalSpent,0));
+  document.getElementById('s-total-rate').innerHTML=totalRate+'<small>%</small>';
+  setTimeout(()=>{document.getElementById('s-total-bar').style.width=totalRate+'%'},100);
 
   const grid=document.getElementById('project-grid');
   grid.innerHTML='';
@@ -295,37 +301,36 @@ function renderAll(){
     const card=document.createElement('a');
     card.href=`budget.html?p=${proj.id}`;
     card.className='proj-card';
-    card.style.cssText=`--proj-color:${proj.color};--proj-light:${proj.light};--proj-border:${proj.border}`;
     card.innerHTML=`
-      <div class="proj-header">
-        <div class="proj-icon">${proj.icon}</div>
+      <div class="proj-head">
         <div>
+          <div class="proj-meta"><span class="proj-dot" style="background:${proj.color}"></span>5개 차년도 사업</div>
           <div class="proj-name">${proj.label}</div>
-          <div class="proj-sub">5차년도 사업</div>
         </div>
-        <div class="proj-arrow">→</div>
+        <span class="proj-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
       <div class="proj-stats">
-        <div class="proj-stat">
+        <div>
           <div class="proj-stat-label">배정 예산</div>
-          <div class="proj-stat-value colored">${b?won(b):'미입력'}</div>
+          <div class="proj-stat-value">${b?won(b):'미입력'}</div>
         </div>
-        <div class="proj-stat">
+        <div>
           <div class="proj-stat-label">집행액</div>
-          <div class="proj-stat-value" style="color:var(--green)">${won(s)}</div>
+          <div class="proj-stat-value">${won(s)}</div>
         </div>
       </div>
       <div>
-        <div class="proj-bar-wrap"><div class="proj-bar" id="pb-${proj.id}" style="width:0%"></div></div>
-        <div class="proj-rate">집행률 <span>${r}%</span></div>
+        <div class="proj-rate"><span>집행률</span><b>${b?r+'%':'—'}</b></div>
+        <div class="proj-bar-wrap"><div class="proj-bar" id="pb-${proj.id}"></div></div>
       </div>
       <div class="proj-years">
-        ${[1,2,3,4,5].map(y=>`<a href="year.html?p=${proj.id}&y=${y}" class="proj-yr-btn" onclick="event.stopPropagation()">${y}차년도</a>`).join('')}
+        ${[1,2,3,4,5].map(y=>`<a href="year.html?p=${proj.id}&y=${y}" class="proj-yr-btn${y===CUR_YEAR?' now':''}" onclick="event.stopPropagation()">${y}차년도</a>`).join('')}
       </div>`;
     grid.appendChild(card);
     setTimeout(()=>{const pb=document.getElementById('pb-'+proj.id);if(pb)pb.style.width=r+'%'},100);
   });
 }
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

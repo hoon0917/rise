@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>사업 예산 현황 — RISE사업단</title>
+<title>사업 예산 현황 — 앵커사업단</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -125,13 +125,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   .nav-remote{display:none}
 }
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span class="nav-chip" id="nav-chip">RISE</span>
+      <span class="nav-chip" id="nav-chip">앵커</span>
       <span class="nav-title" id="nav-title">예산 현황</span>
     </a>
     <ul class="nav-links" id="nav-year-tabs"></ul>
@@ -202,7 +203,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </section>
 
-<footer><div class="footer"><span class="footer-copy">© 대신대학교 RISE사업단 — 내부 공유용</span></div></footer>
+<footer><div class="footer"><span class="footer-copy">© 대신대학교 앵커사업단 — 내부 공유용</span></div></footer>
 
 <!-- 네비 리모콘 -->
 <div class="nav-remote" id="nav-remote"></div>
@@ -234,7 +235,7 @@ document.documentElement.style.setProperty('--pc-l',proj.light);
 document.documentElement.style.setProperty('--pc-b',proj.border);
 
 // UI 초기화
-document.title=`${proj.label} 예산 현황 — RISE사업단`;
+document.title=`${proj.label} 예산 현황 — 앵커사업단`;
 document.getElementById('nav-chip').textContent=proj.icon+' '+proj.label;
 document.getElementById('nav-title').textContent='예산 현황';
 document.getElementById('bc-cur').textContent=proj.label;
@@ -422,7 +423,7 @@ function renderAll(){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   RISE사업단 엑셀 생성 핵심 모듈 (xlsx-style 서식 완전 적용)
+   앵커사업단 엑셀 생성 핵심 모듈 (xlsx-style 서식 완전 적용)
    원본 양식 재현:
    - 구분별 고유 색상 헤더
    - 비목행 회색 (F2F2F2) bold
@@ -878,7 +879,7 @@ function downloadBudgetExcel() {
       });
     }
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`);
+    XLSX.writeFile(wb, `앵커사업_${proj.label}_예산현황_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e);
     alert('엑셀 생성 중 오류: ' + e.message);
@@ -909,12 +910,13 @@ function downloadYearExcelById(y) {
       wb.Sheets[sname] = sCat;
     });
 
-    XLSX.writeFile(wb, `RISE사업_${proj.label}_${YEAR_LABELS[y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
+    XLSX.writeFile(wb, `앵커사업_${proj.label}_${YEAR_LABELS[y-1]}_${todayStr.replace(/\./g,'')}.xlsx`);
   } catch(e) {
     console.error(e); alert('엑셀 생성 오류: ' + e.message);
   }
 }
 
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

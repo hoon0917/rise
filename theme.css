@@ -1,0 +1,228 @@
+/* =========================================================
+   앵커사업단 공통 테마 (모던 리디자인)
+   각 페이지의 <style> 뒤에 불러와 공통 요소를 덮어씁니다.
+   ========================================================= */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+:root{
+  --ink:#15181e;            /* 제목·주요 버튼 */
+  --text:#15181e;
+  --text2:#3b4859;
+  --text3:#6b7684;
+  --text4:#8b95a1;
+  --bg:#f5f6f8;             /* 섹션·페이지 바탕 */
+  --surface:#ffffff;
+  --border:#eceef2;
+  --border2:#dfe3e8;
+  --accent:#3b5bff;         /* 단일 강조색 */
+  --accent-l:#eef1ff;
+  --blue:#3b5bff;--blue-l:#eef1ff;--blue-b:#c9d3ff;
+  --sans:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
+  --mono:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
+  --radius:20px;--radius-sm:12px;
+  --shadow:none;
+  --shadow-md:0 8px 24px rgba(21,24,30,.08);
+}
+
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text2);
+  letter-spacing:-0.01em;
+  font-feature-settings:'tnum';
+  -webkit-font-smoothing:antialiased;
+}
+input,select,textarea,button{font-family:var(--sans)}
+
+/* ---------- 상단 메뉴 ---------- */
+.nav{
+  background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(180%) blur(12px);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--border);
+  box-shadow:none;
+}
+.nav-inner{height:68px;max-width:1200px}
+.nav-chip{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:32px;height:32px;padding:0 8px;border-radius:9px;
+  background:var(--ink);color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:800;letter-spacing:0;
+}
+.nav-title{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.nav-links a,.nav-year-tabs a{
+  font-size:15px;font-weight:500;color:var(--text3);
+  padding:10px 14px;border-radius:999px;background:none;
+}
+.nav-links a:hover,.nav-year-tabs a:hover{background:var(--bg);color:var(--ink)}
+.nav-links a.active,.nav-year-tabs a.active{background:none;color:var(--ink);font-weight:700}
+
+/* 알약 버튼 (관리자·뒤로가기 등) */
+.btn-admin,.btn-nav,.btn-login{
+  display:inline-flex;align-items:center;gap:6px;
+  height:44px;padding:0 20px;border-radius:999px;
+  background:var(--ink);color:#fff;border:none;
+  font-family:var(--sans);font-size:14px;font-weight:600;text-decoration:none;
+}
+.btn-admin:hover,.btn-nav:hover,.btn-login:hover{background:#2b303a}
+.btn-back,.btn-ghost,.btn-logout{
+  display:inline-flex;align-items:center;gap:6px;
+  height:44px;padding:0 18px;border-radius:999px;
+  background:var(--bg);color:var(--ink);border:none;
+  font-family:var(--sans);font-size:14px;font-weight:600;text-decoration:none;
+}
+.btn-back:hover,.btn-ghost:hover,.btn-logout:hover{background:var(--border)}
+
+/* ---------- 브레드크럼 ---------- */
+.breadcrumb{font-family:var(--sans);font-size:14px;color:var(--text4);max-width:1200px}
+.breadcrumb a{color:var(--text3)}
+.breadcrumb-cur{color:var(--ink);font-weight:600}
+
+/* ---------- 히어로 ---------- */
+.hero{max-width:1200px;padding-top:64px;padding-bottom:40px}
+.hero-eyebrow{
+  font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;
+  color:var(--accent);
+}
+.hero-eyebrow::before{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.hero h1{
+  font-size:clamp(32px,4.4vw,52px);font-weight:800;line-height:1.2;
+  letter-spacing:-.04em;color:var(--ink);
+}
+.hero h1 em{color:var(--ink)}
+.hero-desc,.hero-period{font-size:17px;color:var(--text3);font-family:var(--sans)}
+
+/* ---------- 요약 카드 ---------- */
+.summary{max-width:1200px;gap:16px}
+.s-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;box-shadow:none;
+}
+.s-label{
+  font-family:var(--sans);font-size:15px;font-weight:500;
+  letter-spacing:0;text-transform:none;color:var(--text3);margin-bottom:10px;
+}
+.s-value{
+  font-family:var(--sans);font-size:36px;font-weight:800;
+  letter-spacing:-.03em;color:var(--ink);line-height:1.15;
+}
+.s-value.blue,.s-value.green,.s-value.pc,.s-value.yellow{color:var(--ink)}
+.s-sub{font-size:14px;color:var(--text4);margin-top:8px}
+
+/* ---------- 섹션 제목 ---------- */
+.section{max-width:1200px}
+.sh{gap:12px;margin-bottom:24px}
+.sh-label{
+  font-family:var(--sans);font-size:24px;font-weight:800;
+  letter-spacing:-.03em;text-transform:none;color:var(--ink);
+}
+.sh-line{background:transparent}
+.sh-badge,.sh-count{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  background:var(--surface);border:1px solid var(--border);color:var(--text3);
+  padding:6px 12px;border-radius:999px;
+}
+
+/* ---------- 카드 공통 ---------- */
+.proj-card,.y-card,.form-card,.side-card,.cal-card,.upload-card,.login-card,
+.prog-card,.quick-card,.bp-wrap,.cat-wrap,.exp-wrap,.doc-table-wrap,
+.bp-input-wrap,.manage-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:none;
+}
+.proj-card:hover,.y-card:hover,.quick-card:hover{
+  box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--border2);
+}
+.proj-card::before{display:none}
+
+/* 진행 막대 */
+.proj-bar-wrap,.y-bar-wrap,.prog-track,.rate-bar-bg{
+  background:var(--border);border:none;border-radius:99px;height:8px;
+}
+.proj-bar,.y-bar,.prog-bar,.rate-bar-fill{border-radius:99px}
+
+/* ---------- 표 ---------- */
+table th{
+  font-family:var(--sans) !important;letter-spacing:0 !important;text-transform:none !important;
+  font-size:13px;font-weight:600;color:var(--text3);background:#fafbfc;
+}
+table td{font-family:var(--sans)}
+.amt-cell,.rate-num,.doc-num,.doc-date{font-family:var(--sans);font-variant-numeric:tabular-nums}
+
+/* ---------- 탭 ---------- */
+.proj-tab-bar,.proj-bar{background:var(--surface);border-bottom:1px solid var(--border)}
+.proj-tab,.tab-btn{
+  font-family:var(--sans);font-size:16px;font-weight:500;color:var(--text4);
+  padding:16px 4px;margin-right:24px;border-bottom:2px solid transparent;
+}
+.proj-tab:hover,.tab-btn:hover{color:var(--ink)}
+.proj-tab.active,.tab-btn.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+
+/* 알약형 선택 버튼 */
+.yr-btn,.filter-btn,.mf-btn,.page-btn,.type-btn,.leave-kind-btn,.proj-yr-btn{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  min-height:36px;padding:0 14px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border2);color:var(--text3);
+}
+.yr-btn.active,.filter-btn.active,.mf-btn.active,.page-btn.active,.leave-kind-btn.on{
+  background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600;
+}
+.yr-btn:hover,.filter-btn:hover,.mf-btn:hover,.page-btn:hover{border-color:var(--ink);color:var(--ink)}
+.yr-btn.active:hover,.filter-btn.active:hover,.mf-btn.active:hover,.page-btn.active:hover{color:#fff}
+.seg{border-radius:999px;overflow:hidden;border:1px solid var(--border2)}
+.seg button{font-family:var(--sans);font-size:13px;font-weight:500}
+.seg button.on{background:var(--ink);color:#fff}
+
+/* ---------- 폼 ---------- */
+.f-label{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text2);letter-spacing:0;text-transform:none}
+.f-input,.f-select,.f-textarea,.search-input,.amount-input{
+  font-family:var(--sans);font-size:15px;
+  border:1px solid var(--border2);border-radius:var(--radius-sm);
+  background:var(--surface);color:var(--ink);
+}
+.f-input:focus,.f-select:focus,.f-textarea:focus,.search-input:focus,.amount-input:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l);
+}
+.btn-primary{
+  background:var(--ink);color:#fff;border:none;border-radius:999px;
+  font-family:var(--sans);font-weight:600;min-height:44px;padding:0 22px;
+}
+.btn-primary:hover{background:#2b303a}
+.btn-secondary,.btn-tool,.btn-dl,.add-member-btn{
+  background:var(--bg);color:var(--ink);border:1px solid var(--border);border-radius:999px;
+  font-family:var(--sans);font-weight:600;min-height:40px;padding:0 18px;
+}
+.btn-secondary:hover,.btn-tool:hover,.btn-dl:hover,.add-member-btn:hover{background:var(--border)}
+#btn-budget-dl,#btn-year-dl,#btn-doc-dl{
+  background:var(--bg) !important;color:var(--ink) !important;border:1px solid var(--border) !important;
+  border-radius:999px !important;font-family:var(--sans) !important;font-size:14px !important;
+  font-weight:600 !important;height:44px;padding:0 18px !important;
+}
+
+/* ---------- 모달·토스트 ---------- */
+.modal{border-radius:24px;border:none;box-shadow:0 24px 64px rgba(21,24,30,.18)}
+.toast{border-radius:999px;font-family:var(--sans);background:var(--ink)}
+
+/* ---------- 우측 바로가기 ---------- */
+.nr-btn{
+  width:44px;height:44px;background:var(--surface);border:1px solid var(--border);
+  box-shadow:0 4px 14px rgba(21,24,30,.08);color:var(--text3);
+}
+.nr-btn:hover{border-color:var(--ink);color:var(--ink);transform:none}
+.nr-btn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.nr-tooltip{font-family:var(--sans);background:var(--ink);border-radius:8px;font-size:12px}
+
+/* ---------- 아이콘 (이모지 대체) ---------- */
+.ic{display:inline-flex;width:1.15em;height:1.15em;vertical-align:-.18em;flex-shrink:0}
+.ic svg{width:100%;height:100%}
+.ic-dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;vertical-align:.05em}
+
+/* ---------- 푸터 ---------- */
+.footer{max-width:1200px;border-top:1px solid var(--border)}
+.footer-copy,.footer-live{font-family:var(--sans);font-size:13px}
+.footer-copy{color:var(--text3)}
+
+/* 로딩 */
+.spin{border-color:var(--border);border-top-color:var(--ink)}
