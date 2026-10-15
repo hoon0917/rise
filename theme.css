@@ -58,7 +58,7 @@ input,select,textarea,button{font-family:var(--sans)}
 .nav-links a.active,.nav-year-tabs a.active{background:none;color:var(--ink);font-weight:700}
 
 /* 알약 버튼 (관리자·뒤로가기 등) */
-.btn-admin,.btn-nav,.btn-login{
+.btn-admin,.btn-nav,.btn-login{justify-content:center;
   display:inline-flex;align-items:center;gap:6px;
   height:44px;padding:0 20px;border-radius:999px;
   background:var(--ink);color:#fff;border:none;
