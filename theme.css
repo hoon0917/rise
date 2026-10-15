@@ -226,3 +226,18 @@ table td{font-family:var(--sans)}
 
 /* 로딩 */
 .spin{border-color:var(--border);border-top-color:var(--ink)}
+
+/* ---------- 레이아웃 정렬 (모든 페이지 같은 좌우 기준선) ---------- */
+:root{--wrap:1200px;--gutter:40px}
+.nav,.proj-tab-bar,.proj-bar:has(.proj-tabs){padding-left:0 !important;padding-right:0 !important}
+.proj-bar:has(.proj-tabs){top:68px}
+.nav-inner,.breadcrumb,.hero,.summary,.prog-wrap,.kpi,.tabs-inner,
+.section,.proj-tabs,.main,.page-wrap,.footer{
+  box-sizing:border-box;
+  max-width:calc(var(--wrap) + var(--gutter) * 2) !important;
+  padding-left:var(--gutter) !important;
+  padding-right:var(--gutter) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+@media(max-width:768px){:root{--gutter:16px}}
