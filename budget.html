@@ -74,7 +74,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .bp-empty{color:var(--text4)!important;font-size:11px!important}
 
 /* 차년도 카드 */
-.year-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.year-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .y-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px 18px;text-decoration:none;color:inherit;transition:all .2s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .y-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--pc);transform:scaleX(0);transform-origin:left;transition:transform .25s}
 .y-card:hover{border-color:var(--pc-b);box-shadow:var(--shadow-md);transform:translateY(-2px)}
@@ -390,7 +390,7 @@ function renderAll(){
     // 엑셀 버튼 — DOM으로 직접 생성해서 이벤트 명확히 분리
     const xlBtn=document.createElement('button');
     xlBtn.textContent='⬇ '+y+'차년도 엑셀';
-    xlBtn.style.cssText='margin-top:8px;width:100%;background:#059669;border:none;color:#fff;font-size:11px;font-family:var(--mono);padding:5px 0;border-radius:6px;cursor:pointer;font-weight:600;letter-spacing:.03em';
+    xlBtn.style.cssText='margin-top:12px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--ink);font-size:13px;font-family:var(--sans);height:38px;border-radius:999px;cursor:pointer;font-weight:600';
     xlBtn.addEventListener('click', function(e){
       e.stopPropagation();  // 카드 클릭 이벤트 차단
       e.preventDefault();
