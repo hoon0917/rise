@@ -1155,6 +1155,1378 @@
    ],
    "etype": "contract",
    "pay": "vendor"
+  },
+  {
+   "id": "x_pay",
+   "file": "x_pay.hwpx",
+   "kind": "expense",
+   "name": "급여·수당 지급",
+   "desc": "직원 급여, 초과근무수당 등 인건비 지급. 대상자별 지급 내역 표 + 지출과목",
+   "source": "1팀 2025-018 직원 급여 지급 / 2602 초과근무수당 지급",
+   "title": "[{사업약칭}] {건명} 지급의 건",
+   "intro": "앵커 사업단의 원활한 사업 운영을 위하여 {건명}{을/를} 아래와 같이 지급하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "구분",
+     "label": "구분",
+     "type": "text",
+     "placeholder": "2026년 10월분 앵커사업단 직원 2명 급여"
+    },
+    {
+     "key": "대상",
+     "label": "대상",
+     "type": "text",
+     "placeholder": "홍길동, 김철수"
+    },
+    {
+     "key": "지급기간",
+     "label": "지급(근로)기간",
+     "type": "text",
+     "placeholder": "2026. 10. 1.(수) ~ 2026. 10. 31.(금)"
+    },
+    {
+     "key": "재원",
+     "label": "재원",
+     "type": "text",
+     "default": "앵커사업 인건비"
+    }
+   ],
+   "attachments": [
+    "급여 계산액 1부.",
+    "통장사본 각 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "pay",
+   "list": {
+    "name": "전문가",
+    "label": "지출 내역",
+    "cols": [
+     {
+      "key": "성명",
+      "label": "성 명"
+     },
+     {
+      "key": "소속",
+      "label": "직 위"
+     },
+     {
+      "key": "일자",
+      "label": "산출 내역",
+      "placeholder": "기본급+4대보험 기관부담"
+     },
+     {
+      "key": "시간",
+      "label": "지급 방법",
+      "placeholder": "계좌이체"
+     },
+     {
+      "key": "금액",
+      "label": "지 급 액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "pay": "person"
+  },
+  {
+   "id": "o_x_pay",
+   "file": "o_x_pay.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 급여·수당 지급",
+   "desc": "직원 급여, 초과근무수당 등 인건비 지급. 대상자별 지급 내역 표 + 지출과목",
+   "source": "1팀 2025-018 직원 급여 지급 / 2602 초과근무수당 지급",
+   "title": "({사업약칭}) {건명} 지급의 건",
+   "intro": "앵커 사업단의 원활한 사업 운영을 위하여 {건명}{을/를} 아래와 같이 지급하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "구분",
+     "label": "구분",
+     "type": "text",
+     "placeholder": "2026년 10월분 앵커사업단 직원 2명 급여"
+    },
+    {
+     "key": "대상",
+     "label": "대상",
+     "type": "text",
+     "placeholder": "홍길동, 김철수"
+    },
+    {
+     "key": "지급기간",
+     "label": "지급(근로)기간",
+     "type": "text",
+     "placeholder": "2026. 10. 1.(수) ~ 2026. 10. 31.(금)"
+    },
+    {
+     "key": "재원",
+     "label": "재원",
+     "type": "text",
+     "default": "앵커사업 인건비"
+    }
+   ],
+   "attachments": [
+    "급여 계산액 1부.",
+    "통장사본 각 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "pay",
+   "list": {
+    "name": "품목",
+    "label": "지출내역",
+    "cols": [
+     {
+      "key": "업체명",
+      "label": "성명"
+     },
+     {
+      "key": "내역",
+      "label": "산출내역",
+      "placeholder": "기본급+4대보험 기관부담"
+     },
+     {
+      "key": "방법",
+      "label": "지급방법",
+      "placeholder": "농협 000-0000-0000-00"
+     },
+     {
+      "key": "금액",
+      "label": "지급금액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "subjectRows": true,
+   "pay": "person"
+  },
+  {
+   "id": "x_trip",
+   "file": "x_trip.hwpx",
+   "kind": "expense",
+   "name": "출장 여비 지출",
+   "desc": "국내·국외 출장, 교육·워크숍 참가 여비(교통비·숙박비·식비) 지출",
+   "source": "1팀 2025-135 직무교육 및 워크숍 여비 지출",
+   "title": "[{사업약칭}] {건명} 여비 지출의 건",
+   "intro": "{건명}에 참가(출장)하였으니 관련 여비 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "관련",
+     "label": "관련 공문",
+     "type": "text",
+     "placeholder": "경상북도앵커센터-3066(2026. 11. 20.)호"
+    },
+    {
+     "key": "일시",
+     "label": "행사(출장) 일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "출장자",
+     "label": "출장자",
+     "type": "text"
+    }
+   ],
+   "attachments": [
+    "출장명령서(신청서) 1부.",
+    "여비 정산서 및 지출 증빙자료 각 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "trip",
+   "list": {
+    "name": "전문가",
+    "label": "지출 내역",
+    "cols": [
+     {
+      "key": "성명",
+      "label": "성 명"
+     },
+     {
+      "key": "소속",
+      "label": "소속 및 직위"
+     },
+     {
+      "key": "일자",
+      "label": "산출 내역",
+      "placeholder": "교통비 30,000 + 식비 10,000"
+     },
+     {
+      "key": "시간",
+      "label": "지급 방법",
+      "placeholder": "개인카드 결제"
+     },
+     {
+      "key": "금액",
+      "label": "여 비",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "pay": "person"
+  },
+  {
+   "id": "o_x_trip",
+   "file": "o_x_trip.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 출장 여비 지출",
+   "desc": "국내·국외 출장, 교육·워크숍 참가 여비(교통비·숙박비·식비) 지출",
+   "source": "1팀 2025-135 직무교육 및 워크숍 여비 지출",
+   "title": "({사업약칭}) {건명} 여비 지출의 건",
+   "intro": "{건명}에 참가(출장)하였으니 관련 여비 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "관련",
+     "label": "관련 공문",
+     "type": "text",
+     "placeholder": "경상북도앵커센터-3066(2026. 11. 20.)호"
+    },
+    {
+     "key": "일시",
+     "label": "행사(출장) 일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "출장자",
+     "label": "출장자",
+     "type": "text"
+    }
+   ],
+   "attachments": [
+    "출장명령서(신청서) 1부.",
+    "여비 정산서 및 지출 증빙자료 각 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "trip",
+   "list": {
+    "name": "품목",
+    "label": "지출내역",
+    "cols": [
+     {
+      "key": "업체명",
+      "label": "성명·업체명"
+     },
+     {
+      "key": "내역",
+      "label": "지출내역",
+      "placeholder": "- 숙박 1박 * 1명"
+     },
+     {
+      "key": "방법",
+      "label": "지출방법",
+      "placeholder": "개인카드 결제 / 계좌"
+     },
+     {
+      "key": "금액",
+      "label": "지출금액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "subjectRows": true,
+   "pay": "person"
+  },
+  {
+   "id": "x_fee",
+   "file": "x_fee.hwpx",
+   "kind": "expense",
+   "name": "원고료·사례비 지출",
+   "desc": "교재·가이드북 원고료, 번역료, 사례비 등 개인 지급",
+   "source": "1팀 2025-079 요양보호 실습 가이드북 원고료 지출",
+   "title": "[{사업약칭}] {건명} 지출의 건",
+   "intro": "앵커 사업단에서 {목적}{과/와} 관련해 소요되는 비용을 지출하고자 하오니 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [],
+   "attachments": [
+    "결과물(원고) 1부.",
+    "원고료 지급청구서 및 증빙자료 각 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "fee",
+   "list": {
+    "name": "전문가",
+    "label": "지출 내역",
+    "cols": [
+     {
+      "key": "성명",
+      "label": "성 명"
+     },
+     {
+      "key": "소속",
+      "label": "소속 및 직위"
+     },
+     {
+      "key": "일자",
+      "label": "내 용",
+      "placeholder": "실습 가이드북 원고 집필"
+     },
+     {
+      "key": "시간",
+      "label": "완료일",
+      "placeholder": "2026. 9. 30."
+     },
+     {
+      "key": "금액",
+      "label": "금 액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고",
+      "placeholder": "세금 8.8% 원천징수 후 지급"
+     }
+    ]
+   },
+   "totalNote": "",
+   "pay": "person"
+  },
+  {
+   "id": "o_x_fee",
+   "file": "o_x_fee.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 원고료·사례비 지출",
+   "desc": "교재·가이드북 원고료, 번역료, 사례비 등 개인 지급",
+   "source": "1팀 2025-079 요양보호 실습 가이드북 원고료 지출",
+   "title": "({사업약칭}) {건명} 지출의 건",
+   "intro": "앵커 사업단에서 {목적}{과/와} 관련해 소요되는 비용을 지출하고자 하오니 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [],
+   "attachments": [
+    "결과물(원고) 1부.",
+    "원고료 지급청구서 및 증빙자료 각 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "fee",
+   "list": {
+    "name": "품목",
+    "label": "지출내역",
+    "cols": [
+     {
+      "key": "업체명",
+      "label": "성명"
+     },
+     {
+      "key": "내역",
+      "label": "소속·내용",
+      "placeholder": "대신대학교 OO학부 / 가이드북 원고"
+     },
+     {
+      "key": "방법",
+      "label": "지출방법",
+      "placeholder": "계좌이체(은행, 예금주)"
+     },
+     {
+      "key": "금액",
+      "label": "지출금액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고",
+      "placeholder": "세금 8.8% 원천징수 후 지급"
+     }
+    ]
+   },
+   "totalNote": "",
+   "subjectRows": true,
+   "pay": "person"
+  },
+  {
+   "id": "x_meal",
+   "file": "x_meal.hwpx",
+   "kind": "expense",
+   "name": "특근매식비 지출",
+   "desc": "초과근무·휴일근무 직원 식대(특근매식비)",
+   "source": "1팀 2025-117 직원 특근매식비 지출",
+   "title": "[{사업약칭}] {건명} 지출의 건",
+   "intro": "앵커 사업단의 원활한 업무 수행을 위해 초과근무한 직원의 특근매식비를 아래와 같이 지출하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "구분",
+     "label": "구분",
+     "type": "text",
+     "placeholder": "2026년 10월분 특근매식비"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "초과근무 근무일지 1부.",
+    "지출 영수증 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "meal",
+   "list": {
+    "name": "전문가",
+    "label": "지출 내역",
+    "cols": [
+     {
+      "key": "성명",
+      "label": "성 명"
+     },
+     {
+      "key": "소속",
+      "label": "직 위"
+     },
+     {
+      "key": "일자",
+      "label": "근무 일자",
+      "placeholder": "2026. 10. 14.(화)"
+     },
+     {
+      "key": "시간",
+      "label": "근무 시간",
+      "placeholder": "18:00 ~ 21:00"
+     },
+     {
+      "key": "금액",
+      "label": "금 액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "pay": "card"
+  },
+  {
+   "id": "o_x_meal",
+   "file": "o_x_meal.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 특근매식비 지출",
+   "desc": "초과근무·휴일근무 직원 식대(특근매식비)",
+   "source": "1팀 2025-117 직원 특근매식비 지출",
+   "title": "({사업약칭}) {건명} 지출의 건",
+   "intro": "앵커 사업단의 원활한 업무 수행을 위해 초과근무한 직원의 특근매식비를 아래와 같이 지출하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "items",
+   "fields": [
+    {
+     "key": "구분",
+     "label": "구분",
+     "type": "text",
+     "placeholder": "2026년 10월분 특근매식비"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "초과근무 근무일지 1부.",
+    "지출 영수증 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "meal",
+   "list": {
+    "name": "품목",
+    "label": "지출내역",
+    "cols": [
+     {
+      "key": "업체명",
+      "label": "성명"
+     },
+     {
+      "key": "내역",
+      "label": "근무 일자·시간",
+      "placeholder": "10. 14.(화) 18:00 ~ 21:00"
+     },
+     {
+      "key": "방법",
+      "label": "지출방법",
+      "placeholder": "보조금 카드"
+     },
+     {
+      "key": "금액",
+      "label": "지출금액",
+      "type": "money"
+     },
+     {
+      "key": "비고",
+      "label": "비 고"
+     }
+    ]
+   },
+   "totalNote": "",
+   "subjectRows": true,
+   "pay": "card"
+  },
+  {
+   "id": "x_rent",
+   "file": "x_rent.hwpx",
+   "kind": "expense",
+   "name": "임차료·대여료 지출",
+   "desc": "프린터·복합기 월 임차료, 장비·차량 렌트비, 와이파이 대여료",
+   "source": "1팀 2026-063·2025-117 프린터 임차료 지출 / 2025-086 렌트비 지출",
+   "title": "[{사업약칭}] {건명} 지출의 건",
+   "intro": "앵커 사업단에서 원활한 업무 처리를 위해 {건명}{을/를} 지출하고자 합니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "내용",
+     "label": "내용",
+     "type": "text",
+     "placeholder": "앵커사업단 프린터 10월분 임대료"
+    },
+    {
+     "key": "계약기간",
+     "label": "계약(대여)기간",
+     "type": "text"
+    },
+    {
+     "key": "계약내용",
+     "label": "계약내용",
+     "type": "lines"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "지출 영수증 및 증빙자료 각 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "rent",
+   "pay": "card"
+  },
+  {
+   "id": "o_x_rent",
+   "file": "o_x_rent.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 임차료·대여료 지출",
+   "desc": "프린터·복합기 월 임차료, 장비·차량 렌트비, 와이파이 대여료",
+   "source": "1팀 2026-063·2025-117 프린터 임차료 지출 / 2025-086 렌트비 지출",
+   "title": "({사업약칭}) {건명} 지출의 건",
+   "intro": "앵커 사업단에서 원활한 업무 처리를 위해 {건명}{을/를} 지출하고자 합니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "내용",
+     "label": "내용",
+     "type": "text",
+     "placeholder": "앵커사업단 프린터 10월분 임대료"
+    },
+    {
+     "key": "계약기간",
+     "label": "계약(대여)기간",
+     "type": "text"
+    },
+    {
+     "key": "계약내용",
+     "label": "계약내용",
+     "type": "lines"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "지출 영수증 및 증빙자료 각 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "rent",
+   "subjectRows": true,
+   "pay": "card"
+  },
+  {
+   "id": "x_post",
+   "file": "x_post.hwpx",
+   "kind": "expense",
+   "name": "우편·등기 발송 지출",
+   "desc": "협약서·공문 등기 발송, 택배비 등 공공요금",
+   "source": "1팀 2026-005-1·013-1 우체국 등기 발송 지출",
+   "title": "[{사업약칭}] {건명} 지출의 건",
+   "intro": "{목적}{을/를} 위하여 우편물을 발송하였으니 관련 경비 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "발송처",
+     "label": "발송처(받는 곳)",
+     "type": "text"
+    },
+    {
+     "key": "발송일",
+     "label": "발송일",
+     "type": "date"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "우편 발송 영수증 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "post",
+   "pay": "card"
+  },
+  {
+   "id": "o_x_post",
+   "file": "o_x_post.hwpx",
+   "kind": "expense",
+   "name": "(1팀) 우편·등기 발송 지출",
+   "desc": "협약서·공문 등기 발송, 택배비 등 공공요금",
+   "source": "1팀 2026-005-1·013-1 우체국 등기 발송 지출",
+   "title": "({사업약칭}) {건명} 지출의 건",
+   "intro": "{목적}{을/를} 위하여 우편물을 발송하였으니 관련 경비 지출을 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "발송처",
+     "label": "발송처(받는 곳)",
+     "type": "text"
+    },
+    {
+     "key": "발송일",
+     "label": "발송일",
+     "type": "date"
+    },
+    {
+     "key": "지출방법",
+     "label": "지출방법",
+     "type": "text",
+     "default": "앵커사업단 보조금 카드"
+    }
+   ],
+   "attachments": [
+    "우편 발송 영수증 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "post",
+   "subjectRows": true,
+   "pay": "card"
+  },
+  {
+   "id": "x_plan_trip",
+   "file": "x_plan_trip.hwpx",
+   "kind": "plan",
+   "name": "출장 계획 (출장명령서)",
+   "desc": "국내·국외 출장, 교육·설명회 참가 계획. 출장자·기간·출장지·소요예산",
+   "source": "1팀 2025-051 출장명령서 제출 / 2025-089 해외인재유치(베트남) 출장 계획",
+   "title": "[{사업약칭}] {건명} 출장 계획의 건",
+   "intro": "{목적}{을/를} 위하여 아래와 같이 출장을 다녀오고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "출장지",
+     "label": "출장지",
+     "type": "text"
+    },
+    {
+     "key": "출장기간",
+     "label": "출장기간",
+     "type": "text",
+     "placeholder": "2026. 11. 5.(목) ~ 11. 6.(금)"
+    },
+    {
+     "key": "출장자",
+     "label": "출장자",
+     "type": "text",
+     "placeholder": "앵커사업단 직원 홍길동"
+    },
+    {
+     "key": "출장내용",
+     "label": "출장 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text",
+     "placeholder": "교통비 30,000 + 식비 10,000"
+    }
+   ],
+   "attachments": [
+    "출장신청서(출장명령서) 1부.",
+    "관련 공문 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "plan_trip",
+   "amountOptional": true,
+   "next": [
+    "x_trip"
+   ]
+  },
+  {
+   "id": "o_x_plan_trip",
+   "file": "o_x_plan_trip.hwpx",
+   "kind": "plan",
+   "name": "(1팀) 출장 계획 (출장명령서)",
+   "desc": "국내·국외 출장, 교육·설명회 참가 계획. 출장자·기간·출장지·소요예산",
+   "source": "1팀 2025-051 출장명령서 제출 / 2025-089 해외인재유치(베트남) 출장 계획",
+   "title": "({사업약칭}) {건명} 출장 계획의 건",
+   "intro": "{목적}{을/를} 위하여 아래와 같이 출장을 다녀오고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "출장지",
+     "label": "출장지",
+     "type": "text"
+    },
+    {
+     "key": "출장기간",
+     "label": "출장기간",
+     "type": "text",
+     "placeholder": "2026. 11. 5.(목) ~ 11. 6.(금)"
+    },
+    {
+     "key": "출장자",
+     "label": "출장자",
+     "type": "text",
+     "placeholder": "앵커사업단 직원 홍길동"
+    },
+    {
+     "key": "출장내용",
+     "label": "출장 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text",
+     "placeholder": "교통비 30,000 + 식비 10,000"
+    }
+   ],
+   "attachments": [
+    "출장신청서(출장명령서) 1부.",
+    "관련 공문 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "plan_trip",
+   "amountOptional": true,
+   "next": [
+    "o_x_trip"
+   ]
+  },
+  {
+   "id": "x_plan_rent",
+   "file": "x_plan_rent.hwpx",
+   "kind": "plan",
+   "name": "임차·대여 계획",
+   "desc": "행사 기자재·차량 렌트, 장비 대여 계획",
+   "source": "1팀 2025-080 EXPO 참가 렌트 계획 / 2025-094 포켓 와이파이 대여 계획",
+   "title": "[{사업약칭}] {건명} 계획의 건",
+   "intro": "앵커 사업단은 {목적}{을/를} 위해 필요한 {건명}{을/를} 진행하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": true,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "행사명",
+     "label": "행사명(사용 목적)",
+     "type": "text"
+    },
+    {
+     "key": "기간",
+     "label": "임차 기간",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "업체명",
+     "label": "임차업체",
+     "type": "text"
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text",
+     "default": "견적서 참조"
+    }
+   ],
+   "attachments": [
+    "견적서 및 비교견적서 각 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "plan_rent",
+   "next": [
+    "x_rent"
+   ]
+  },
+  {
+   "id": "o_x_plan_rent",
+   "file": "o_x_plan_rent.hwpx",
+   "kind": "plan",
+   "name": "(1팀) 임차·대여 계획",
+   "desc": "행사 기자재·차량 렌트, 장비 대여 계획",
+   "source": "1팀 2025-080 EXPO 참가 렌트 계획 / 2025-094 포켓 와이파이 대여 계획",
+   "title": "({사업약칭}) {건명} 계획의 건",
+   "intro": "앵커 사업단은 {목적}{을/를} 위해 필요한 {건명}{을/를} 진행하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": true,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "행사명",
+     "label": "행사명(사용 목적)",
+     "type": "text"
+    },
+    {
+     "key": "기간",
+     "label": "임차 기간",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "업체명",
+     "label": "임차업체",
+     "type": "text"
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text",
+     "default": "견적서 참조"
+    }
+   ],
+   "attachments": [
+    "견적서 및 비교견적서 각 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "plan_rent",
+   "next": [
+    "o_x_rent"
+   ]
+  },
+  {
+   "id": "x_plan_mou",
+   "file": "x_plan_mou.hwpx",
+   "kind": "plan",
+   "name": "업무협약(MOU) 체결 계획",
+   "desc": "기관·기업·해외 대학과 업무협약 체결 계획. 일시·장소·참석자·협약 내용",
+   "source": "1팀 2025-077 베트남 빈 산업대학교 업무협약 체결 계획 / 2025-003 라온메타 업무협약 체결",
+   "title": "[{사업약칭}] {건명} 업무협약 체결 계획의 건",
+   "intro": "{목적}{을/를} 위하여 {건명} 업무협약 체결을 진행하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text",
+     "placeholder": "2026. 11. 5.(목) 16:00"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자 (한 줄에 하나)",
+     "type": "lines",
+     "placeholder": "대신대학교: 총장, 앵커사업단장, 국제교류교육원장\n협약기관: 대표 외 2명",
+     "bullet": "   가. "
+    },
+    {
+     "key": "협약내용",
+     "label": "주요 협약 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text"
+    }
+   ],
+   "attachments": [
+    "업무협약서(안) 1부.",
+    "참석자 명단 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "plan_mou",
+   "amountOptional": true
+  },
+  {
+   "id": "o_x_plan_mou",
+   "file": "o_x_plan_mou.hwpx",
+   "kind": "plan",
+   "name": "(1팀) 업무협약(MOU) 체결 계획",
+   "desc": "기관·기업·해외 대학과 업무협약 체결 계획. 일시·장소·참석자·협약 내용",
+   "source": "1팀 2025-077 베트남 빈 산업대학교 업무협약 체결 계획 / 2025-003 라온메타 업무협약 체결",
+   "title": "({사업약칭}) {건명} 업무협약 체결 계획의 건",
+   "intro": "{목적}{을/를} 위하여 {건명} 업무협약 체결을 진행하고자 하오니 허가하여 주시기 바랍니다.",
+   "vat": false,
+   "president": true,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text",
+     "placeholder": "2026. 11. 5.(목) 16:00"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자 (한 줄에 하나)",
+     "type": "lines",
+     "placeholder": "대신대학교: 총장, 앵커사업단장, 국제교류교육원장\n협약기관: 대표 외 2명",
+     "bullet": "     1) "
+    },
+    {
+     "key": "협약내용",
+     "label": "주요 협약 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    },
+    {
+     "key": "소요내역",
+     "label": "소요내역",
+     "type": "text"
+    }
+   ],
+   "attachments": [
+    "업무협약서(안) 1부.",
+    "참석자 명단 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "plan_mou",
+   "amountOptional": true
+  },
+  {
+   "id": "x_rep_meeting",
+   "file": "x_rep_meeting.hwpx",
+   "kind": "report",
+   "name": "회의 결과 보고",
+   "desc": "지출 없는 회의 결과 보고. 회의비가 나갔다면 \"회의비 지출\" 틀을 쓰세요",
+   "source": "1팀 2025-053 업무 분장 및 예산 변경 회의 결과 보고",
+   "title": "[{사업약칭}] {건명} 회의 결과 보고의 건",
+   "intro": "{목적}{을/를} 위하여 {건명} 회의를 실시하였기에 그 결과를 아래와 같이 보고드립니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자 (한 줄에 하나)",
+     "type": "lines",
+     "placeholder": "앵커사업단: 팀장 OOO, 직원 OOO",
+     "bullet": "   가. "
+    },
+    {
+     "key": "논의내용",
+     "label": "주요 논의 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    },
+    {
+     "key": "결정사항",
+     "label": "결정 사항 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    }
+   ],
+   "attachments": [
+    "회의록 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "rep_meeting",
+   "noAmount": true
+  },
+  {
+   "id": "o_x_rep_meeting",
+   "file": "o_x_rep_meeting.hwpx",
+   "kind": "report",
+   "name": "(1팀) 회의 결과 보고",
+   "desc": "지출 없는 회의 결과 보고. 회의비가 나갔다면 \"회의비 지출\" 틀을 쓰세요",
+   "source": "1팀 2025-053 업무 분장 및 예산 변경 회의 결과 보고",
+   "title": "({사업약칭}) {건명} 회의 결과 보고의 건",
+   "intro": "{목적}{을/를} 위하여 {건명} 회의를 실시하였기에 그 결과를 아래와 같이 보고드립니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자 (한 줄에 하나)",
+     "type": "lines",
+     "placeholder": "앵커사업단: 팀장 OOO, 직원 OOO",
+     "bullet": "     1) "
+    },
+    {
+     "key": "논의내용",
+     "label": "주요 논의 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    },
+    {
+     "key": "결정사항",
+     "label": "결정 사항 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    }
+   ],
+   "attachments": [
+    "회의록 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "rep_meeting",
+   "noAmount": true
+  },
+  {
+   "id": "x_rep_submit",
+   "file": "x_rep_submit.hwpx",
+   "kind": "report",
+   "name": "자료 제출·송부",
+   "desc": "참석자 명단, 조직현황, 수요조사 회신 등 외부 요청 자료 제출",
+   "source": "1팀 2025-010 현장간담회 참석자 명단 제출 / 2025-029 조직현황 송부",
+   "title": "[{사업약칭}] {건명} 제출의 건",
+   "intro": "{관련}{과/와} 관련하여 {건명}{을/를} 아래와 같이 제출하고자 합니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "관련",
+     "label": "관련 공문·행사",
+     "type": "text",
+     "placeholder": "경상북도앵커센터-1234(2026. 10. 1.)호"
+    },
+    {
+     "key": "제출내용",
+     "label": "제출 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    },
+    {
+     "key": "제출처",
+     "label": "제출처",
+     "type": "text"
+    },
+    {
+     "key": "제출기한",
+     "label": "제출기한",
+     "type": "text"
+    },
+    {
+     "key": "제출방법",
+     "label": "제출방법",
+     "type": "text",
+     "placeholder": "담당자 메일(OOO@OOO.kr)"
+    }
+   ],
+   "attachments": [],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "rep_submit",
+   "noAmount": true
+  },
+  {
+   "id": "o_x_rep_submit",
+   "file": "o_x_rep_submit.hwpx",
+   "kind": "report",
+   "name": "(1팀) 자료 제출·송부",
+   "desc": "참석자 명단, 조직현황, 수요조사 회신 등 외부 요청 자료 제출",
+   "source": "1팀 2025-010 현장간담회 참석자 명단 제출 / 2025-029 조직현황 송부",
+   "title": "({사업약칭}) {건명} 제출의 건",
+   "intro": "{관련}{과/와} 관련하여 {건명}{을/를} 아래와 같이 제출하고자 합니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "관련",
+     "label": "관련 공문·행사",
+     "type": "text",
+     "placeholder": "경상북도앵커센터-1234(2026. 10. 1.)호"
+    },
+    {
+     "key": "제출내용",
+     "label": "제출 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    },
+    {
+     "key": "제출처",
+     "label": "제출처",
+     "type": "text"
+    },
+    {
+     "key": "제출기한",
+     "label": "제출기한",
+     "type": "text"
+    },
+    {
+     "key": "제출방법",
+     "label": "제출방법",
+     "type": "text",
+     "placeholder": "담당자 메일(OOO@OOO.kr)"
+    }
+   ],
+   "attachments": [],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "rep_submit",
+   "noAmount": true
+  },
+  {
+   "id": "x_rep_result",
+   "file": "x_rep_result.hwpx",
+   "kind": "report",
+   "name": "행사·출장 결과 보고",
+   "desc": "지출 없는 행사·교육·출장 결과 보고. 성과와 향후 계획",
+   "source": "1팀·2팀 결과 보고 공문 구성",
+   "title": "[{사업약칭}] {건명} 결과 보고의 건",
+   "intro": "{건명}{을/를} 아래와 같이 실시하였기에 그 결과를 보고드립니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자(대상)",
+     "type": "text"
+    },
+    {
+     "key": "주요내용",
+     "label": "주요 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    },
+    {
+     "key": "성과",
+     "label": "성과 및 향후 계획 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "   가. "
+    }
+   ],
+   "attachments": [
+    "결과보고서 1부.",
+    "증빙사진 1부."
+   ],
+   "teams": [
+    "localrd"
+   ],
+   "etype": "rep_result",
+   "noAmount": true
+  },
+  {
+   "id": "o_x_rep_result",
+   "file": "o_x_rep_result.hwpx",
+   "kind": "report",
+   "name": "(1팀) 행사·출장 결과 보고",
+   "desc": "지출 없는 행사·교육·출장 결과 보고. 성과와 향후 계획",
+   "source": "1팀·2팀 결과 보고 공문 구성",
+   "title": "({사업약칭}) {건명} 결과 보고의 건",
+   "intro": "{건명}{을/를} 아래와 같이 실시하였기에 그 결과를 보고드립니다.",
+   "vat": false,
+   "president": false,
+   "amountFrom": "input",
+   "fields": [
+    {
+     "key": "일시",
+     "label": "일시",
+     "type": "text"
+    },
+    {
+     "key": "장소",
+     "label": "장소",
+     "type": "text"
+    },
+    {
+     "key": "참석자",
+     "label": "참석자(대상)",
+     "type": "text"
+    },
+    {
+     "key": "주요내용",
+     "label": "주요 내용 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    },
+    {
+     "key": "성과",
+     "label": "성과 및 향후 계획 (한 줄에 하나)",
+     "type": "lines",
+     "bullet": "     1) "
+    }
+   ],
+   "attachments": [
+    "결과보고서 1부.",
+    "증빙사진 1부."
+   ],
+   "teams": [
+    "overseas",
+    "city"
+   ],
+   "etype": "rep_result",
+   "noAmount": true
   }
  ]
 }

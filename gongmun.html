@@ -26,6 +26,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .proj-tabs{margin:0 auto;display:flex;flex-wrap:wrap}
 .proj-tab{padding:12px 20px;font-size:14px;color:var(--text3);text-decoration:none;display:block;border-bottom:2px solid transparent}
 .main{margin:0 auto;padding-top:28px;padding-bottom:80px}
+body.kind-report .no-report{display:none!important}
 .tabs-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:28px;flex-wrap:wrap}
 .tab-btn{background:none;border:none;cursor:pointer}
 .tab-pane{display:none}.tab-pane.on{display:block}
@@ -168,7 +169,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
         <div class="card">
           <div class="card-h"><span class="step">1</span><h3>공문 종류</h3><span class="hint" id="edit-state"></span></div>
           <div class="row" style="justify-content:space-between">
-            <div class="seg2" id="kind-seg"><button data-kind="plan">계획 공문</button><button data-kind="expense" class="on">지출 공문</button></div>
+            <div class="seg2" id="kind-seg"><button data-kind="plan">계획 공문</button><button data-kind="expense" class="on">지출 공문</button><button data-kind="report">보고·제출</button></div>
             <div class="row">
               <label class="f-label" for="f-year">차년도</label>
               <select class="f-select" id="f-year" style="width:auto"></select>
@@ -190,12 +191,12 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
             <div class="f-group"><label class="f-label" for="f-subject">건명 <small>제목에 들어갈 대상</small></label><input class="f-input" id="f-subject" placeholder="DB 암호화 솔루션"></div>
             <div class="f-group"><label class="f-label" for="f-purpose">목적</label><input class="f-input" id="f-purpose" placeholder="통합 데이터 인프라의 개인정보 등 중요정보 보호"></div>
           </div>
-          <div class="reco" id="reco"></div>
-          <div class="grid2">
+          <div class="reco no-report" id="reco"></div>
+          <div class="grid2 no-report">
             <div class="f-group"><label class="f-label" for="f-cat">항목 <small>사업계획서 구분</small></label><select class="f-select" id="f-cat"></select></div>
             <div class="f-group"><label class="f-label" for="f-subj">비목-세목 <small>지출과목 괄호 안 표기</small></label><input class="f-input" id="f-subj" list="subj-list" placeholder="유형자산-자산취득비"><datalist id="subj-list"></datalist></div>
           </div>
-          <div id="src-wrap"></div>
+          <div id="src-wrap" class="no-report"></div>
           <div id="plan-ref"></div>
         </div>
 
@@ -235,7 +236,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
       </div>
 
       <aside class="side">
-        <div class="card" style="margin:0">
+        <div class="card no-report" style="margin:0">
           <div class="card-h" style="margin-bottom:12px"><h3>지출과목</h3><span class="hint" id="bud-year"></span></div>
           <div class="subj-line" id="bud-cat">항목을 선택하세요</div>
           <div class="subj-sub" id="bud-subj"></div>
@@ -275,7 +276,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
       <div class="row" style="justify-content:space-between">
         <div class="row">
           <select class="f-select" id="h-year" style="width:auto"></select>
-          <select class="f-select" id="h-kind" style="width:auto"><option value="">전체 종류</option><option value="plan">계획</option><option value="expense">지출</option></select>
+          <select class="f-select" id="h-kind" style="width:auto"><option value="">전체 종류</option><option value="plan">계획</option><option value="expense">지출</option><option value="report">보고·제출</option></select>
           <select class="f-select" id="h-status" style="width:auto"><option value="">전체 상태</option><option>기안</option><option>결재완료</option><option>집행완료</option><option>취소</option></select>
         </div>
         <div class="row">
@@ -301,7 +302,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
       <div class="grid2" style="margin-top:18px">
         <div class="f-group"><label class="f-label" for="t-file">hwpx 파일</label><input type="file" class="f-input" id="t-file" accept=".hwpx"></div>
         <div class="f-group"><label class="f-label" for="t-name">틀 이름</label><input class="f-input" id="t-name" placeholder="여비 지출"></div>
-        <div class="f-group"><label class="f-label" for="t-kind">종류</label><select class="f-select" id="t-kind"><option value="expense">지출 공문</option><option value="plan">계획 공문</option></select></div>
+        <div class="f-group"><label class="f-label" for="t-kind">종류</label><select class="f-select" id="t-kind"><option value="expense">지출 공문</option><option value="plan">계획 공문</option><option value="report">보고·제출 공문</option></select></div>
         <div class="f-group"><label class="f-label" for="t-title">제목 문장 틀 <small>선택</small></label><input class="f-input" id="t-title" placeholder="[{사업약칭}] {건명} 지출의 건"></div>
         <div class="f-group" style="grid-column:1/-1"><label class="f-label" for="t-intro">도입 문장 틀 <small>선택, {목적}{을/를}처럼 쓰면 조사가 맞춰집니다</small></label><input class="f-input" id="t-intro"></div>
       </div>
@@ -432,6 +433,8 @@ function ensureProj(p){
 const OTHER={}; // 같은 번호 체계를 쓰는 다른 사업의 색인표·공문 기록
 // 시행번호 앞부분(팀): 공문마다 고를 수 있고, 기본값은 사업 설정값
 const TEAMS=['앵커사업단1팀','앵커사업단2팀'];
+const KIND_LABEL={plan:'계획',expense:'지출',report:'보고'};
+const kindLabel=k=>KIND_LABEL[k]||'지출';
 const npfx=x=>String(x||'').replace(/\s+/g,'');
 const curPrefix=()=>($('f-team')&&$('f-team').value)||PS().prefix||'앵커사업단';
 const pfxOf=str=>{const m=String(str||'').match(/앵커사업단\s*\d\s*팀/);return m?npfx(m[0]):''};
@@ -624,6 +627,7 @@ function tplSpec(t){
 }
 function selectTpl(id){
   const t=tplById(id); S.tplId=id||null;
+  document.body.classList.toggle('kind-report',(t?.kind||S.kind)==='report');
   renderTplGrid();
   const sp=tplSpec(t);
   $('tpl-source').textContent=t?(t.builtIn?`바탕 공문: ${t.source||''}`:'직접 등록한 틀'):'';
@@ -644,7 +648,9 @@ function selectTpl(id){
   });
   // 금액
   const vatDefault=sp.vat?' checked':'';
-  if(sp.amountFrom==='input'||!sp.list){
+  if(sp.noAmount){
+    $('amount-wrap').innerHTML='<input type="checkbox" id="f-vat" hidden>';
+  }else if(sp.amountFrom==='input'||!sp.list){
     $('amount-wrap').innerHTML=`<div class="grid2"><div class="f-group"><label class="f-label" for="f-amount">${S.kind==='plan'?'소요예산':'지출금액'} (원)${sp.amountOptional?' <small>선택</small>':''}</label><input class="f-input" id="f-amount" inputmode="numeric" value="${S.values.금액?E.comma(S.values.금액):''}"></div>
       <div class="f-group" style="justify-content:flex-end"><label class="chk" style="margin:0 0 10px"><input type="checkbox" id="f-vat"${S.values._vat??vatDefault?' checked':''}> 금액 뒤에 '부가가치세 포함' 표기</label></div></div>`;
     $('f-amount').oninput=e=>{const n=E.toNum(e.target.value);S.values.금액=n?String(n):'';e.target.value=n?E.comma(n):'';updateBudget();};
@@ -698,7 +704,7 @@ function baseVals(){
 }
 function autoText(){
   const t=tplById(S.tplId); if(!t) return; const v=baseVals();
-  const titlePat=t.title||(S.kind==='plan'?'[{사업약칭}] {건명} 계획의 건':'[{사업약칭}] {건명} 지출의 건');
+  const titlePat=t.title||(S.kind==='plan'?'[{사업약칭}] {건명} 계획의 건':S.kind==='report'?'[{사업약칭}] {건명} 보고의 건':'[{사업약칭}] {건명} 지출의 건');
   if(S.autoTitle) $('f-title').value=renderPattern(titlePat,v);
   if(S.autoIntro) $('f-intro').value=renderPattern(t.intro||'',v);
 }
@@ -969,7 +975,7 @@ function validate(c){
   if(!c.t) miss.push('공문 틀');
   if(!c.values.제목) miss.push('제목');
   if(c.t?.kind==='expense'&&!c.b.cat) miss.push('항목(사업계획서 구분)');
-  if(!c.amt&&!c.sp.amountOptional) miss.push('금액');
+  if(!c.amt&&!c.sp.amountOptional&&!c.sp.noAmount) miss.push('금액');
   if(c.sp.subjectRows&&c.t?.kind==='expense'){
     if(S.extra.some(x=>!x.cat||!E.toNum(x.amount))) miss.push('나눈 재원의 항목·금액');
     if(c.b.now<0){toast('나눈 재원 금액 합계가 전체 금액보다 큽니다.',true);return false}
@@ -997,7 +1003,7 @@ async function saveRecord(c,{register=true}={}){
   // 색인표 등록·갱신
   if(register&&$('f-index').checked){
     const shortStyle=idxDocs.length?idxDocs.filter(d=>/^\s*\d{1,4}(\s*-\s*\d+)?\s*$/.test(d.docNum??'')).length>=idxDocs.length/2:true;
-    const idx={docNum:shortStyle?$('f-seq').value.trim():docNumFull(),title:c.values.제목,date:iso,type:c.t.kind==='plan'?'계획':'지출'};
+    const idx={docNum:shortStyle?$('f-seq').value.trim():docNumFull(),title:c.values.제목,date:iso,type:kindLabel(c.t.kind)};
     if(prev?.indexDocId&&idxDocs.some(d=>d.id===prev.indexDocId)) await db.collection(COL_DOC).doc(prev.indexDocId).update(idx);
     else {const r=await db.collection(COL_DOC).add({...idx,seq:Date.now(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});rec.indexDocId=r.id;}
   }
@@ -1048,7 +1054,7 @@ async function doPreview(){
 }
 function claudeText(c){
   const v=c.values, s=PS().sign, L=[];
-  L.push(`[${v.사업약칭}] ${c.t.kind==='plan'?'계획':'지출'} 공문 작성 요청 (내부결재, hwpx)`);
+  L.push(`[${v.사업약칭}] ${kindLabel(c.t.kind)} 공문 작성 요청 (내부결재, hwpx)`);
   L.push('대신대 공문 스킬로 작성해 주세요. 아래 금액·과목·번호는 홈페이지에서 계산한 값이니 그대로 쓰고 다시 계산하지 마세요.');
   L.push('');
   L.push(`- 공문 틀: ${c.t.name}${c.t.source?` (바탕: ${c.t.source})`:''}`);
@@ -1147,11 +1153,11 @@ function renderHistory(){
   const m=matchCandidates(); $('h-match-hint').textContent=m.length?`맞출 수 있는 집행 ${m.length}건`:'';
   $('h-body').innerHTML=rows.length?rows.map(g=>{
     const ex=g.expenseId&&expenses.find(e=>e.id===g.expenseId);
-    return `<tr><td style="white-space:nowrap">${esc(g.docNum||'')}</td><td style="white-space:nowrap">${esc(g.docDate||'')}</td><td>${g.kind==='plan'?'계획':'지출'}</td>
+    return `<tr><td style="white-space:nowrap">${esc(g.docNum||'')}</td><td style="white-space:nowrap">${esc(g.docDate||'')}</td><td>${kindLabel(g.kind)}</td>
     <td>${esc(g.title||'')}<div class="tiny">${esc(g.templateName||'')}</div></td><td>${esc(g.planCategory||'')}${g.subject?`<div class="tiny">(${esc(g.subject)})</div>`:''}</td>
     <td class="num">${E.comma(g.amount||0)}</td>
     <td><select class="st st-${esc(g.status||'기안')}" data-st="${g.id}">${['기안','결재완료','집행완료','취소'].map(s=>`<option${(g.status||'기안')===s?' selected':''}>${s}</option>`).join('')}</select></td>
-    <td class="tiny">${g.kind==='plan'?'—':ex?`${esc((ex.date||'').slice(0,10))}<br>${E.comma(ex.amount)}원`:g.status==='집행완료'?'연결 없음':'대기'}</td>
+    <td class="tiny">${g.kind!=='expense'?'—':ex?`${esc((ex.date||'').slice(0,10))}<br>${E.comma(ex.amount)}원`:g.status==='집행완료'?'연결 없음':'대기'}</td>
     <td style="white-space:nowrap"><button class="btn-secondary btn-sm" data-open="${g.id}">열기</button> <button class="btn-danger" data-del="${g.id}">삭제</button></td></tr>`}).join('')
     :`<tr><td colspan="9" class="empty">아직 작성한 공문이 없습니다.</td></tr>`;
   $('h-body').querySelectorAll('[data-st]').forEach(s=>s.onchange=async()=>{try{await db.collection(COL_G).doc(s.dataset.st).update({status:s.value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});toast('상태를 바꿨습니다.')}catch(e){toast(e.message,true)}});
@@ -1192,7 +1198,7 @@ function renderTemplates(){
   $('t-body').innerHTML=list.map(t=>{
     const sp=tplSpec(t);
     const inputs=[...(sp.fields||[]).map(f=>f.label),...(sp.list?[`${sp.list.label||sp.list.name} 표`]:[])];
-    return `<tr><td><b>${esc(t.name)}</b> ${t.custom?'<span class="badge c">등록</span>':'<span class="badge">기본</span>'}<div class="tiny">${esc(t.desc||'')}</div></td><td>${t.kind==='plan'?'계획':'지출'}<div class="tiny">${t.teams?(t.teams.includes('overseas')?'1팀':'2팀'):'공통'}</div></td>
+    return `<tr><td><b>${esc(t.name)}</b> ${t.custom?'<span class="badge c">등록</span>':'<span class="badge">기본</span>'}<div class="tiny">${esc(t.desc||'')}</div></td><td>${kindLabel(t.kind)}<div class="tiny">${t.teams?(t.teams.includes('overseas')?'1팀':'2팀'):'공통'}</div></td>
       <td class="tiny">${esc(t.source||'')}</td><td class="tiny">${esc(inputs.join(', ')||'—')}</td>
       <td style="white-space:nowrap"><button class="btn-secondary btn-sm" data-dl="${esc(t.id)}">틀 받기</button>${t.custom?` <button class="btn-danger" data-tdel="${esc(t.id)}">삭제</button>`:''}</td></tr>`}).join('');
   $('t-body').querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>downloadTemplate(b.dataset.dl));
