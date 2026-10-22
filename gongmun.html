@@ -116,6 +116,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .ph-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .ph{font-family:var(--mono);font-size:12px;background:var(--bg);border-radius:6px;padding:3px 8px;color:var(--text2)}
 .ph.a{background:var(--green-l);color:var(--green)}
+.chkl{margin-top:18px;border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:#fcfdfe}
+.chkl-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.chkl-h b{font-size:14px}
+.ci{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)}
+.ci:first-of-type{border-top:none}
+.ci .lv{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;margin-top:2px}
+.lv-필수{background:var(--red-l);color:var(--red)}.lv-권장{background:var(--blue-l);color:var(--blue)}.lv-주의{background:var(--yellow-l);color:var(--yellow)}
+.ci .tx{flex:1;min-width:0;font-size:13px;line-height:1.5}.ci .tx small{display:block;color:var(--text3);font-size:12px}
+.ci .ok{font-size:12px;color:var(--green);white-space:nowrap}
+.planref{margin-top:14px;font-size:13px;background:var(--bg);border-radius:10px;padding:10px 14px}
+.planref li{margin:3px 0 3px 18px}.planref li.hit{font-weight:700;color:var(--pc)}
 .empty{padding:40px;text-align:center;color:var(--text3);font-size:14px}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;opacity:0;transition:all .25s;z-index:900;pointer-events:none;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -183,6 +194,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
             <div class="f-group"><label class="f-label" for="f-subj">비목-세목 <small>지출과목 괄호 안 표기</small></label><input class="f-input" id="f-subj" list="subj-list" placeholder="유형자산-자산취득비"><datalist id="subj-list"></datalist></div>
           </div>
           <div id="src-wrap"></div>
+          <div id="plan-ref"></div>
         </div>
 
         <div class="card">
@@ -194,6 +206,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
             <div class="f-group" style="grid-column:1/-1">
               <label class="f-label" for="f-att">붙임 <small>한 줄에 하나, 번호와 '끝.'은 자동</small></label>
               <textarea class="f-textarea" id="f-att"></textarea>
+              <div id="checklist"></div>
             </div>
             <div class="f-group" style="grid-column:1/-1">
               <label class="f-label" for="f-title">제목 <button class="link" id="title-reset" hidden>자동 문장으로 되돌리기</button></label>
@@ -386,7 +399,7 @@ const db=firebase.firestore();
 try{db.settings({ignoreUndefinedProperties:true,merge:true})}catch(e){}
 const COL_G=`${P}_gongmun`, COL_DOC=`${P}_documents`;
 let SETTINGS=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-let MANIFEST=[], CUSTOM=[], catsByYear={}, budgetPlans={}, expenses=[], gdocs=[], idxDocs=[];
+let GUIDE=null, MANIFEST=[], CUSTOM=[], catsByYear={}, budgetPlans={}, expenses=[], gdocs=[], idxDocs=[];
 let pool=[]; // 과목 추천용 과거 내역
 const PD={}; // 재원 나누기에서 쓰는 다른 사업의 예산·집행 데이터
 function dataOf(p){return p===P?{catsByYear,budgetPlans,expenses}:(PD[p]||{catsByYear:{},budgetPlans:{},expenses:[]})}
@@ -427,6 +440,7 @@ async function loadAll(){
   try{
     const r=await fetch('templates/manifest.json?v=20261022'); MANIFEST=(await r.json()).templates;
   }catch(e){toast('기본 공문 틀 목록을 불러오지 못했습니다.',true)}
+  try{GUIDE=await (await fetch('templates/guide.json?v=20261022')).json()}catch(e){GUIDE=null}
   try{
     const s=await db.collection('gongmunSettings').doc('global').get();
     if(s.exists){const d=s.data()||{};Object.keys(SETTINGS.projects).forEach(p=>{const x=(d.projects||{})[p];if(x)SETTINGS.projects[p]={...SETTINGS.projects[p],...x,sign:{...SETTINGS.projects[p].sign,...(x.sign||{})}}});}
@@ -522,7 +536,7 @@ function initForm(){
   $('f-year').onchange=()=>{S.year=+$('f-year').value;fillCats();renderSources();updateBudget();renderReco()};
   let deb; const onSubj=()=>{clearTimeout(deb);deb=setTimeout(renderReco,200);autoText();};
   $('f-subject').oninput=onSubj; $('f-purpose').oninput=onSubj;
-  $('f-cat').onchange=()=>{updateBudget();renderReco()}; $('f-subj').oninput=()=>{updateBudget()};
+  $('f-cat').onchange=()=>{fillCats();updateBudget();renderReco()}; $('f-subj').oninput=()=>{updateBudget()};
   $('f-title').oninput=()=>{S.autoTitle=false;$('title-reset').hidden=false};
   $('f-intro').oninput=()=>{S.autoIntro=false;$('intro-reset').hidden=false};
   $('title-reset').onclick=()=>{S.autoTitle=true;$('title-reset').hidden=true;autoText()};
@@ -545,7 +559,8 @@ function fillCats(){
   const cur=$('f-cat').value; const list=catsByYear[S.year]||DEFAULT_PLAN_CATS;
   $('f-cat').innerHTML='<option value="">— 선택 —</option>'+list.map(c=>`<option>${esc(c)}</option>`).join('');
   if(cur) $('f-cat').value=resolveCat(cur,S.year)||'';
-  const subs=[...new Set([...expenses.map(e=>cleanSubj(e.note)),...gdocs.map(g=>cleanSubj(g.subject)),...SUBJECT_RULES.map(r=>r[2])].filter(Boolean))].sort();
+  const mk=GUIDE&&Object.keys(GUIDE.matrix).find(k=>E.norm(k)===E.norm($('f-cat').value));
+  const subs=[...new Set([...(mk?GUIDE.matrix[mk]:[]),...expenses.map(e=>cleanSubj(e.note)),...gdocs.map(g=>cleanSubj(g.subject)),...SUBJECT_RULES.map(r=>r[2])].filter(Boolean))].sort();
   $('subj-list').innerHTML=subs.map(s=>`<option value="${esc(s)}">`).join('');
 }
 function renderTplGrid(){
@@ -612,7 +627,7 @@ function selectTpl(id){
   }else{$('list-wrap').innerHTML='';}
   // 붙임
   if(!S.attTouched) $('f-att').value=(sp.attachments||[]).join('\n');
-  $('f-att').oninput=()=>{S.attTouched=true};
+  $('f-att').oninput=()=>{S.attTouched=true;renderChecklist()};
   $('f-pres').checked=S.values._pres??!!sp.president;
   autoText(); renderSources(); updateBudget(); renderSignLine();
 }
@@ -711,6 +726,70 @@ function updateBudget(){
     if(b.now<0) notes.push(['r',`나눈 재원 금액 합계가 전체 금액(${E.comma(tot)}원)보다 큽니다.`]);
   }
   $('bud-notes').innerHTML=notes.map(([c,t])=>`<div class="warn ${c}">${esc(t)}</div>`).join('');
+  renderChecklist(); renderPlanRef();
+}
+
+/* ── 붙임·증빙 점검 (집행 지침·FAQ·설명회·실제 공문 기준) ── */
+const srcName=s=>String(s||'').replace(/\bG4\b/g,'집행지침(4차)').replace(/\bFAQ\b/g,'지침 FAQ').replace(/\bSEM\b/g,'경북 설명회').replace(/\bDOC\b/g,'실제 공문').replace(/\bLAW\b/g,'국가계약법 시행령');
+const PAY_LABEL={vendor:'업체 계좌이체(세금계산서)',card:'보조금 카드',person:'개인 지급(강사료·수당 등)'};
+function payMode(){const t=tplById(S.tplId);return S.values._pay||t?.pay||(t?.kind==='expense'?'vendor':'')}
+function guideText(){
+  const it=(S.list||[]).map(x=>['품명','내역','규격','성명'].map(k=>x[k]||'').join(' ')).join(' '); // 업체명은 빼고 (예: '○○광고기획')
+  return [$('f-title').value,$('f-subject').value,$('f-purpose').value,S.values.지급구분||'',S.values.활용내용||'',S.values.주요내용||'',it].join(' ');
+}
+function etypeOf(t){return t?.etype||(t?.kind==='plan'?'plan_goods':'goods')}
+function checklistItems(){
+  if(!GUIDE) return {items:[],warns:[]};
+  const t=tplById(S.tplId); if(!t) return {items:[],warns:[]};
+  const kind=t.kind, et=etypeOf(t), pay=payMode(), amt=curAmount(), cat=$('f-cat').value, subj=cleanSubj($('f-subj').value), text=guideText();
+  const items=GUIDE.rules.filter(r=>{const w=r.when||{};
+    if(w.kinds&&!w.kinds.includes(kind)) return false;
+    if(w.types&&!w.types.includes(et)) return false;
+    if(w.pay&&!w.pay.includes(pay)) return false;
+    if(w.min!=null&&amt<w.min) return false;
+    if(w.max!=null&&amt>w.max) return false;
+    if(w.cats&&!w.cats.some(c=>E.norm(c)===E.norm(cat))) return false;
+    if(w.subj&&!w.subj.some(x=>subj.includes(x))) return false;
+    if(w.kw&&!new RegExp(w.kw).test(text)) return false;
+    return true;});
+  const warns=(GUIDE.warnings||[]).filter(w=>new RegExp(w.kw).test(text)).map(w=>({msg:w.msg,src:w.src}));
+  // 항목 ↔ 비목-세목 짝 확인 (FAQ 붙임 매칭 예시)
+  const mk=Object.keys(GUIDE.matrix).find(k=>E.norm(k)===E.norm(cat));
+  if(mk&&subj){const ok=GUIDE.matrix[mk].some(a=>E.norm(a)===E.norm(subj)||E.norm(subj).endsWith(E.norm(a.split('-').pop())));
+    if(!ok&&!/^\d/.test(subj)) warns.push({msg:`'${subj}'는 '${mk}' 항목의 비목-세목 예시에 없습니다. 예시: ${GUIDE.matrix[mk].join(', ')}`,src:'FAQ 붙임(사업비 항목·보조세목 매칭)'});}
+  return {items,warns};
+}
+const attLines=()=>$('f-att').value.split('\n').map(x=>x.trim()).filter(Boolean);
+function inAtt(a){const v=renderPattern(a,baseVals());const core=E.norm(v.replace(/\(.*?\)/g,'').replace(/(각\s*)?\d+\s*부\.?/g,'')).slice(0,6);return attLines().some(l=>E.similarity(l,v)>=.6||(core.length>=3&&E.norm(l).includes(core)))}
+function addAtt(list){
+  const cur=attLines(); list.forEach(a=>{if(!a||inAtt(a))return;cur.push(a)}); $('f-att').value=cur.join('\n'); S.attTouched=true; renderChecklist();
+}
+function renderChecklist(){
+  const box=$('checklist'); if(!box) return;
+  const t=tplById(S.tplId); if(!t||!GUIDE){box.innerHTML='';return}
+  const {items,warns}=checklistItems(); const pay=payMode();
+  const need=items.filter(i=>i.level==='필수'&&i.attach&&!inAtt(i.attach));
+  box.innerHTML=`<div class="chkl"><div class="chkl-h"><b>필요한 붙임 · 점검</b>
+    ${t.kind==='expense'?`<label class="row" style="gap:6px;font-size:12px;color:var(--text3)">지급 방법 <select class="f-select" id="f-pay" style="width:auto;padding:4px 8px;font-size:12px">${Object.entries(PAY_LABEL).map(([k,v])=>`<option value="${k}"${k===pay?' selected':''}>${v}</option>`).join('')}</select></label>`:''}</div>
+    ${warns.map(w=>`<div class="ci"><span class="lv lv-주의">확인</span><div class="tx">${esc(w.msg)}<small>${esc(srcName(w.src))}</small></div></div>`).join('')}
+    ${items.map((i,k)=>`<div class="ci"><span class="lv lv-${i.level}">${i.level}</span><div class="tx">${i.attach?`<b>${esc(renderPattern(i.attach,baseVals()).replace(/\(\s*\)/,''))}</b>`:''}<small>${esc(i.why)} · ${esc(srcName(i.src))}</small></div>
+      ${i.attach?(inAtt(i.attach)?'<span class="ok">붙임에 있음</span>':`<button type="button" class="link" data-add="${k}">+ 붙임에 추가</button>`):''}</div>`).join('')||'<p class="tiny">해당하는 점검 항목이 없습니다.</p>'}
+    <div class="row" style="justify-content:space-between;margin-top:8px">${need.length?`<button type="button" class="btn-secondary btn-sm" id="add-need">필수 붙임 ${need.length}개 모두 넣기</button>`:'<span class="ok">필수 붙임이 모두 들어 있습니다</span>'}
+    <span class="tiny">기준: 앵커 집행 지침(4차)·FAQ(3차)·경북 설명회·실제 결재 공문</span></div></div>`;
+  box.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addAtt([items[+b.dataset.add].attach]));
+  if($('add-need')) $('add-need').onclick=()=>addAtt(need.map(i=>i.attach));
+  if($('f-pay')) $('f-pay').onchange=e=>{S.values._pay=e.target.value;renderChecklist()};
+}
+// 사업계획서(2차년도 실행계획서) 세부 예산 중 이 항목 줄과 가장 비슷한 줄 표시
+function renderPlanRef(){
+  const box=$('plan-ref'); if(!box) return;
+  const cat=$('f-cat').value; const pl=GUIDE?.plans?.[P]?.[String(S.year)];
+  if(!cat||!pl){box.innerHTML='';return}
+  const key=Object.keys(pl.items).find(k=>E.norm(k)===E.norm(cat));
+  if(!key){box.innerHTML=`<div class="planref"><b>사업계획서</b> · ${esc(pl._title)}에 '${esc(cat)}' 세부 예산이 없습니다. 사업계획 변경(심의) 대상인지 확인하세요.</div>`;return}
+  const q=($('f-subject').value+' '+$('f-purpose').value).trim();
+  const sj=$('f-subject').value.trim(); const sc=pl.items[key].map(l=>q?Math.max(sj?E.similarity(sj,l):0,E.similarity(q,l)*.9):0); const best=Math.max(...sc);
+  box.innerHTML=`<div class="planref"><b>사업계획서 세부 예산</b> <span class="tiny">${esc(pl._title)} (단위: ${esc(pl._unit)})</span><ul>${pl.items[key].map((l,i)=>`<li class="${best>.12&&sc[i]===best?'hit':''}">${esc(l)}</li>`).join('')}</ul>${q&&best<=.12?'<p class="tiny">건명과 비슷한 계획 항목을 찾지 못했습니다. 계획서에 반영된 지출인지 확인하세요.</p>':''}</div>`;
 }
 
 /* ── 재원 나누기 (국비·시비 등 지출과목을 여러 줄로) ── */
@@ -960,6 +1039,9 @@ function claudeText(c){
   }
   L.push('');
   L.push(`[결재선] 담당 ${s.담당} → 운영단장 ${s.운영단장} → 단장 ${s.단장}${v.결재_총장?` → 총장 ${s.총장}`:''} / 협조 총무처장 ${s.총무처장}`);
+  const ck=checklistItems();
+  const miss=ck.items.filter(i=>i.level==='필수'&&i.attach&&!inAtt(i.attach)).map(i=>renderPattern(i.attach,baseVals()));
+  if(miss.length||ck.warns.length){L.push('');L.push('[붙임·증빙 점검 — 홈페이지 기준]');miss.forEach(m=>L.push(`- 붙임에 없음(필수): ${m}`));ck.warns.forEach(w=>L.push(`- 확인: ${w.msg} (${w.src})`));}
   const extra=$('f-extra').value.trim();
   if(extra){L.push('');L.push('[추가 요청]');L.push(extra);}
   return L.join('\n');

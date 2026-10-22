@@ -68,7 +68,8 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "plan_goods"
   },
   {
    "id": "plan_expert",
@@ -134,7 +135,8 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "plan_expert"
   },
   {
    "id": "plan_contract",
@@ -194,7 +196,8 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "plan_contract"
   },
   {
    "id": "plan_event",
@@ -241,7 +244,8 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "plan_event"
   },
   {
    "id": "exp_goods",
@@ -315,7 +319,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "goods",
+   "pay": "vendor"
   },
   {
    "id": "exp_proc",
@@ -412,7 +418,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "proc",
+   "pay": "vendor"
   },
   {
    "id": "exp_supplies",
@@ -441,7 +449,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "supplies",
+   "pay": "card"
   },
   {
    "id": "exp_expert",
@@ -503,7 +513,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "expert",
+   "pay": "person"
   },
   {
    "id": "exp_contract",
@@ -565,7 +577,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "contract",
+   "pay": "vendor"
   },
   {
    "id": "exp_meeting",
@@ -611,7 +625,9 @@
    "teams": [
     "localrd",
     "common"
-   ]
+   ],
+   "etype": "meeting",
+   "pay": "card"
   },
   {
    "id": "o_plan_purchase",
@@ -683,7 +699,8 @@
    ],
    "next": [
     "o_exp_purchase"
-   ]
+   ],
+   "etype": "plan_goods"
   },
   {
    "id": "o_plan_program",
@@ -769,7 +786,8 @@
    ],
    "next": [
     "o_exp_program"
-   ]
+   ],
+   "etype": "plan_program"
   },
   {
    "id": "o_plan_contract",
@@ -834,7 +852,8 @@
    ],
    "next": [
     "o_exp_contract"
-   ]
+   ],
+   "etype": "plan_contract"
   },
   {
    "id": "o_exp_purchase",
@@ -904,7 +923,9 @@
    "attachments": [
     "지출 영수증 1부.",
     "지출 증빙사진 1부."
-   ]
+   ],
+   "etype": "goods",
+   "pay": "vendor"
   },
   {
    "id": "o_exp_program",
@@ -984,7 +1005,9 @@
    "attachments": [
     "RISE 프로그램 결과보고서 1부.",
     "지출 영수증 및 증빙자료 각 1부."
-   ]
+   ],
+   "etype": "program",
+   "pay": "card"
   },
   {
    "id": "o_exp_meeting",
@@ -1060,7 +1083,9 @@
    "attachments": [
     "회의록 1부.",
     "영수증 1부."
-   ]
+   ],
+   "etype": "meeting",
+   "pay": "card"
   },
   {
    "id": "o_exp_contract",
@@ -1137,7 +1162,9 @@
     "선금금 청구 및 보증 관련 서류 각 1부.",
     "대금 지급 및 업체 확인 관련 서류 각 1부.",
     "법정 의무 완납 증명 서류(국세·지방세·4대보험) 각 1부."
-   ]
+   ],
+   "etype": "contract",
+   "pay": "vendor"
   }
  ]
 }
