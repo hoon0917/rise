@@ -66,8 +66,7 @@
     "exp_supplies"
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "plan_goods"
   },
@@ -133,8 +132,7 @@
     "exp_expert"
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "plan_expert"
   },
@@ -194,8 +192,7 @@
     "exp_contract"
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "plan_contract"
   },
@@ -242,8 +239,7 @@
     "exp_supplies"
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "plan_event"
   },
@@ -317,8 +313,7 @@
     "지출증빙자료 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "goods",
    "pay": "vendor"
@@ -416,8 +411,7 @@
     "지출 증빙 자료 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "proc",
    "pay": "vendor"
@@ -447,8 +441,7 @@
     "증빙사진 및 지출 증빙자료 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "supplies",
    "pay": "card"
@@ -511,8 +504,7 @@
     "증빙사진 및 참석자 명단 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "expert",
    "pay": "person"
@@ -575,8 +567,7 @@
     "사업자등록증 및 통장사본 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "contract",
    "pay": "vendor"
@@ -623,8 +614,7 @@
     "지출 증빙자료 각 1부."
    ],
    "teams": [
-    "localrd",
-    "common"
+    "localrd"
    ],
    "etype": "meeting",
    "pay": "card"

@@ -337,7 +337,6 @@ const FIREBASE_CONFIG={apiKey:"AIzaSyCyCfGii35x0D3Q-Gtk7edATMfD4ycPs08",authDoma
 const PROJECTS={
   localrd: {id:'localrd', label:'로컬R&D',    icon:'🔬',color:'#2563eb',light:'#eff6ff',border:'#bfdbfe'},
   overseas:{id:'overseas',label:'해외인재유치',icon:'✈️',color:'#059669',light:'#ecfdf5',border:'#a7f3d0'},
-  common:  {id:'common',  label:'공통운영경비',icon:'📦',color:'#d97706',light:'#fffbeb',border:'#fde68a'},
   city:    {id:'city',    label:'시비',         icon:'🏛️',color:'#7c3aed',light:'#f5f3ff',border:'#ddd6fe'},
 };
 const DEFAULT_PLAN_CATS=["인건비","장학금","교육·연구프로그램개발·운영비","교육·연구 환경개선비","실험·실습장비 및 기자재 구입·운영비","지역 연계·협업 지원비","기업 지원·협력 활동비","성과 활용·확산 지원비","그 밖의 사업운영 경비"];
@@ -349,7 +348,6 @@ const SIGN1={담당:'임지훈',운영단장:'육수근',단장:'김지수',총�
 const DEFAULT_SETTINGS={projects:{
   localrd: {abbr:'로컬 R&D',    prefix:'앵커사업단2팀',fund:'국비',    phone:'053-810-0828',email:'ancient0917@naver.com',sign:{...SIGN2}},
   overseas:{abbr:'해외인재유치',prefix:'앵커사업단1팀',fund:'국비',    phone:'053-810-0826',email:'lljh8336@naver.com',  sign:{...SIGN1}},
-  common:  {abbr:'공통운영경비',prefix:'앵커사업단2팀',fund:'국비',    phone:'053-810-0828',email:'ancient0917@naver.com',sign:{...SIGN2}},
   city:    {abbr:'시비',        prefix:'앵커사업단1팀',fund:'경산시비',phone:'053-810-0826',email:'lljh8336@naver.com',  sign:{...SIGN1}},
 }};
 const PS=(p=P)=>SETTINGS.projects[p]||DEFAULT_SETTINGS.projects.localrd;
