@@ -231,6 +231,7 @@
             if (mm[2] === '#' || mm[2] === '연번') return item[mm[2]] ?? (i + 1);
             return item[mm[2]];
           });
+          if (/^\s*\(\s*\)\s*$/.test(ownText(p))) setOwnText(p, '');
         });
         tbl.insertBefore(clone, tr);
       });
@@ -251,20 +252,33 @@
       if (r.allEmpty && !hasAncestor(p, 'tbl') && !p.getElementsByTagNameNS(HP, 'tbl').length) {
         toRemove.push(p); return;
       }
+      // 값이 빈 괄호만 남으면 지운다 (예: 세목 미입력 → "()")
+      if (/^\s*\(\s*\)\s*$/.test(ownText(p))) setOwnText(p, '');
       splitMultiline(p);
     });
     toRemove.forEach(p => p.parentNode && p.parentNode.removeChild(p));
     // 선택 항목 줄이 빠지면 본문 번호(1. 2. 3.)를 다시 매긴다
     if (data.renumber !== false) {
-      let n = 0;
+      const KO = '가나다라마바사아자차카타파하';
+      let n = 0, k = 0, kIndent = null;
       allEls(doc, 'p').forEach(p => {
         if (hasAncestor(p, 'tbl')) return;
         const node = ownTextNodes(p).find(x => tv(x).trim() !== '');
         if (!node) return;
-        const m = tv(node).match(/^()(\d{1,2})\.(\s)/); // 들여 쓴 줄(붙임 2. 등)은 건드리지 않음
-        if (!m) return;
-        n++;
-        if (+m[2] !== n) { setTv(node, m[1] + n + '.' + m[3] + tv(node).slice(m[0].length)); dropLineseg(p); }
+        const t = tv(node);
+        const m = t.match(/^()(\d{1,2})\.(\s)/); // 들여 쓴 줄(붙임 2. 등)은 건드리지 않음
+        if (m) {
+          n++; k = 0; kIndent = null;
+          if (+m[2] !== n) { setTv(node, m[1] + n + '.' + m[3] + t.slice(m[0].length)); dropLineseg(p); }
+          return;
+        }
+        // 가. 나. 다. 항목도 빠진 줄이 있으면 다시 매긴다 (같은 들여쓰기끼리)
+        const g = t.match(/^(\s*)([가-하])\.(\s)/);
+        if (!g) return;
+        if (kIndent !== null && g[1].length !== kIndent) return;
+        kIndent = g[1].length;
+        const want = KO[k++];
+        if (want && g[2] !== want) { setTv(node, g[1] + want + '.' + g[3] + t.slice(g[0].length)); dropLineseg(p); }
       });
     }
     let out = new env.XMLSerializer().serializeToString(doc);
