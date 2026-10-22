@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "note": "기본 공문 틀. 문장 틀의 {이름}은 입력값으로 바뀌고, {이름}{을/를}처럼 쓰면 받침에 맞는 조사가 붙는다.",
+  "templates": [
+    {
+      "id": "plan_goods", "file": "plan_goods.hwpx", "kind": "plan", "name": "물품 구매 계획",
+      "desc": "견적 구매(컴퓨터·NAS·번역 시스템 등). 구매 내용 표 포함",
+      "source": "081-2 업무용 컴퓨터 및 노트북 구매 계획",
+      "title": "[{사업약칭}] {건명} 구매 계획의 건",
+      "intro": "대신대학교 앵커 사업단의 {목적}{을/를} 위해 {건명}{을/를} 아래와 같이 구매하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": true, "president": true, "amountFrom": "items",
+      "fields": [
+        {"key": "업체명", "label": "구매업체", "type": "text", "placeholder": "제로컴"}
+      ],
+      "list": {"name": "품목", "label": "구매 내용", "cols": [
+        {"key": "품명", "label": "품명"}, {"key": "규격", "label": "규격"},
+        {"key": "수량", "label": "수량", "type": "number"}, {"key": "단가", "label": "단가", "type": "money"},
+        {"key": "금액", "label": "공급가액", "type": "money", "calc": "수량*단가"}, {"key": "비고", "label": "비고"}]},
+      "totalNote": "VAT 포함",
+      "attachments": ["견적서 및 비교견적서 각 1부."],
+      "next": ["exp_goods", "exp_proc", "exp_supplies"]
+    },
+    {
+      "id": "plan_expert", "file": "plan_expert.hwpx", "kind": "plan", "name": "전문가 활용 계획 (강의·자문·검수)",
+      "desc": "강사료·자문료·번역 검수비 등 전문가 활용비",
+      "source": "003 입찰 강의 계획 / 008 심리검사 검수 계획 / 047 지식재산권 자문 계획",
+      "title": "[{사업약칭}] {건명} 계획의 건",
+      "intro": "대신대학교 앵커 사업단은 {목적}{을/를} 위하여 관련 분야 전문가를 아래와 같이 활용하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": false, "president": false, "amountFrom": "items",
+      "fields": [
+        {"key": "활용내용", "label": "활용 내용", "type": "text", "placeholder": "외국인 유학생 상담 AI 플랫폼 입찰 계약 실무 강의"}
+      ],
+      "list": {"name": "전문가", "label": "소요 내역", "cols": [
+        {"key": "성명", "label": "성명"}, {"key": "소속", "label": "소속 및 직위"},
+        {"key": "일자", "label": "활용 일자", "type": "date"}, {"key": "시간", "label": "활용 시간", "placeholder": "13:00 ~ 17:00"},
+        {"key": "금액", "label": "활용비", "type": "money"}, {"key": "비고", "label": "비고"}]},
+      "totalNote": "",
+      "attachments": ["전문가 활용 신청서 1부.", "강사카드 1부."],
+      "next": ["exp_expert"]
+    },
+    {
+      "id": "plan_contract", "file": "plan_contract.hwpx", "kind": "plan", "name": "용역 수의계약 계획",
+      "desc": "용역·라이선스 수의계약 체결 계획. 계약 내용 표 포함",
+      "source": "045 4MAT 학습유형 검사 수의계약 체결 계획",
+      "title": "[{사업약칭}] {계약명} 수의계약 체결 계획의 건",
+      "intro": "대신대학교 앵커 사업단의 {목적}{을/를} 위한 {계약명} 수의계약을 아래와 같이 체결하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": true, "president": true, "amountFrom": "input",
+      "fields": [
+        {"key": "계약명", "label": "계약명", "type": "text", "placeholder": "4MAT 학습유형 검사 라이선스 구입"},
+        {"key": "업체명", "label": "계약업체", "type": "text"},
+        {"key": "계약기간", "label": "계약기간", "type": "text", "placeholder": "2026. 11. 1. ~ 2027. 2. 28."},
+        {"key": "주요내용", "label": "주요 내용 (한 줄에 하나)", "type": "lines", "bullet": "- "},
+        {"key": "계약사유", "label": "수의계약 체결 사유 (한 줄에 하나)", "type": "lines", "bullet": "- "}
+      ],
+      "attachments": ["용역 표준계약서 1부.", "계약보증금 지급각서 1부.", "수의계약각서 1부.", "수의계약체결제한여부 확인서 1부.", "청렴계약 이행 서약서 1부.", "계약특수조건 1부.", "견적서 1부."],
+      "next": ["exp_contract"]
+    },
+    {
+      "id": "plan_event", "file": "plan_event.hwpx", "kind": "plan", "name": "회의·행사 계획",
+      "desc": "협약식·설명회·간담회 등 행사 추진 계획",
+      "source": "012 글로벌 인재 허브 컨소시엄 협약식 계획",
+      "title": "[{사업약칭}] {건명} 계획의 건",
+      "intro": "대신대학교 앵커 사업단은 {목적}{을/를} 위하여 아래와 같이 {건명}{을/를} 추진하고자 합니다.",
+      "vat": false, "president": true, "amountFrom": "input", "amountOptional": true,
+      "fields": [
+        {"key": "일시", "label": "일시", "type": "text", "placeholder": "2026. 11. 5.(목) 14:00"},
+        {"key": "장소", "label": "장소", "type": "text"},
+        {"key": "참석대상", "label": "참석 대상", "type": "text"},
+        {"key": "주요내용", "label": "주요 내용 (한 줄에 하나)", "type": "lines", "bullet": "   가. "}
+      ],
+      "attachments": [],
+      "next": ["exp_meeting", "exp_supplies"]
+    },
+    {
+      "id": "exp_goods", "file": "exp_goods.hwpx", "kind": "expense", "name": "물품 구매 지출",
+      "desc": "견적 구매 물품 대금 지급. 구매 내용 표 + 지출과목",
+      "source": "084 업무용 컴퓨터 및 노트북 구매 지출 / 075 NAS 지출",
+      "title": "[{사업약칭}] {건명} 구매 지출의 건",
+      "intro": "대신대학교 앵커 사업단의 {목적}{을/를} 위해 구매한 {건명}에 대하여 아래와 같이 지출하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": true, "president": true, "amountFrom": "items",
+      "fields": [
+        {"key": "업체명", "label": "구매업체", "type": "text"},
+        {"key": "대표자", "label": "대표자", "type": "text"},
+        {"key": "사업자번호", "label": "사업자등록번호", "type": "text", "placeholder": "000-00-00000"}
+      ],
+      "list": {"name": "품목", "label": "구매 내용", "cols": [
+        {"key": "품명", "label": "품명"}, {"key": "규격", "label": "규격"},
+        {"key": "수량", "label": "수량", "type": "number"}, {"key": "단가", "label": "단가", "type": "money"},
+        {"key": "금액", "label": "금액", "type": "money", "calc": "수량*단가"}, {"key": "비고", "label": "비고(설치장소)"}]},
+      "totalNote": "VAT 포함",
+      "attachments": ["계획공문({계획공문번호}) 1부.", "지출증빙자료 각 1부."]
+    },
+    {
+      "id": "exp_proc", "file": "exp_proc.hwpx", "kind": "expense", "name": "조달청 구매 지출",
+      "desc": "나라장터 종합쇼핑몰 납품요구 물품 대금 지급",
+      "source": "090 DB 암호화 솔루션 조달청 구매 지출",
+      "title": "[{사업약칭}] {건명} 조달청 구매 지출의 건",
+      "intro": "대신대학교 앵커 사업단의 {목적}{을/를} 위하여 구매한 {건명}의 납품 및 검사·검수가 완료되어, 아래와 같이 대금을 지출하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": false, "president": true, "amountFrom": "items",
+      "fields": [
+        {"key": "업체명", "label": "계약업체", "type": "text"},
+        {"key": "대표자", "label": "대표자", "type": "text"},
+        {"key": "사업자번호", "label": "사업자등록번호", "type": "text"},
+        {"key": "납품요구번호", "label": "납품요구번호", "type": "text"},
+        {"key": "납품요구일", "label": "납품요구일", "type": "date"},
+        {"key": "검수일", "label": "검사·검수 완료일", "type": "date"}
+      ],
+      "list": {"name": "품목", "label": "구매 내용", "cols": [
+        {"key": "품명", "label": "품명"}, {"key": "규격", "label": "규격"},
+        {"key": "수량", "label": "수량", "type": "number"}, {"key": "단가", "label": "단가", "type": "money"},
+        {"key": "금액", "label": "금액", "type": "money", "calc": "수량*단가"}, {"key": "비고", "label": "설치장소"}],
+        "defaultRows": [{}, {"품명": "조달수수료", "규격": "조달청 대지급", "수량": "1", "비고": "-"}]},
+      "totalNote": "VAT 포함",
+      "attachments": ["계획공문({계획공문번호}) 1부.", "지출 증빙 자료 각 1부."]
+    },
+    {
+      "id": "exp_supplies", "file": "exp_supplies.hwpx", "kind": "expense", "name": "소모품·물품 지출 (검수서 첨부)",
+      "desc": "카드 결제 소모품·소액 물품. 내역은 물품 검수서로 갈음",
+      "source": "010·038 소모품 구입 지출",
+      "title": "[{사업약칭}] {건명} 지출의 건",
+      "intro": "앵커 사업단에서는 {목적}{을/를} 위해 {건명}{을/를} 구입하였으니 지출을 허가하여 주시기 바랍니다.",
+      "vat": false, "president": false, "amountFrom": "input",
+      "fields": [
+        {"key": "지출내역", "label": "지출내역", "type": "text", "default": "물품 검수서 참조"}
+      ],
+      "attachments": ["물품구입 검수서 1부.", "증빙사진 및 지출 증빙자료 각 1부."]
+    },
+    {
+      "id": "exp_expert", "file": "exp_expert.hwpx", "kind": "expense", "name": "전문가 활용비 지출",
+      "desc": "강사료·자문료·검수비 지급",
+      "source": "004 입찰 강의 지출 / 009 심리검사 검수 지출 / 049 자문 지출",
+      "title": "[{사업약칭}] {건명} 지출의 건",
+      "intro": "대신대학교 앵커 사업단은 {목적}{을/를} 위하여 활용한 전문가에 대해 아래와 같이 지출하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": false, "president": false, "amountFrom": "items",
+      "fields": [
+        {"key": "활용내용", "label": "활용 내용", "type": "text"}
+      ],
+      "list": {"name": "전문가", "label": "지출 내역", "cols": [
+        {"key": "성명", "label": "성명"}, {"key": "소속", "label": "소속 및 직위"},
+        {"key": "일자", "label": "활용 일자", "type": "date"}, {"key": "시간", "label": "활용 시간"},
+        {"key": "금액", "label": "활용비", "type": "money"}, {"key": "비고", "label": "비고"}]},
+      "totalNote": "",
+      "attachments": ["계획공문({계획공문번호}) 1부.", "강사료 등 지급 청구서 1부.", "증빙사진 및 참석자 명단 각 1부."]
+    },
+    {
+      "id": "exp_contract", "file": "exp_contract.hwpx", "kind": "expense", "name": "용역 대금 지출 (계약금·선금·잔금)",
+      "desc": "용역 계약 대금 지급. 지급 구분과 입금계좌 포함",
+      "source": "024 AI 업체 계약 지출 / 028 선금 / 054 잔금 / 068 2단계 선금",
+      "title": "[{사업약칭}] {사업명} {지급구분} 지출의 건",
+      "intro": "{사업명} 사업 추진을 위하여 아래와 같이 {지급구분}{을/를} 지출하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": false, "president": true, "amountFrom": "input",
+      "carry": {"사업명": "계약명", "계약금액": "금액"},
+      "fields": [
+        {"key": "사업명", "label": "사업명(계약명)", "type": "text"},
+        {"key": "업체명", "label": "계약업체", "type": "text"},
+        {"key": "계약금액", "label": "계약금액", "type": "money"},
+        {"key": "계약기간", "label": "계약기간", "type": "text"},
+        {"key": "지급구분", "label": "지급 구분", "type": "text", "placeholder": "선금", "default": "대금"},
+        {"key": "입금계좌", "label": "입금계좌", "type": "text", "placeholder": "중소기업은행 000-000000-000 / ㈜업체명"}
+      ],
+      "attachments": ["계획공문({계획공문번호}) 1부.", "표준용역계약서 1부.", "전자세금계산서 및 거래명세서 각 1부.", "사업자등록증 및 통장사본 각 1부."]
+    },
+    {
+      "id": "exp_meeting", "file": "exp_meeting.hwpx", "kind": "expense", "name": "회의비 지출",
+      "desc": "업무 회의·간담회 다과·식대",
+      "source": "011 H.W 구축 검토 회의 / 033~073 회의비 지출",
+      "title": "[{사업약칭}] {건명} 지출의 건",
+      "intro": "앵커 사업단에서는 업무의 효율적인 운영을 위하여 회의를 진행하였으며, 아래와 같이 회의비를 지출하고자 하오니 승인하여 주시기 바랍니다.",
+      "vat": false, "president": false, "amountFrom": "input",
+      "fields": [
+        {"key": "일시", "label": "일시", "type": "text", "placeholder": "2026. 10. 20.(화) 12:00"},
+        {"key": "장소", "label": "장소", "type": "text"},
+        {"key": "참석인원", "label": "참석 인원(명)", "type": "number"},
+        {"key": "참석자상세", "label": "참석자 (한 줄에 한 기관)", "type": "lines", "bullet": "   가. ", "placeholder": "앵커사업단 : 단장, 운영단장, 담당 3명"}
+      ],
+      "attachments": ["회의록 1부.", "지출 증빙자료 각 1부."]
+    }
+  ]
+}
