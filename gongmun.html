@@ -351,11 +351,17 @@ const DEFAULT_SETTINGS={projects:{
   city:    {abbr:'시비',        prefix:'앵커사업단1팀',fund:'경산시비',phone:'053-810-0826',email:'lljh8336@naver.com',  sign:{...SIGN1}},
 }};
 const PS=(p=P)=>SETTINGS.projects[p]||DEFAULT_SETTINGS.projects.localrd;
-// 과목 추천 보조 규칙: 실제 공문(2팀 2차년도)에서 반복된 조합
-const SUBJECT_RULES=[
-  [/회의|간담|다과|식대|협약식|업무추진/, '그 밖의 사업운영 경비','업무추진비-사업추진비'],
-  [/임차|렌탈|복합기|프린터/, '그 밖의 사업운영 경비','운영비-임차료'],
+// 과목 추천 보조 규칙: 팀별 실제 공문·색인표(2차년도)에서 반복된 조합
+const SUBJECT_RULES_COMMON=[
+  [/출장|여비/, '그 밖의 사업운영 경비','여비-국내여비'],
+  [/우편|등기|택배|우체국/, '그 밖의 사업운영 경비','운영비-공공요금및제세'],
   [/급여|인건비|4대보험|퇴직/, '인건비','보수-보수'],
+  [/회의|간담|다과|식대|업무추진/, '그 밖의 사업운영 경비','업무추진비-사업추진비'],
+];
+// 2팀(로컬R&D): 2팀 결재 공문 기준
+const SUBJECT_RULES_T2=[
+  [/협약식/, '그 밖의 사업운영 경비','업무추진비-사업추진비'],
+  [/임차|렌탈|복합기/, '그 밖의 사업운영 경비','운영비-임차료'],
   [/컴퓨터|노트북|모니터|NAS|서버|스토리지|장비|기자재|소모품|사무용품|가구|번역 ?시스템|암호화|솔루션/i, '실험·실습장비 및 기자재 구입·운영비','유형자산-자산취득비'],
   [/환경개선|공사|리모델링/, '교육·연구 환경개선비','유형자산-자산취득비'],
   [/강의|강사|자문|검수|전문가|연구비|연구지원/, '교육·연구프로그램개발·운영비','운영비-일반수용비'],
@@ -363,6 +369,16 @@ const SUBJECT_RULES=[
   [/플랫폼 ?구축|데이터 ?인프라|선금|잔금|연구개발/, '기업 지원·협력 활동비','연구개발비-연구개발비'],
   [/특허|변리|지식재산|성과 ?확산|홍보/, '성과 활용·확산 지원비','운영비-일반수용비'],
 ];
+// 1팀(해외인재유치·시비): 1팀 결재 공문·색인표(2026학년도) 기준
+const SUBJECT_RULES_T1=[
+  [/임차|렌탈|복합기/, '그 밖의 사업운영 경비','운영비-임차료'],
+  [/용지|사무용품|사무 ?운영 ?물품|볼펜|토너|사업단 ?소모품/, '그 밖의 사업운영 경비','운영비-기타운영비'],
+  [/용역|컨설팅|콘서트|공연|취업 ?연계|인턴십|현장실습/, '교육·연구프로그램개발·운영비','운영비-일반용역비'],
+  [/교재|인쇄|현수막|국기|체험|문화|강사|강의|교육|프로그램|행사|축구|음악회|예배|홍보|서포터즈|소모품/, '교육·연구프로그램개발·운영비','운영비-일반수용비'],
+  [/실습 ?물품|장비|기자재|환경개선|자산/, '교육·연구 환경개선비','유형자산-자산취득비'],
+];
+const TEAM1=['overseas','city'];
+const subjectRules=()=>[...SUBJECT_RULES_COMMON,...(TEAM1.includes(P)?SUBJECT_RULES_T1:SUBJECT_RULES_T2)];
 // 화면 입력칸 없이 자동으로 채우는 자리표시자
 const AUTO_KEYS=['제목','도입문','목적','건명','사업약칭','금액','한글금액','금액표기','합계','합계비고','항목','세목','예산액','기집행액','금회집행액','잔액','계획공문번호','업체정보','계약금액표기','붙임','시행번호','시행일','결재_담당','결재_운영단장','결재_단장','결재_총장직위','결재_총장','결재_총무처장'];
 
@@ -488,10 +504,11 @@ function recommend(subject,purpose=''){
     const g=groups.get(key)||{cat,subj:c.subj||'',score:0,ev:[],n:0};
     g.n++; if(sim>g.score) g.score=sim; g.ev.push([sim,c.text]); groups.set(key,g);
   });
-  SUBJECT_RULES.forEach(([re,cat,subj])=>{
+  subjectRules().forEach(([re,cat,subj])=>{
     if(!re.test(q)) return; const rc=resolveCat(cat,S.year); if(!rc) return;
     // 같은 항목의 실제 세목 표기가 있으면 그것을 쓴다
-    const known=[...groups.values()].find(g=>g.cat===rc&&E.norm(g.subj).includes(E.norm(subj.split('-').pop())));
+    const known=[...groups.values()].find(g=>g.cat===rc&&E.norm(g.subj).includes(E.norm(subj.split('-').pop())))
+      ||(P==='city'?[...groups.values()].filter(g=>g.cat===rc&&g.subj).sort((a,b)=>b.n-a.n)[0]:null); // 시비는 경산시 세목 표기를 따른다
     const key=rc+'||'+(known?known.subj:subj);
     const g=groups.get(key)||{cat:rc,subj:known?known.subj:subj,score:0,ev:[],n:0};
     g.score=g.score?Math.min(.99,g.score+.12):.42; g.rule=true; groups.set(key,g);
@@ -561,7 +578,7 @@ function fillCats(){
   $('f-cat').innerHTML='<option value="">— 선택 —</option>'+list.map(c=>`<option>${esc(c)}</option>`).join('');
   if(cur) $('f-cat').value=resolveCat(cur,S.year)||'';
   const mk=GUIDE&&Object.keys(GUIDE.matrix).find(k=>E.norm(k)===E.norm($('f-cat').value));
-  const subs=[...new Set([...(mk?GUIDE.matrix[mk]:[]),...expenses.map(e=>cleanSubj(e.note)),...gdocs.map(g=>cleanSubj(g.subject)),...SUBJECT_RULES.map(r=>r[2])].filter(Boolean))].sort();
+  const subs=[...new Set([...(mk?GUIDE.matrix[mk]:[]),...expenses.map(e=>cleanSubj(e.note)),...gdocs.map(g=>cleanSubj(g.subject)),...subjectRules().map(r=>r[2])].filter(Boolean))].sort();
   $('subj-list').innerHTML=subs.map(s=>`<option value="${esc(s)}">`).join('');
 }
 function renderTplGrid(){
