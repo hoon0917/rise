@@ -31,7 +31,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tab-pane{display:none}.tab-pane.on{display:block}
 
 .write-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
-@media(max-width:1080px){.write-grid{grid-template-columns:1fr}}
+@media(max-width:1080px){.write-grid{grid-template-columns:minmax(0,1fr)}}
+.write-grid>*{min-width:0}
+@media(max-width:640px){#src-wrap .row,.f-group .row{flex-wrap:wrap !important}.card{padding:18px 16px}}
 .side{position:sticky;top:150px;display:flex;flex-direction:column;gap:16px}
 @media(max-width:1080px){.side{position:static}}
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:20px}
@@ -396,7 +398,7 @@ document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>
 /* ── 데이터 ── */
 firebase.initializeApp(FIREBASE_CONFIG);
 const db=firebase.firestore();
-try{db.settings({ignoreUndefinedProperties:true,merge:true})}catch(e){}
+try{db.settings({ignoreUndefinedProperties:true})}catch(e){}
 const COL_G=`${P}_gongmun`, COL_DOC=`${P}_documents`;
 let SETTINGS=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 let GUIDE=null, MANIFEST=[], CUSTOM=[], catsByYear={}, budgetPlans={}, expenses=[], gdocs=[], idxDocs=[];
@@ -506,7 +508,7 @@ function renderReco(){
     <div class="ev">${r.ev.length?'근거: '+r.ev.map(esc).join(' · '):'키워드 규칙 (과거 집행 내역 없음)'}</div></div>
     <span class="pct">${Math.min(99,Math.round(r.score*100))}%</span></button>`).join('')
     :`<p class="tiny">${$('f-subject').value.trim()?'비슷한 과거 집행 내역이 없습니다. 아래에서 직접 고르세요.':''}</p>`;
-  $('reco').querySelectorAll('.reco-item').forEach(b=>b.onclick=()=>{const r=list[+b.dataset.i];$('f-cat').value=r.cat;$('f-subj').value=r.subj;renderReco();updateBudget();});
+  $('reco').querySelectorAll('.reco-item').forEach(b=>b.onclick=()=>{const r=list[+b.dataset.i];$('f-cat').value=r.cat;$('f-subj').value=r.subj;fillCats();renderReco();updateBudget();});
 }
 
 /* ── 문장 틀 ── */
@@ -520,7 +522,8 @@ function josa(word,pair){
 function renderPattern(pat,vals){
   if(!pat) return '';
   return pat.replace(/\{([^{}\/]+)\}\{([^{}]+\/[^{}]+)\}/g,(_,k,pair)=>{const v=String(vals[k.trim()]??'').trim();return v?v+josa(v,pair):''})
-            .replace(/\{([^{}]+)\}/g,(_,k)=>String(vals[k.trim()]??'').trim()).replace(/\s{2,}/g,' ').trim();
+            .replace(/\{([^{}]+)\}(에서|에게|에|의|으로|로|와|과|은|는|이|가|을|를)?/g,(m,k,j)=>{const v=String(vals[k.trim()]??'').trim();return v?v+(j||''):''})
+            .replace(/\(\s*\)/g,'').replace(/「\s*」/g,'').replace(/[ \t]{2,}/g,' ').replace(/ +\n/g,'\n').trim();
 }
 
 /* ── 작성 폼 ── */
@@ -534,7 +537,7 @@ function initForm(){
   document.querySelectorAll('#kind-seg button').forEach(b=>b.onclick=()=>{S.kind=b.dataset.kind;document.querySelectorAll('#kind-seg button').forEach(x=>x.classList.toggle('on',x===b));
     const first=visibleTemplates(S.kind)[0];selectTpl(first?.id);});
   $('f-year').onchange=()=>{S.year=+$('f-year').value;fillCats();renderSources();updateBudget();renderReco()};
-  let deb; const onSubj=()=>{clearTimeout(deb);deb=setTimeout(renderReco,200);autoText();};
+  let deb; const onSubj=()=>{clearTimeout(deb);deb=setTimeout(()=>{renderReco();renderChecklist();renderPlanRef()},200);autoText();};
   $('f-subject').oninput=onSubj; $('f-purpose').oninput=onSubj;
   $('f-cat').onchange=()=>{fillCats();updateBudget();renderReco()}; $('f-subj').oninput=()=>{updateBudget()};
   $('f-title').oninput=()=>{S.autoTitle=false;$('title-reset').hidden=false};
@@ -542,7 +545,7 @@ function initForm(){
   $('title-reset').onclick=()=>{S.autoTitle=true;$('title-reset').hidden=true;autoText()};
   $('intro-reset').onclick=()=>{S.autoIntro=true;$('intro-reset').hidden=true;autoText()};
   $('f-pending').onchange=updateBudget; $('f-pres').onchange=renderSignLine;
-  $('f-date').onchange=()=>{if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint();S.year=currentBudgetYear(E.parseDate($('f-date').value))||S.year;$('f-year').value=S.year;fillCats();updateBudget()};
+  $('f-date').onchange=()=>{if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint();S.year=currentBudgetYear(E.parseDate($('f-date').value))||S.year;$('f-year').value=S.year;fillCats();renderSources();updateBudget()};
   $('f-seq').oninput=()=>{S.seqTouched=true;renderSeqHint()};
   $('btn-subseq').onclick=setSubSeq; $('btn-nextseq').onclick=()=>{S.seqTouched=false;setNextSeq()};
   $('f-plan').onchange=()=>loadPlan($('f-plan').value);
@@ -598,7 +601,9 @@ function selectTpl(id){
   const sp=tplSpec(t);
   $('tpl-source').textContent=t?(t.builtIn?`바탕 공문: ${t.source||''}`:'직접 등록한 틀'):'';
   // 필드 (기본값은 값으로도 넣어 둔다 → 제목·도입 문장에 바로 반영)
-  (sp.fields||[]).forEach(f=>{if(S.values[f.key]==null&&f.default!=null)S.values[f.key]=f.default});
+  S.defaults=S.defaults||{};
+  Object.entries(S.defaults).forEach(([k,d])=>{if(S.values[k]===d)delete S.values[k]}); S.defaults={};
+  (sp.fields||[]).forEach(f=>{if(f.default==null)return; if(S.values[f.key]==null){S.values[f.key]=f.default;S.defaults[f.key]=f.default}});
   $('dyn-fields').innerHTML=(sp.fields||[]).map(f=>{
     const v=S.values[f.key]??f.default??'';
     const ph=f.placeholder?` placeholder="${esc(f.placeholder)}"`:'';
@@ -870,7 +875,7 @@ function loadPlan(id){
   const carry=t?.carry||{};
   const v={...(p.values||{})};
   Object.entries(carry).forEach(([to,from])=>{if(v[from]!=null&&v[to]==null)v[to]=v[from]});
-  S.values={...v,_vat:S.values._vat,_pres:undefined}; S.planRef=id;
+  S.values={...v,_vat:S.values._vat}; delete S.values._pres; S.defaults={}; S.planRef=id;
   S.extra=(p.sources||[]).slice(1).map(x=>({p:x.p,cat:x.cat,subj:x.subj,amount:String(x.amount||'')})); S.extra.forEach(x=>ensureProj(x.p).then(renderSources));
   S.list=(p.list||[]).map(r=>({...r})); S.listName=tplSpec(fromT).list?.name||null;
   $('f-subject').value=v.건명||''; $('f-purpose').value=v.목적||'';
@@ -907,7 +912,7 @@ function collect(){
   Object.assign(out,{
     금액:E.comma(amt),한글금액:E.koreanAmount(amt),금액표기:E.amountPhrase(amt,vat),합계:E.comma(amt),
     합계비고:S.values.합계비고??sp.totalNote??'',
-    계약금액표기:(S.values.계약금액||amt)?E.amountPhrase(S.values.계약금액||amt,true):'',
+    계약금액표기:(S.values.계약금액||(t?.kind==='plan'?amt:0))?E.amountPhrase(S.values.계약금액||amt,true):'',
     선금표기:S.values.선금?E.amountPhrase(S.values.선금,false).replace(/\)$/,(E.toNum(S.values.계약금액||amt)?`, 계약금액의 ${Math.round(E.toNum(S.values.선금)/E.toNum(S.values.계약금액||amt)*100)}%`:'')+')'):'',
     업체정보:(()=>{const n=S.values.업체명||'';const d=[S.values.대표자?'대표 '+S.values.대표자:'',S.values.사업자번호?'사업자등록번호 '+S.values.사업자번호:'',S.values.업체주소||''].filter(Boolean);return n?(d.length?`${n}(${d.join(', ')})`:n):''})(),
     ...planInfo(),담당전화:PS().phone||'',담당이메일:PS().email||'',
@@ -944,14 +949,15 @@ function validate(c){
 }
 
 /* ── 저장 ── */
+const plain=o=>JSON.parse(JSON.stringify(o??null)); // Firestore가 받지 않는 undefined 제거
 async function saveRecord(c,{register=true}={}){
   const iso=$('f-date').value||E.isoDate();
   const rec={
     kind:c.t.kind,templateId:c.t.id,templateName:c.t.name,year:S.year,title:c.values.제목,docNum:docNumFull(),docSeq:seqKey($('f-seq').value)?.main||null,docSeqText:$('f-seq').value.trim(),docDate:iso,
     planCategory:c.b.cat||'',subject:cleanSubj($('f-subj').value),amount:c.amt,
-    sources:c.rows.map(r=>({p:r.p,cat:r.cat||'',subj:r.subj||'',amount:r.now})),
-    values:{...S.values,건명:$('f-subject').value.trim(),목적:$('f-purpose').value.trim(),_pres:$('f-pres').checked,_vat:$('f-vat')?$('f-vat').checked:false},
-    list:S.list,attachments:$('f-att').value,intro:c.values.도입문,planRef:S.planRef||null,
+    sources:plain(c.rows.map(r=>({p:r.p,cat:r.cat||'',subj:r.subj||'',amount:r.now}))),
+    values:plain({...S.values,건명:$('f-subject').value.trim(),목적:$('f-purpose').value.trim(),_pres:$('f-pres').checked,_vat:$('f-vat')?$('f-vat').checked:false}),
+    list:plain(S.list),attachments:$('f-att').value,intro:c.values.도입문,planRef:S.planRef||null,
     budgetSnapshot:{budget:c.b.budget,prior:c.b.prior,now:c.amt,rem:c.b.rem,inclPending:c.b.incl},
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -965,7 +971,7 @@ async function saveRecord(c,{register=true}={}){
     if(prev?.indexDocId&&idxDocs.some(d=>d.id===prev.indexDocId)) await db.collection(COL_DOC).doc(prev.indexDocId).update(idx);
     else {const r=await db.collection(COL_DOC).add({...idx,seq:Date.now(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});rec.indexDocId=r.id;}
   }
-  await ref.set(rec,{merge:true});
+  if(prev) await ref.update(rec); else await ref.set(rec);
   S.editingId=ref.id; renderEditState();
   return ref.id;
 }
@@ -993,8 +999,8 @@ async function doHwpx(){
     const buf=await loadTemplateBuf(c.t);
     const blob=await E.fillHwpx(buf,{values:c.values,lists:c.lists},ENV);
     saveBlob(blob,`${pad3($('f-seq').value)}_${safeName(c.values.제목)}.hwpx`);
-    await saveRecord(c);
-    toast('hwpx를 내려받았습니다. 한글에서 열어 쪽 넘김을 확인하고 저장하세요.');
+    try{await saveRecord(c);toast('hwpx를 내려받았습니다. 한글에서 열어 쪽 넘김을 확인하고 저장하세요.');}
+    catch(e){console.error(e);toast('hwpx는 내려받았지만 기록·색인표 저장에 실패했습니다: '+e.message,true)}
   }catch(e){console.error(e);toast('hwpx 생성 실패: '+e.message,true)}
   btn.disabled=false; btn.textContent='hwpx 공문 다운로드';
 }
@@ -1064,7 +1070,7 @@ async function downloadTemplate(id){
   try{saveBlob(new Blob([await loadTemplateBuf(t)],{type:'application/hwp+zip'}),`[틀] ${safeName(t.name)}.hwpx`)}catch(e){toast(e.message,true)}
 }
 function resetForm(){
-  Object.assign(S,{editingId:null,values:{},list:[],extra:[],listName:null,planRef:null,autoTitle:true,autoIntro:true,attTouched:false,seqTouched:false});
+  Object.assign(S,{defaults:{},editingId:null,values:{},list:[],extra:[],listName:null,planRef:null,autoTitle:true,autoIntro:true,attTouched:false,seqTouched:false});
   ['f-subject','f-purpose','f-subj','f-extra'].forEach(id=>$(id).value='');
   $('f-cat').value=''; $('f-date').value=E.isoDate(); $('preview').hidden=true;
   $('title-reset').hidden=$('intro-reset').hidden=true;
@@ -1073,7 +1079,7 @@ function resetForm(){
 function openRecord(id){
   const g=gdocs.find(x=>x.id===id); if(!g) return;
   S.kind=g.kind; document.querySelectorAll('#kind-seg button').forEach(x=>x.classList.toggle('on',x.dataset.kind===g.kind));
-  Object.assign(S,{editingId:id,values:{...(g.values||{})},list:(g.list||[]).map(r=>({...r})),listName:tplSpec(tplById(g.templateId)).list?.name||null,extra:(g.sources||[]).slice(1).map(x=>({p:x.p,cat:x.cat,subj:x.subj,amount:String(x.amount||'')})),planRef:g.planRef||null,autoTitle:false,autoIntro:false,attTouched:true,seqTouched:true,year:+g.year||S.year});
+  Object.assign(S,{defaults:{},editingId:id,values:{...(g.values||{})},list:(g.list||[]).map(r=>({...r})),listName:tplSpec(tplById(g.templateId)).list?.name||null,extra:(g.sources||[]).slice(1).map(x=>({p:x.p,cat:x.cat,subj:x.subj,amount:String(x.amount||'')})),planRef:g.planRef||null,autoTitle:false,autoIntro:false,attTouched:true,seqTouched:true,year:+g.year||S.year});
   $('f-year').value=S.year; fillCats();
   $('f-subject').value=g.values?.건명||''; $('f-purpose').value=g.values?.목적||'';
   $('f-cat').value=g.planCategory||''; $('f-subj').value=g.subject||'';

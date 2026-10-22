@@ -182,6 +182,8 @@
       }));
     });
     if (!had) return { had: false };
+    // 일부 값만 빈 경우 남는 "()"·"「」"를 정리 (예: 납품요구번호 R26…(), 검수 완료(…))
+    ownTextNodes(p).forEach(n => { const v = tv(n); const w = v.replace(/\(\s*\)/g, '').replace(/「\s*」/g, ''); if (w !== v) setTv(n, w); });
     dropLineseg(p);
     return { had, allEmpty };
   }
