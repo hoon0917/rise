@@ -225,7 +225,7 @@ pre.req{white-space:pre-wrap;font-family:var(--sans);font-size:13px;line-height:
           <div class="card-h"><span class="step">4</span><h3>결재 · 시행</h3></div>
           <div class="grid2">
             <div class="f-group"><label class="f-label" for="f-seq">시행번호 <small id="seq-hint"></small></label>
-              <div class="row" style="flex-wrap:nowrap"><span class="muted" id="seq-prefix" style="white-space:nowrap"></span><input class="f-input" id="f-seq" style="max-width:110px"><button type="button" class="btn-secondary btn-sm" style="white-space:nowrap" id="btn-subseq" title="041 → 041-1처럼 가지번호를 붙입니다">가지번호</button><button type="button" class="link" style="white-space:nowrap" id="btn-nextseq">새 번호</button></div></div>
+              <div class="row" style="flex-wrap:nowrap"><select class="f-input" id="f-team" style="max-width:150px;flex:0 0 auto" title="시행번호 앞부분(팀)"></select><span class="muted" id="seq-prefix" style="white-space:nowrap"></span><input class="f-input" id="f-seq" style="max-width:110px"><button type="button" class="btn-secondary btn-sm" style="white-space:nowrap" id="btn-subseq" title="041 → 041-1처럼 가지번호를 붙입니다">가지번호</button><button type="button" class="link" style="white-space:nowrap" id="btn-nextseq">새 번호</button></div></div>
             <div class="f-group"><label class="f-label" for="f-date">시행일</label><input type="date" class="f-input" id="f-date"></div>
           </div>
           <label class="chk"><input type="checkbox" id="f-pres"> 총장 결재 포함</label>
@@ -430,7 +430,18 @@ function ensureProj(p){
   return PD[p].ready;
 }
 const OTHER={}; // 같은 번호 체계를 쓰는 다른 사업의 색인표·공문 기록
-const sameNumProjects=()=>Object.keys(PROJECTS).filter(p=>p===P||(PS(p).prefix&&PS(p).prefix===PS().prefix));
+// 시행번호 앞부분(팀): 공문마다 고를 수 있고, 기본값은 사업 설정값
+const TEAMS=['앵커사업단1팀','앵커사업단2팀'];
+const npfx=x=>String(x||'').replace(/\s+/g,'');
+const curPrefix=()=>($('f-team')&&$('f-team').value)||PS().prefix||'앵커사업단';
+const pfxOf=str=>{const m=String(str||'').match(/앵커사업단\s*\d\s*팀/);return m?npfx(m[0]):''};
+const sameNumProjects=()=>Object.keys(PROJECTS).filter(p=>npfx(PS(p).prefix)===npfx(curPrefix()));
+function fillTeams(sel){
+  const opts=[...new Set([...TEAMS,...Object.keys(PROJECTS).map(p=>PS(p).prefix).filter(Boolean)])];
+  const v=sel||($('f-team').value)||PS().prefix||TEAMS[0];
+  if(!opts.includes(v)) opts.push(v);
+  $('f-team').innerHTML=opts.map(o=>`<option${o===v?' selected':''}>${esc(o)}</option>`).join('');
+}
 const tplCache={};
 
 const S={ // 작성 중인 공문
@@ -467,7 +478,7 @@ async function loadAll(){
   }));
   db.collection('expenses').where('project','==',P).onSnapshot(snap=>{expenses=snap.docs.map(d=>({id:d.id,...d.data()}));rebuildPool();refreshAll()},e=>toast('집행내역을 불러오지 못했습니다: '+e.message,true));
   db.collection(COL_G).onSnapshot(snap=>{gdocs=snap.docs.map(d=>({id:d.id,...d.data()}));rebuildPool();refreshAll()},e=>toast('작성 이력을 불러오지 못했습니다: '+e.message,true));
-  sameNumProjects().filter(p=>p!==P).forEach(p=>{OTHER[p]={idx:[],g:[]};
+  Object.keys(PROJECTS).filter(p=>p!==P).forEach(p=>{OTHER[p]={idx:[],g:[]};
     db.collection(`${p}_documents`).onSnapshot(sn=>{OTHER[p].idx=sn.docs.map(d=>({id:d.id,...d.data()}));if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint()},()=>{});
     db.collection(`${p}_gongmun`).onSnapshot(sn=>{OTHER[p].g=sn.docs.map(d=>({id:d.id,...d.data()}));if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint()},()=>{});});
   db.collection(COL_DOC).onSnapshot(snap=>{idxDocs=snap.docs.map(d=>({id:d.id,...d.data()}));if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint()},()=>{});
@@ -562,6 +573,7 @@ function initForm(){
   $('f-pending').onchange=updateBudget; $('f-pres').onchange=renderSignLine;
   $('f-date').onchange=()=>{if(!S.editingId&&!S.seqTouched)setNextSeq();renderSeqHint();S.year=currentBudgetYear(E.parseDate($('f-date').value))||S.year;$('f-year').value=S.year;fillCats();renderSources();updateBudget()};
   $('f-seq').oninput=()=>{S.seqTouched=true;renderSeqHint()};
+  $('f-team').onchange=()=>{if(!S.editingId)S.seqTouched=false;if(!S.seqTouched)setNextSeq();renderSeqHint();autoText()};
   $('btn-subseq').onclick=setSubSeq; $('btn-nextseq').onclick=()=>{S.seqTouched=false;setNextSeq()};
   $('f-plan').onchange=()=>loadPlan($('f-plan').value);
   $('btn-hwpx').onclick=()=>doHwpx(); $('btn-claude').onclick=()=>doClaude(); $('btn-save').onclick=()=>doSave();
@@ -571,7 +583,7 @@ function initForm(){
   $('t-file').onchange=scanUpload; $('btn-tsave').onclick=saveCustomTemplate; $('btn-ssave').onclick=saveSettings;
   $('f-allteams').onchange=e=>{S.allTeams=e.target.checked;renderTplGrid()};
   selectTpl((visibleTemplates(S.kind)[0]||{}).id);
-  setNextSeq(); renderSignLine();
+  fillTeams(); setNextSeq(); renderSignLine();
 }
 function fillCats(){
   const cur=$('f-cat').value; const list=catsByYear[S.year]||DEFAULT_PLAN_CATS;
@@ -847,9 +859,12 @@ function seqKey(str){
 const fmtSeq=k=>pad3(k.main)+(k.sub?'-'+k.sub:'');
 function usedKeys(fy){
   const out=[]; const mine=S.editingId&&gdocs.find(g=>g.id===S.editingId)?.indexDocId;
-  sameNumProjects().forEach(p=>{
-    (p===P?idxDocs:(OTHER[p]?.idx||[])).forEach(d=>{if(d.id!==mine&&docFiscalYear(d.date)===fy){const k=seqKey(d.docNum??d.num);if(k)out.push(k)}});
-    (p===P?gdocs:(OTHER[p]?.g||[])).forEach(g=>{if(g.id!==S.editingId&&docFiscalYear(g.docDate)===fy){const k=seqKey(g.docSeqText??g.docSeq);if(k)out.push(k)}});
+  // 같은 팀 사업의 번호 + 다른 사업에서 이 팀 번호로 낸 공문. 번호에 다른 팀이 적힌 것은 뺀다
+  const cp=npfx(curPrefix()), pool=sameNumProjects();
+  const ok=(p,num)=>{const f=pfxOf(num);return f?f===cp:pool.includes(p)};
+  Object.keys(PROJECTS).forEach(p=>{
+    (p===P?idxDocs:(OTHER[p]?.idx||[])).forEach(d=>{if(d.id!==mine&&docFiscalYear(d.date)===fy&&ok(p,d.docNum??d.num)){const k=seqKey(d.docNum??d.num);if(k)out.push(k)}});
+    (p===P?gdocs:(OTHER[p]?.g||[])).forEach(g=>{if(g.id!==S.editingId&&docFiscalYear(g.docDate)===fy&&ok(p,g.docPrefix||g.docNum)){const k=seqKey(g.docSeqText??g.docSeq);if(k)out.push(k)}});
   });
   return out;
 }
@@ -867,7 +882,7 @@ function setSubSeq(){
 }
 function renderSeqHint(){
   const iso=$('f-date').value||E.isoDate(); const y=iso.slice(0,4);
-  $('seq-prefix').textContent=`${PS().prefix||'앵커사업단'}${y} -`;
+  $('seq-prefix').textContent=`${y} -`;
   const u=usedKeys(docFiscalYear(iso)); const cur=seqKey($('f-seq').value);
   const dup=cur&&u.some(k=>k.key===cur.key);
   const last=u.length?u.reduce((a,b)=>b.main>a.main||(b.main===a.main&&b.sub>a.sub)?b:a):null;
@@ -875,7 +890,7 @@ function renderSeqHint(){
   $('seq-hint').textContent=dup?'이미 쓰인 번호입니다':(last?`마지막 번호 ${fmtSeq(last)}${share.length?` (${[proj.label,...share].join('·')} 통합)`:''}`:'');
   $('seq-hint').style.color=dup?'var(--red)':'';
 }
-function docNumFull(){const iso=$('f-date').value||E.isoDate();return `${PS().prefix||'앵커사업단'}${iso.slice(0,4)} - ${$('f-seq').value.trim()}`}
+function docNumFull(){const iso=$('f-date').value||E.isoDate();return `${curPrefix()}${iso.slice(0,4)} - ${$('f-seq').value.trim()}`}
 function renderSignLine(){
   const s=PS().sign; const pres=$('f-pres').checked;
   $('sign-line').textContent=`결재선: 담당 ${s.담당} → 운영단장 ${s.운영단장} → 단장 ${s.단장}${pres?` → 총장 ${s.총장}`:''} · 협조 총무처장 ${s.총무처장}`;
@@ -968,7 +983,7 @@ const plain=o=>JSON.parse(JSON.stringify(o??null)); // Firestore가 받지 않�
 async function saveRecord(c,{register=true}={}){
   const iso=$('f-date').value||E.isoDate();
   const rec={
-    kind:c.t.kind,templateId:c.t.id,templateName:c.t.name,year:S.year,title:c.values.제목,docNum:docNumFull(),docSeq:seqKey($('f-seq').value)?.main||null,docSeqText:$('f-seq').value.trim(),docDate:iso,
+    kind:c.t.kind,templateId:c.t.id,templateName:c.t.name,year:S.year,title:c.values.제목,docNum:docNumFull(),docPrefix:curPrefix(),docSeq:seqKey($('f-seq').value)?.main||null,docSeqText:$('f-seq').value.trim(),docDate:iso,
     planCategory:c.b.cat||'',subject:cleanSubj($('f-subj').value),amount:c.amt,
     sources:plain(c.rows.map(r=>({p:r.p,cat:r.cat||'',subj:r.subj||'',amount:r.now}))),
     values:plain({...S.values,건명:$('f-subject').value.trim(),목적:$('f-purpose').value.trim(),_pres:$('f-pres').checked,_vat:$('f-vat')?$('f-vat').checked:false}),
@@ -1089,7 +1104,7 @@ function resetForm(){
   ['f-subject','f-purpose','f-subj','f-extra'].forEach(id=>$(id).value='');
   $('f-cat').value=''; $('f-date').value=E.isoDate(); $('preview').hidden=true;
   $('title-reset').hidden=$('intro-reset').hidden=true;
-  selectTpl(S.tplId); setNextSeq(); renderReco(); renderEditState();
+  fillTeams(PS().prefix); selectTpl(S.tplId); setNextSeq(); renderReco(); renderEditState();
 }
 function openRecord(id){
   const g=gdocs.find(x=>x.id===id); if(!g) return;
@@ -1103,7 +1118,7 @@ function openRecord(id){
   selectTpl(g.templateId);
   $('f-title').value=g.title||''; $('f-intro').value=g.intro||'';
   $('title-reset').hidden=$('intro-reset').hidden=false;
-  renderSeqHint(); renderReco(); renderEditState();
+  fillTeams(g.docPrefix||pfxOf(g.docNum)||PS().prefix); renderSeqHint(); renderReco(); renderEditState();
   document.querySelector('.tab-btn[data-tab="write"]').click(); window.scrollTo({top:0,behavior:'smooth'});
 }
 
